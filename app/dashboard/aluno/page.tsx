@@ -1,0 +1,247 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { getUser, clearAuth } from '../../lib/auth';
+import api from '../../lib/api';
+import { BookOpen, CheckSquare, DollarSign, Bell, LogOut, TrendingUp, AlertTriangle } from 'lucide-react';
+
+interface Grade {
+  id: number;
+  value: number;
+  type: string;
+  description: string;
+  subject: { name: string };
+  createdAt: string;
+}
+
+interface AttendanceSummary {
+  summary: { total: number; present: number; absent: number; percentage: number };
+  status: string;
+}
+
+interface Tuition {
+  id: number;
+  amount: number;
+  dueDate: string;
+  status: string;
+  reference: string;
+}
+
+export default function AlunoDashboard() {
+  const router = useRouter();
+  const user = getUser();
+  const [grades, setGrades] = useState<Grade[]>([]);
+  const [attendance, setAttendance] = useState<AttendanceSummary | null>(null);
+  const [tuitions, setTuitions] = useState<Tuition[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user || user.role !== 'student') {
+      router.push('/login');
+      return;
+    }
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [gradesRes, attendanceRes, tuitionsRes] = await Promise.all([
+        api.get('/grades/my-grades'),
+        api.get('/attendance/my-attendance'),
+        api.get('/finance/tuitions/my'),
+      ]);
+      setGrades(gradesRes.data.slice(0, 5));
+      setAttendance(attendanceRes.data);
+      setTuitions(tuitionsRes.data.filter((t: Tuition) => t.status !== 'paid').slice(0, 3));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const statusColor = (status: string) => {
+    switch (status) {
+      case 'paid': return 'text-green-600 bg-green-50';
+      case 'overdue': return 'text-red-600 bg-red-50';
+      default: return 'text-orange-600 bg-orange-50';
+    }
+  };
+
+  const statusLabel = (status: string) => {
+    switch (status) {
+      case 'paid': return 'Pago';
+      case 'overdue': return 'Vencido';
+      default: return 'Pendente';
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#1E3A5F] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <header className="bg-white border-b border-gray-100 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-[#1E3A5F] rounded-lg flex items-center justify-center">
+              <span className="text-white text-sm font-bold">E</span>
+            </div>
+            <span className="font-bold text-[#1E3A5F]">EduSaaS</span>
+            <span className="text-gray-300">|</span>
+            <span className="text-sm text-gray-500">Portal do Aluno</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center">
+                <span className="text-white text-xs font-bold">{user?.name?.charAt(0).toUpperCase()}</span>
+              </div>
+              <span className="text-sm font-medium text-gray-700 hidden sm:block">{user?.name}</span>
+            </div>
+            <button onClick={() => { clearAuth(); router.push('/login'); }} className="text-sm text-gray-500 hover:text-red-500">
+              <LogOut size={16} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-[#1E3A5F]">Olá, {user?.name?.split(' ')[0]}! 👋</h1>
+          <p className="text-gray-500 text-sm mt-1">Acompanhe seu desempenho escolar.</p>
+        </div>
+
+        {/* Cards de resumo */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
+              <TrendingUp size={20} className="text-blue-600" />
+            </div>
+            <p className="text-3xl font-bold text-[#1E3A5F]">{grades.length}</p>
+            <p className="text-sm text-gray-500 mt-1">Notas lançadas</p>
+          </div>
+
+          <div className={`rounded-2xl p-6 border ${attendance && attendance.summary.percentage < 75 ? 'bg-red-50 border-red-100' : 'bg-white border-gray-100'}`}>
+            <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mb-4">
+              <CheckSquare size={20} className="text-green-600" />
+            </div>
+            <p className={`text-3xl font-bold ${attendance && attendance.summary.percentage < 75 ? 'text-red-500' : 'text-[#1E3A5F]'}`}>
+              {attendance?.summary.percentage || 0}%
+            </p>
+            <p className="text-sm text-gray-500 mt-1">Frequência</p>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center mb-4">
+              <DollarSign size={20} className="text-orange-600" />
+            </div>
+            <p className="text-3xl font-bold text-[#1E3A5F]">{tuitions.length}</p>
+            <p className="text-sm text-gray-500 mt-1">Mensalidades pendentes</p>
+          </div>
+        </div>
+
+        {/* Alerta de frequência */}
+        {attendance && attendance.summary.percentage < 75 && (
+          <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center gap-3 mb-6">
+            <AlertTriangle size={20} className="text-red-500 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-red-700">Frequência irregular!</p>
+              <p className="text-xs text-red-500">Sua frequência está abaixo de 75% — risco de reprovação.</p>
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          {/* Últimas notas */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold text-[#1E3A5F]">Últimas notas</h2>
+              <button onClick={() => router.push('/dashboard/aluno/notas')} className="text-xs text-[#F97316] hover:underline">
+                Ver todas
+              </button>
+            </div>
+            {grades.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-4">Nenhuma nota lançada ainda</p>
+            ) : (
+              <div className="space-y-3">
+                {grades.map((grade) => (
+                  <div key={grade.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">{grade.subject?.name}</p>
+                      <p className="text-xs text-gray-400">{grade.description || grade.type}</p>
+                    </div>
+                    <span className={`text-lg font-bold ${Number(grade.value) >= 6 ? 'text-green-600' : 'text-red-500'}`}>
+                      {Number(grade.value).toFixed(1)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Mensalidades pendentes */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold text-[#1E3A5F]">Mensalidades</h2>
+              <button onClick={() => router.push('/dashboard/aluno/financeiro')} className="text-xs text-[#F97316] hover:underline">
+                Ver todas
+              </button>
+            </div>
+            {tuitions.length === 0 ? (
+              <div className="text-center py-4">
+                <p className="text-sm text-green-600 font-medium">✓ Tudo em dia!</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {tuitions.map((tuition) => (
+                  <div key={tuition.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">{tuition.reference || 'Mensalidade'}</p>
+                      <p className="text-xs text-gray-400">Vence: {new Date(tuition.dueDate).toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-bold text-gray-700">R$ {Number(tuition.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor(tuition.status)}`}>
+                        {statusLabel(tuition.status)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+        </div>
+
+        {/* Menu rápido */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+          {[
+            { label: 'Minhas Notas', icon: BookOpen, href: '/dashboard/aluno/notas', color: 'bg-blue-50 text-blue-600' },
+            { label: 'Frequência', icon: CheckSquare, href: '/dashboard/aluno/frequencia', color: 'bg-green-50 text-green-600' },
+            { label: 'Financeiro', icon: DollarSign, href: '/dashboard/aluno/financeiro', color: 'bg-orange-50 text-orange-600' },
+            { label: 'Avisos', icon: Bell, href: '/dashboard/aluno/avisos', color: 'bg-purple-50 text-purple-600' },
+          ].map((item) => (
+            <button
+              key={item.label}
+              onClick={() => router.push(item.href)}
+              className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all text-left"
+            >
+              <div className={`w-10 h-10 ${item.color} rounded-xl flex items-center justify-center mb-3`}>
+                <item.icon size={20} />
+              </div>
+              <p className="text-sm font-medium text-gray-700">{item.label}</p>
+            </button>
+          ))}
+        </div>
+
+      </main>
+    </div>
+  );
+}
