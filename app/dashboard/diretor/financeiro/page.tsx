@@ -36,11 +36,21 @@ interface Report {
   };
 }
 
+interface CashFlow {
+  id: number;
+  type: 'income' | 'expense';
+  category: string;
+  amount: number;
+  description: string;
+  date: string;
+}
+
 export default function FinanceiroPage() {
   const router = useRouter();
   const user = getUser();
   const [report, setReport] = useState<Report | null>(null);
   const [defaulters, setDefaulters] = useState<Defaulter[]>([]);
+  const [cashflows, setCashflows] = useState<CashFlow[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showCashFlowModal, setShowCashFlowModal] = useState(false);
@@ -74,14 +84,16 @@ export default function FinanceiroPage() {
 
   const loadData = async () => {
     try {
-      const [reportRes, defaultersRes, studentsRes] = await Promise.all([
+      const [reportRes, defaultersRes, studentsRes, cashflowRes] = await Promise.all([
         api.get(`/finance/report?month=${currentMonth}&year=${currentYear}`),
         api.get('/finance/defaulters'),
         api.get('/users?role=student'),
+        api.get('/finance/cashflow'),
       ]);
       setReport(reportRes.data);
       setDefaulters(defaultersRes.data);
       setStudents(studentsRes.data);
+      setCashflows(cashflowRes.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -296,10 +308,49 @@ export default function FinanceiroPage() {
 
         {/* Fluxo de caixa */}
         {activeTab === 'fluxo' && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
-            <p className="text-sm text-gray-500 text-center py-4">
-              Use o botão "Lançamento" para registrar entradas e saídas.
-            </p>
+          <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            {cashflows.length === 0 ? (
+              <div className="p-8 text-center">
+                <p className="text-gray-400 text-sm">Nenhum lançamento registrado.</p>
+                <p className="text-xs text-gray-400 mt-1">Use o botão "Lançamento" para registrar entradas e saídas.</p>
+              </div>
+            ) : (
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-100">
+                  <tr>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Data</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Descrição</th>
+                    <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Tipo</th>
+                    <th className="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Valor</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {cashflows.map((cf) => (
+                    <tr key={cf.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-500">
+                          {new Date(cf.date).toLocaleDateString('pt-BR')}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 hidden sm:table-cell">
+                        <span className="text-sm text-gray-700">{cf.description}</span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${cf.type === 'income' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                          {cf.type === 'income' ? 'Entrada' : 'Saída'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <span className={`text-sm font-bold ${cf.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                          {cf.type === 'expense' ? '- ' : '+ '}
+                          R$ {Number(cf.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
 

@@ -65,12 +65,19 @@ export default function LancarNotasPage() {
 
   const loadSubjectsAndStudents = async (classId: number) => {
     try {
-      const [subjectsRes, studentsRes] = await Promise.all([
-        api.get(`/classes/${classId}/subjects`),
-        api.get('/users?role=student'),
-      ]);
+      const subjectsRes = await api.get(`/classes/${classId}/subjects`);
       setSubjects(subjectsRes.data);
-      setStudents(studentsRes.data);
+
+      let studentList: Student[];
+      try {
+        const res = await api.get(`/classes/${classId}/students`);
+        studentList = res.data;
+      } catch {
+        const res = await api.get(`/users?role=student&classId=${classId}`);
+        studentList = res.data;
+      }
+
+      setStudents(studentList);
     } catch (err) {
       console.error(err);
     }
