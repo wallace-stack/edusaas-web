@@ -38,14 +38,6 @@ const faqs = [
   { q: 'Tem suporte em português?', a: 'Sim, nosso suporte é totalmente em português. Atendemos por e-mail e, no plano Pro, por chat com prioridade.' },
 ];
 
-const techBadges = [
-  { label: 'NestJS', color: '#E0234E' },
-  { label: 'Next.js', color: '#F1F5F9' },
-  { label: 'TypeScript', color: '#3178C6' },
-  { label: 'MySQL', color: '#4479A1' },
-  { label: 'JWT', color: '#8B5CF6' },
-  { label: 'Tailwind CSS', color: '#06B6D4' },
-];
 
 const basicFeats = ['Até 50 alunos', 'Lançamento de notas', 'Controle de frequência', '1 turma', 'Suporte por e-mail'];
 const proFeats = ['Alunos ilimitados', 'Gestão financeira completa', 'Relatórios e exportações', 'Suporte prioritário', 'Turmas ilimitadas', 'Múltiplos professores', 'Acesso via API'];
@@ -156,7 +148,7 @@ export default function LandingPage() {
 
   const heroRef = useFadeIn();
   const featRef = useFadeIn();
-  const techRef = useFadeIn();
+
   const stepsRef = useFadeIn();
   const testiRef = useFadeIn();
   const planosRef = useFadeIn();
@@ -297,18 +289,12 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── TECH BADGES ── */}
-      <section ref={techRef} style={{ ...fadeStyle, borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0D0D14' }}>
-        <div className="max-w-5xl mx-auto px-6 py-10 text-center">
-          <p className="text-xs uppercase tracking-widest mb-6" style={{ color: '#475569' }}>Construído com tecnologia de ponta</p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {techBadges.map((t) => (
-              <span key={t.label} className="text-xs font-semibold px-4 py-2 rounded-full border"
-                style={{ color: t.color, borderColor: `${t.color}30`, background: `${t.color}10` }}>
-                {t.label}
-              </span>
-            ))}
-          </div>
+      {/* ── FAIXA TECNOLOGIA ── */}
+      <section style={{ borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0D0D14' }}>
+        <div className="max-w-5xl mx-auto px-6 py-8 text-center">
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Construído com tecnologia de ponta para máxima segurança e conforto
+          </p>
         </div>
       </section>
 
