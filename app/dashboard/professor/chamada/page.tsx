@@ -67,12 +67,18 @@ export default function ChamadaPage() {
 
   const loadSubjectsAndStudents = async (classId: number) => {
     try {
-      const [subjectsRes, studentsRes] = await Promise.all([
-        api.get(`/classes/${classId}/subjects`),
-        api.get('/users?role=student'),
-      ]);
+      const subjectsRes = await api.get(`/classes/${classId}/subjects`);
       setSubjects(subjectsRes.data);
-      const studentList = studentsRes.data;
+
+      let studentList: Student[];
+      try {
+        const res = await api.get(`/classes/${classId}/students`);
+        studentList = res.data;
+      } catch {
+        const res = await api.get(`/users?role=student&classId=${classId}`);
+        studentList = res.data;
+      }
+
       setStudents(studentList);
       // Inicializa todos como presentes
       setAttendances(studentList.map((s: Student) => ({
