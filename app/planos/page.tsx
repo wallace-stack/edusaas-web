@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Inter } from 'next/font/google';
-import { Check, Zap } from 'lucide-react';
+import { Check, Zap, Sparkles, Star, ArrowRight } from 'lucide-react';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -30,19 +30,9 @@ export default function PlanosPage() {
     <div className={inter.className} style={{ background: '#0A0A0F', minHeight: '100vh', color: '#F1F5F9', display: 'flex', flexDirection: 'column' }}>
 
       <style>{`
-        .glow-btn {
-          box-shadow: 0 0 20px rgba(59,130,246,0.35);
-          transition: box-shadow 0.2s ease, transform 0.2s ease;
-        }
-        .glow-btn:hover {
-          box-shadow: 0 0 32px rgba(59,130,246,0.5);
-          transform: translateY(-1px);
-        }
-        .gradient-border {
-          background: linear-gradient(135deg, #3B82F6, #8B5CF6);
-          padding: 1.5px;
-          border-radius: 20px;
-        }
+        .glow-btn { box-shadow: 0 0 20px rgba(59,130,246,0.35); transition: box-shadow 0.2s ease, transform 0.2s ease; }
+        .glow-btn:hover { box-shadow: 0 0 32px rgba(59,130,246,0.5); transform: translateY(-1px); }
+        .gradient-border { background: linear-gradient(135deg,#3B82F6,#8B5CF6); padding: 1.5px; border-radius: 20px; }
       `}</style>
 
       {/* ── NAVBAR ── */}
@@ -56,17 +46,21 @@ export default function PlanosPage() {
               EduSaaS
             </span>
           </Link>
-          <Link href="/login" className="text-sm transition-colors" style={{ color: '#94A3B8' }}
+          <Link href="/login" className="text-sm transition-colors flex items-center gap-1" style={{ color: '#94A3B8' }}
             onMouseOver={e => (e.currentTarget as HTMLElement).style.color = '#F1F5F9'}
             onMouseOut={e => (e.currentTarget as HTMLElement).style.color = '#94A3B8'}>
-            Já tenho conta →
+            Já tenho conta <ArrowRight size={13} />
           </Link>
         </div>
       </header>
 
       {/* ── HERO ── */}
       <section className="text-center px-6 pt-16 pb-12">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-3">Escolha seu plano</h1>
+        <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-6 text-xs font-semibold text-white"
+          style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
+          <Sparkles size={11} /> Escolha seu plano
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-bold mb-3">Simples e transparente</h1>
         <p className="text-base sm:text-lg max-w-md mx-auto" style={{ color: '#94A3B8' }}>
           Continue gerenciando sua escola sem interrupções
         </p>
@@ -93,19 +87,20 @@ export default function PlanosPage() {
               ))}
             </ul>
 
-            <Link href="/cadastro" className="w-full text-center py-3 rounded-xl border font-semibold text-sm transition-colors"
+            <Link href="/cadastro" className="w-full text-center py-3 rounded-xl border font-semibold text-sm transition-colors flex items-center justify-center gap-1.5"
               style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#F1F5F9' }}
               onMouseOver={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'}
               onMouseOut={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
-              Começar grátis
+              Começar grátis <ArrowRight size={13} />
             </Link>
           </div>
 
           {/* Pro — gradient border */}
           <div className="gradient-border flex flex-col relative">
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-              <span className="text-xs font-bold px-4 py-1.5 rounded-full text-white" style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-                ⭐ Mais popular
+              <span className="text-xs font-bold px-4 py-1.5 rounded-full text-white flex items-center gap-1.5"
+                style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
+                <Star size={11} fill="currentColor" /> Mais popular
               </span>
             </div>
             <div className="rounded-[18px] p-8 flex flex-col h-full" style={{ background: '#111118' }}>
@@ -130,9 +125,9 @@ export default function PlanosPage() {
               </ul>
 
               <button onClick={() => alert('Em breve!')}
-                className="w-full py-3 rounded-xl font-bold text-sm text-white glow-btn"
+                className="w-full py-3 rounded-xl font-bold text-sm text-white glow-btn flex items-center justify-center gap-1.5"
                 style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-                Assinar agora
+                Assinar agora <ArrowRight size={13} />
               </button>
             </div>
           </div>

@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2, Zap } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 import api from '../lib/api';
 import { setAuth, getDashboardRoute } from '../lib/auth';
 
@@ -50,118 +52,154 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F0F4F8] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-md border border-gray-100 w-full max-w-md p-8">
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+
+      {/* Theme toggle */}
+      <div style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 50 }}>
+        <ThemeToggle />
+      </div>
+
+      <div style={{
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border)',
+        borderRadius: '20px',
+        width: '100%',
+        maxWidth: '440px',
+        padding: '40px',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+      }}>
 
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 bg-[#1E3A5F] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <span className="text-white text-2xl font-bold">E</span>
+        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+          <div style={{
+            width: '52px', height: '52px',
+            background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)',
+            borderRadius: '14px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 12px',
+            boxShadow: '0 8px 24px rgba(59,130,246,0.3)',
+          }}>
+            <Zap size={24} color="white" />
           </div>
-          <h1 className="text-2xl font-bold text-[#1E3A5F]">EduSaaS</h1>
-          <p className="text-gray-500 text-sm mt-1">Entre com sua conta</p>
+          <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>EduSaaS</h1>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Entre com sua conta</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
           {/* E-mail */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>
               E-mail
             </label>
-            <input
-              {...register('email')}
-              type="email"
-              autoComplete="email"
-              placeholder="seu@email.com"
-              className={`w-full px-4 py-3 rounded-xl border text-sm text-gray-900 placeholder-gray-400
-                focus:outline-none focus:ring-2 focus:border-transparent transition-all
-                ${errors.email
-                  ? 'border-red-400 focus:ring-red-300 bg-red-50'
-                  : 'border-gray-200 focus:ring-[#1E3A5F]'
-                }`}
-            />
+            <div style={{ position: 'relative' }}>
+              <Mail size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', pointerEvents: 'none' }} />
+              <input
+                {...register('email')}
+                type="email"
+                autoComplete="email"
+                placeholder="seu@email.com"
+                className={`themed-input${errors.email ? ' error' : ''}`}
+                style={{ paddingLeft: '40px' }}
+              />
+            </div>
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                <span>⚠</span> {errors.email.message}
+              <p style={{ fontSize: '12px', color: 'var(--error)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <AlertCircle size={12} /> {errors.email.message}
               </p>
             )}
           </div>
 
           {/* Senha */}
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-sm font-semibold text-gray-700">
-                Senha
-              </label>
-              <a
-                href="/recuperar-senha"
-                className="text-xs text-[#F97316] hover:underline font-medium"
-              >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>Senha</label>
+              <a href="/recuperar-senha" style={{ fontSize: '12px', color: '#F97316', textDecoration: 'none', fontWeight: 500 }}
+                onMouseOver={e => (e.currentTarget.style.textDecoration = 'underline')}
+                onMouseOut={e => (e.currentTarget.style.textDecoration = 'none')}>
                 Esqueceu a senha?
               </a>
             </div>
-            <div className="relative">
+            <div style={{ position: 'relative' }}>
+              <Lock size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', pointerEvents: 'none' }} />
               <input
                 {...register('password')}
                 type={showPass ? 'text' : 'password'}
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className={`w-full px-4 py-3 pr-12 rounded-xl border text-sm text-gray-900 placeholder-gray-400
-                  focus:outline-none focus:ring-2 focus:border-transparent transition-all
-                  ${errors.password
-                    ? 'border-red-400 focus:ring-red-300 bg-red-50'
-                    : 'border-gray-200 focus:ring-[#1E3A5F]'
-                  }`}
+                className={`themed-input${errors.password ? ' error' : ''}`}
+                style={{ paddingLeft: '40px', paddingRight: '44px' }}
               />
               <button
                 type="button"
                 onClick={() => setShowPass(p => !p)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm p-1"
                 tabIndex={-1}
+                style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', padding: '4px' }}
               >
-                {showPass ? '🙈' : '👁'}
+                {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
             {errors.password && (
-              <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                <span>⚠</span> {errors.password.message}
+              <p style={{ fontSize: '12px', color: 'var(--error)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <AlertCircle size={12} /> {errors.password.message}
               </p>
             )}
           </div>
 
           {/* Erro geral */}
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-xl flex items-start gap-2">
-              <span className="mt-0.5">⚠</span>
+            <div style={{
+              background: 'var(--error-bg)',
+              border: '1px solid var(--error-border)',
+              color: 'var(--error)',
+              fontSize: '13px',
+              padding: '12px 14px',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '8px',
+            }}>
+              <AlertCircle size={15} style={{ marginTop: '1px', flexShrink: 0 }} />
               <span>{error}</span>
             </div>
           )}
 
+          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#1E3A5F] text-white py-3 rounded-xl font-semibold
-              hover:bg-[#162d4a] active:scale-[0.98] transition-all
-              disabled:opacity-50 disabled:cursor-not-allowed
-              flex items-center justify-center gap-2"
+            style={{
+              width: '100%',
+              background: loading ? 'rgba(59,130,246,0.6)' : 'linear-gradient(135deg,#3B82F6,#8B5CF6)',
+              color: 'white',
+              padding: '13px',
+              borderRadius: '12px',
+              fontWeight: 600,
+              fontSize: '14px',
+              border: 'none',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'opacity 0.15s ease',
+              boxShadow: '0 4px 16px rgba(59,130,246,0.3)',
+            }}
           >
             {loading ? (
-              <>
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-                </svg>
-                Entrando...
-              </>
+              <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Entrando...</>
             ) : 'Entrar'}
           </button>
+
+          <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-500">
+        <div style={{ marginTop: '24px', textAlign: 'center' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
             Não tem conta?{' '}
-            <a href="/cadastro" className="text-[#F97316] font-semibold hover:underline">
+            <a href="/cadastro" style={{ color: '#F97316', fontWeight: 600, textDecoration: 'none' }}
+              onMouseOver={e => (e.currentTarget.style.textDecoration = 'underline')}
+              onMouseOut={e => (e.currentTarget.style.textDecoration = 'none')}>
               Cadastrar escola
             </a>
           </p>
