@@ -35,15 +35,18 @@ const testimonials = [
 ];
 
 const faqs = [
-  { q: 'Preciso de cartão de crédito para o trial?',        a: 'Não. O trial de 14 dias é completamente gratuito e não exige nenhum dado de pagamento. Você só é cobrado se decidir continuar.' },
-  { q: 'Quantos alunos posso cadastrar no plano Básico?',   a: 'O plano Básico permite até 50 alunos ativos. Para escolas maiores, o plano Pro oferece alunos ilimitados.' },
-  { q: 'Como funciona o período de trial?',                 a: 'Ao criar sua conta, você tem acesso a todos os recursos por 14 dias. No final do trial, pode escolher um plano ou encerrar sem cobranças.' },
-  { q: 'Posso cancelar quando quiser?',                     a: 'Sim. O cancelamento pode ser feito a qualquer momento diretamente pelo painel, sem multas ou burocracia.' },
-  { q: 'Tem suporte em português?',                         a: 'Sim, nosso suporte é totalmente em português. Atendemos por e-mail e, no plano Pro, por chat com prioridade.' },
+  { q: 'Preciso de cartão de crédito para o trial?',      a: 'Não. O trial de 14 dias é completamente gratuito e não exige nenhum dado de pagamento. Você só é cobrado se decidir assinar um plano.' },
+  { q: 'Quantos alunos posso cadastrar?',                 a: 'No plano gratuito (trial), até 150 alunos. No Pro, até 350 alunos. No Premium, alunos ilimitados.' },
+  { q: 'Como funciona o período de trial?',               a: 'Ao criar sua conta, você tem acesso a todos os recursos do plano gratuito por 14 dias. No final do trial, pode escolher o plano Pro ou Premium para continuar usando.' },
+  { q: 'Posso cancelar quando quiser?',                   a: 'Sim. O cancelamento pode ser feito a qualquer momento diretamente pelo painel, sem multas ou burocracia.' },
+  { q: 'Tem suporte?',                                    a: 'Sim, nosso suporte é 100% humanizado. Atendemos por e-mail em todos os planos e por chat com prioridade no plano Premium.' },
+  { q: 'Qual a diferença entre Pro e Premium?',           a: 'O Pro suporta até 350 alunos e 2 imagens por post. O Premium oferece alunos ilimitados, 5 imagens por post e acesso antecipado a novos recursos.' },
+  { q: 'Como funciona o pagamento?',                      a: 'Os pagamentos são processados mensalmente via Asaas. Aceitamos boleto, Pix e cartão de crédito.' },
 ];
 
-const basicFeats = ['Até 50 alunos', 'Lançamento de notas', 'Controle de frequência', '1 turma', 'Suporte por e-mail'];
-const proFeats   = ['Alunos ilimitados', 'Gestão financeira completa', 'Relatórios e exportações', 'Suporte prioritário', 'Turmas ilimitadas', 'Múltiplos professores', 'Acesso via API'];
+const freeFeats    = ['Até 150 alunos', 'Lançamento de notas', 'Controle de frequência', '1 imagem por post no feed', 'Suporte por e-mail', 'Trial de 14 dias'];
+const proFeats     = ['Até 350 alunos', 'Gestão financeira completa', 'Lançamento de notas', 'Controle de frequência', '2 imagens por post no feed', 'Feed de notícias', 'Turmas ilimitadas', 'Suporte prioritário'];
+const premiumFeats = ['Alunos ilimitados', 'Tudo do plano Pro', '5 imagens por post no feed', 'Relatórios avançados', 'Suporte prioritário via chat', 'Acesso antecipado a novos recursos'];
 
 /* ─── HOOK FADE-IN ───────────────────────────── */
 
@@ -185,11 +188,11 @@ export default function LandingPage() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-7">
-            {['#funcionalidades', '#planos', '#contato'].map((href, i) => (
+            {['#funcionalidades', '#planos', '#faq', '#contato'].map((href, i) => (
               <a key={href} href={href} className="text-sm transition-colors" style={{ color: '#94A3B8' }}
                 onMouseOver={e => (e.currentTarget.style.color = '#F1F5F9')}
                 onMouseOut={e => (e.currentTarget.style.color = '#94A3B8')}>
-                {['Funcionalidades', 'Planos', 'Contato'][i]}
+                {['Funcionalidades', 'Planos', 'FAQ', 'Contato'][i]}
               </a>
             ))}
           </nav>
@@ -214,7 +217,7 @@ export default function LandingPage() {
 
         {menuOpen && (
           <div className="md:hidden px-6 py-5 flex flex-col gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            {[['#funcionalidades', 'Funcionalidades'], ['#planos', 'Planos'], ['#contato', 'Contato']].map(([href, label]) => (
+            {[['#funcionalidades', 'Funcionalidades'], ['#planos', 'Planos'], ['#faq', 'FAQ'], ['#contato', 'Contato']].map(([href, label]) => (
               <a key={href} href={href} onClick={() => setMenuOpen(false)} className="text-sm" style={{ color: '#94A3B8' }}>{label}</a>
             ))}
             <div className="flex flex-col gap-2 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
@@ -359,19 +362,20 @@ export default function LandingPage() {
 
       {/* ── PLANOS ── */}
       <section id="planos" className="py-24 px-6" style={{ background: '#0D0D14' }}>
-        <div ref={planosRef} style={fadeStyle} className="max-w-4xl mx-auto">
+        <div ref={planosRef} style={fadeStyle} className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">Planos simples e transparentes</h2>
             <p style={{ color: '#94A3B8' }}>Comece grátis, escale quando precisar. Sem surpresas.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-stretch">
 
+            {/* Free */}
             <div className="rounded-2xl border p-8 flex flex-col" style={{ background: '#111118', borderColor: 'rgba(255,255,255,0.08)' }}>
-              <span className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#64748B' }}>Básico</span>
+              <span className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#64748B' }}>Gratuito</span>
               <div className="flex items-end gap-1 mb-1"><span className="text-4xl font-extrabold">Grátis</span></div>
               <p className="text-sm mb-8" style={{ color: '#64748B' }}>14 dias de trial — sem cartão</p>
               <ul className="space-y-3 flex-1 mb-8">
-                {basicFeats.map((f) => (
+                {freeFeats.map((f) => (
                   <li key={f} className="flex items-center gap-3 text-sm" style={{ color: '#94A3B8' }}>
                     <Check size={14} style={{ color: '#64748B' }} strokeWidth={3} />{f}
                   </li>
@@ -385,6 +389,7 @@ export default function LandingPage() {
               </Link>
             </div>
 
+            {/* Pro — destaque */}
             <div className="gradient-border flex flex-col" style={{ position: 'relative' }}>
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
                 <span className="text-xs font-bold px-4 py-1.5 rounded-full text-white flex items-center gap-1.5"
@@ -397,10 +402,11 @@ export default function LandingPage() {
                   style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Pro</span>
                 <div className="flex items-end gap-1 mb-1">
                   <span className="text-lg font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
-                  <span className="text-4xl font-extrabold">97</span>
+                  <span className="text-4xl font-extrabold">79</span>
+                  <span className="text-xl font-bold">,90</span>
                   <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
                 </div>
-                <p className="text-sm mb-8" style={{ color: '#64748B' }}>Tudo que sua escola precisa</p>
+                <p className="text-sm mb-8" style={{ color: '#64748B' }}>Para escolas em crescimento</p>
                 <ul className="space-y-3 flex-1 mb-8">
                   {proFeats.map((f) => (
                     <li key={f} className="flex items-center gap-3 text-sm font-medium">
@@ -410,9 +416,35 @@ export default function LandingPage() {
                 </ul>
                 <Link href="/planos" className="w-full text-center py-3 rounded-xl font-bold text-sm text-white glow-btn flex items-center justify-center gap-1.5"
                   style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-                  Assinar agora <ArrowRight size={14} />
+                  Assinar Pro <ArrowRight size={14} />
                 </Link>
               </div>
+            </div>
+
+            {/* Premium */}
+            <div className="rounded-2xl border p-8 flex flex-col" style={{ background: '#111118', borderColor: 'rgba(255,255,255,0.08)' }}>
+              <span className="text-xs font-semibold uppercase tracking-widest mb-3"
+                style={{ background: 'linear-gradient(90deg,#A78BFA,#F97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Premium</span>
+              <div className="flex items-end gap-1 mb-1">
+                <span className="text-lg font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
+                <span className="text-4xl font-extrabold">149</span>
+                <span className="text-xl font-bold">,90</span>
+                <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
+              </div>
+              <p className="text-sm mb-8" style={{ color: '#64748B' }}>Para escolas que precisam do máximo</p>
+              <ul className="space-y-3 flex-1 mb-8">
+                {premiumFeats.map((f) => (
+                  <li key={f} className="flex items-center gap-3 text-sm font-medium">
+                    <Check size={14} style={{ color: '#A78BFA' }} strokeWidth={3} />{f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/planos" className="w-full text-center py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-1.5"
+                style={{ background: 'linear-gradient(135deg,#8B5CF6,#F97316)', boxShadow: '0 0 20px rgba(139,92,246,0.35)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
+                onMouseOver={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 32px rgba(139,92,246,0.5)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
+                onMouseOut={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px rgba(139,92,246,0.35)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
+                Assinar Premium <ArrowRight size={14} />
+              </Link>
             </div>
 
           </div>
@@ -420,7 +452,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="py-24 px-6">
+      <section id="faq" className="py-24 px-6">
         <div ref={faqRef} style={fadeStyle} className="max-w-2xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">Perguntas frequentes</h2>
@@ -487,7 +519,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <p className="text-xs" style={{ color: '#334155' }}>© 2025 EduSaaS. Todos os direitos reservados.</p>
+            <p className="text-xs" style={{ color: '#334155' }}>© 2026 EduSaaS. Todos os direitos reservados.</p>
             <p className="text-xs mt-2 sm:mt-0" style={{ color: '#334155' }}>Construído com Next.js · Hospedado na Vercel</p>
           </div>
         </div>

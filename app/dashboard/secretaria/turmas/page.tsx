@@ -30,9 +30,7 @@ export default function SecretariaTurmasPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
-    name: '',
-    year: new Date().getFullYear().toString(),
-    shift: 'morning',
+    name: '', year: new Date().getFullYear().toString(), shift: 'morning',
   });
 
   useEffect(() => {
@@ -44,11 +42,8 @@ export default function SecretariaTurmasPage() {
     try {
       const response = await api.get('/secretary/classes');
       setClasses(response.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -62,28 +57,28 @@ export default function SecretariaTurmasPage() {
       loadClasses();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao criar turma');
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#1E3A5F] border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
+  const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] dark:bg-gray-800 dark:text-gray-100";
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <header className="bg-white border-b border-gray-100 px-6 py-4">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-lg">
-              <ArrowLeft size={18} className="text-gray-600" />
+            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+              <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
             </button>
-            <h1 className="font-bold text-[#1E3A5F]">Turmas</h1>
+            <h1 className="font-bold text-[#1E3A5F] dark:text-white">Turmas</h1>
           </div>
           <button
             onClick={() => setShowModal(true)}
@@ -97,42 +92,37 @@ export default function SecretariaTurmasPage() {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         {classes.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 p-8 text-center">
-            <BookOpen size={40} className="text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-400 text-sm">Nenhuma turma cadastrada ainda</p>
-            <button
-              onClick={() => setShowModal(true)}
-              className="mt-4 text-sm text-[#F97316] hover:underline"
-            >
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center">
+            <BookOpen size={40} className="text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+            <p className="text-gray-400 dark:text-gray-500 text-sm">Nenhuma turma cadastrada ainda</p>
+            <button onClick={() => setShowModal(true)} className="mt-4 text-sm text-[#F97316] hover:underline">
               Criar primeira turma
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {classes.map((c) => (
-              <div key={c.id} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-sm transition-shadow">
+              <div key={c.id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 hover:shadow-sm transition-shadow">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center">
+                  <div className="w-10 h-10 bg-purple-50 dark:bg-purple-950 rounded-xl flex items-center justify-center">
                     <BookOpen size={20} className="text-purple-600" />
                   </div>
                   {c.shift && (
-                    <span className="text-xs px-2 py-1 bg-gray-50 text-gray-500 rounded-full">
+                    <span className="text-xs px-2 py-1 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-full">
                       {shiftLabel[c.shift] ?? c.shift}
                     </span>
                   )}
                 </div>
-                <h3 className="font-semibold text-[#1E3A5F] mb-1">{c.name}</h3>
-                <p className="text-xs text-gray-400 mb-4">{c.year}</p>
-
+                <h3 className="font-semibold text-[#1E3A5F] dark:text-white mb-1">{c.name}</h3>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">{c.year}</p>
                 <div className="flex items-center gap-2">
-                  <Users size={14} className="text-gray-400" />
-                  <span className="text-sm text-gray-600">
-                    <span className="font-semibold text-[#1E3A5F]">{c.totalStudents ?? 0}</span> alunos
+                  <Users size={14} className="text-gray-400 dark:text-gray-500" />
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    <span className="font-semibold text-[#1E3A5F] dark:text-white">{c.totalStudents ?? 0}</span> alunos
                   </span>
                 </div>
-
                 {c.teacher && (
-                  <p className="text-xs text-gray-400 mt-3 pt-3 border-t border-gray-50">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-3 pt-3 border-t border-gray-50 dark:border-gray-800">
                     Prof. {c.teacher.name}
                   </p>
                 )}
@@ -144,47 +134,20 @@ export default function SecretariaTurmasPage() {
 
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6">
-            <h2 className="text-lg font-bold text-[#1E3A5F] mb-4">Nova turma</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6">
+            <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white mb-4">Nova turma</h2>
             <form onSubmit={handleCreate} className="space-y-3">
-              <input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Nome da turma (ex: 1º A)"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
-              />
-              <input
-                value={form.year}
-                onChange={(e) => setForm({ ...form, year: e.target.value })}
-                type="number"
-                placeholder="Ano letivo"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
-              />
-              <select
-                value={form.shift}
-                onChange={(e) => setForm({ ...form, shift: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
-              >
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nome da turma (ex: 1º A)" required className={inputCls} />
+              <input value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} type="number" placeholder="Ano letivo" required className={inputCls} />
+              <select value={form.shift} onChange={(e) => setForm({ ...form, shift: e.target.value })} className={inputCls}>
                 <option value="morning">Manhã</option>
                 <option value="afternoon">Tarde</option>
                 <option value="evening">Noite</option>
               </select>
-              {error && <p className="text-red-500 text-xs">{error}</p>}
+              {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
               <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => { setShowModal(false); setError(''); }}
-                  className="flex-1 py-3 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="flex-1 py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50"
-                >
+                <button type="button" onClick={() => { setShowModal(false); setError(''); }} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Cancelar</button>
+                <button type="submit" disabled={saving} className="flex-1 py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50">
                   {saving ? 'Criando...' : 'Criar turma'}
                 </button>
               </div>
