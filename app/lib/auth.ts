@@ -4,7 +4,7 @@ export interface User {
   id: number;
   name: string;
   email: string;
-  role: 'director' | 'coordinator' | 'teacher' | 'student';
+  role: 'director' | 'coordinator' | 'teacher' | 'student' | 'secretary';
   schoolId: number;
 }
 
@@ -42,6 +42,7 @@ export function getDashboardRoute(role: string): string {
     case 'coordinator': return '/dashboard/coordenador';
     case 'teacher': return '/dashboard/professor';
     case 'student': return '/dashboard/aluno';
+    case 'secretary': return '/dashboard/secretaria';
     default: return '/login';
   }
 }
