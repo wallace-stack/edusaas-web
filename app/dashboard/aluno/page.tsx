@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, clearAuth } from '../../lib/auth';
 import api from '../../lib/api';
-import { BookOpen, CheckSquare, DollarSign, Bell, LogOut, TrendingUp, AlertTriangle } from 'lucide-react';
+import { BookOpen, CheckSquare, DollarSign, Bell, LogOut, TrendingUp, AlertTriangle, Newspaper } from 'lucide-react';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 interface Grade {
   id: number;
@@ -63,9 +64,9 @@ export default function AlunoDashboard() {
 
   const statusColor = (status: string) => {
     switch (status) {
-      case 'paid': return 'text-green-600 bg-green-50';
-      case 'overdue': return 'text-red-600 bg-red-50';
-      default: return 'text-orange-600 bg-orange-50';
+      case 'paid': return 'text-green-600 bg-green-50 dark:bg-green-950';
+      case 'overdue': return 'text-red-600 bg-red-50 dark:bg-red-950';
+      default: return 'text-orange-600 bg-orange-50 dark:bg-orange-950';
     }
   };
 
@@ -79,32 +80,33 @@ export default function AlunoDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#1E3A5F] border-t-transparent rounded-full animate-spin"></div>
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <header className="bg-white border-b border-gray-100 px-6 py-4">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#1E3A5F] rounded-lg flex items-center justify-center">
               <span className="text-white text-sm font-bold">E</span>
             </div>
-            <span className="font-bold text-[#1E3A5F]">EduSaaS</span>
-            <span className="text-gray-300">|</span>
-            <span className="text-sm text-gray-500">Portal do Aluno</span>
+            <span className="font-bold text-[#1E3A5F] dark:text-white">EduSaaS</span>
+            <span className="text-gray-300 dark:text-gray-600">|</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Portal do Aluno</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">{user?.name?.charAt(0).toUpperCase()}</span>
               </div>
-              <span className="text-sm font-medium text-gray-700 hidden sm:block">{user?.name}</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">{user?.name}</span>
             </div>
-            <button onClick={() => { clearAuth(); router.push('/login'); }} className="text-sm text-gray-500 hover:text-red-500">
+            <ThemeToggle />
+            <button onClick={() => { clearAuth(); router.push('/login'); }} className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400">
               <LogOut size={16} />
             </button>
           </div>
@@ -113,46 +115,46 @@ export default function AlunoDashboard() {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#1E3A5F]">Olá, {user?.name?.split(' ')[0]}! 👋</h1>
-          <p className="text-gray-500 text-sm mt-1">Acompanhe seu desempenho escolar.</p>
+          <h1 className="text-2xl font-bold text-[#1E3A5F] dark:text-white">Olá, {user?.name?.split(' ')[0]}! 👋</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Acompanhe seu desempenho escolar.</p>
         </div>
 
         {/* Cards de resumo */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-2xl p-6 border border-gray-100">
-            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
+            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center mb-4">
               <TrendingUp size={20} className="text-blue-600" />
             </div>
-            <p className="text-3xl font-bold text-[#1E3A5F]">{grades.length}</p>
-            <p className="text-sm text-gray-500 mt-1">Notas lançadas</p>
+            <p className="text-3xl font-bold text-[#1E3A5F] dark:text-white">{grades.length}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Notas lançadas</p>
           </div>
 
-          <div className={`rounded-2xl p-6 border ${attendance && attendance.summary.percentage < 75 ? 'bg-red-50 border-red-100' : 'bg-white border-gray-100'}`}>
-            <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center mb-4">
+          <div className={`rounded-2xl p-6 border ${attendance && attendance.summary.percentage < 75 ? 'bg-red-50 dark:bg-red-950 border-red-100 dark:border-red-800' : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800'}`}>
+            <div className="w-10 h-10 bg-green-50 dark:bg-green-950 rounded-xl flex items-center justify-center mb-4">
               <CheckSquare size={20} className="text-green-600" />
             </div>
-            <p className={`text-3xl font-bold ${attendance && attendance.summary.percentage < 75 ? 'text-red-500' : 'text-[#1E3A5F]'}`}>
+            <p className={`text-3xl font-bold ${attendance && attendance.summary.percentage < 75 ? 'text-red-500' : 'text-[#1E3A5F] dark:text-white'}`}>
               {attendance?.summary.percentage || 0}%
             </p>
-            <p className="text-sm text-gray-500 mt-1">Frequência</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Frequência</p>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 border border-gray-100">
-            <div className="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center mb-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
+            <div className="w-10 h-10 bg-orange-50 dark:bg-orange-950 rounded-xl flex items-center justify-center mb-4">
               <DollarSign size={20} className="text-orange-600" />
             </div>
-            <p className="text-3xl font-bold text-[#1E3A5F]">{tuitions.length}</p>
-            <p className="text-sm text-gray-500 mt-1">Mensalidades pendentes</p>
+            <p className="text-3xl font-bold text-[#1E3A5F] dark:text-white">{tuitions.length}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Mensalidades pendentes</p>
           </div>
         </div>
 
         {/* Alerta de frequência */}
         {attendance && attendance.summary.percentage < 75 && (
-          <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex items-center gap-3 mb-6">
-            <AlertTriangle size={20} className="text-red-500 flex-shrink-0" />
+          <div className="bg-red-50 dark:bg-red-950 border border-red-100 dark:border-red-800 rounded-2xl p-4 flex items-center gap-3 mb-6">
+            <AlertTriangle size={20} className="text-red-500 dark:text-red-400 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-red-700">Frequência irregular!</p>
-              <p className="text-xs text-red-500">Sua frequência está abaixo de 75% — risco de reprovação.</p>
+              <p className="text-sm font-medium text-red-700 dark:text-red-300">Frequência irregular!</p>
+              <p className="text-xs text-red-500 dark:text-red-400">Sua frequência está abaixo de 75% — risco de reprovação.</p>
             </div>
           </div>
         )}
@@ -160,22 +162,22 @@ export default function AlunoDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           {/* Últimas notas */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-[#1E3A5F]">Últimas notas</h2>
+              <h2 className="font-semibold text-[#1E3A5F] dark:text-white">Últimas notas</h2>
               <button onClick={() => router.push('/dashboard/aluno/notas')} className="text-xs text-[#F97316] hover:underline">
                 Ver todas
               </button>
             </div>
             {grades.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-4">Nenhuma nota lançada ainda</p>
+              <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Nenhuma nota lançada ainda</p>
             ) : (
               <div className="space-y-3">
                 {grades.map((grade) => (
-                  <div key={grade.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                  <div key={grade.id} className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800 last:border-0">
                     <div>
-                      <p className="text-sm font-medium text-gray-700">{grade.subject?.name}</p>
-                      <p className="text-xs text-gray-400">{grade.description || grade.type}</p>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{grade.subject?.name}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{grade.description || grade.type}</p>
                     </div>
                     <span className={`text-lg font-bold ${Number(grade.value) >= 6 ? 'text-green-600' : 'text-red-500'}`}>
                       {Number(grade.value).toFixed(1)}
@@ -187,9 +189,9 @@ export default function AlunoDashboard() {
           </div>
 
           {/* Mensalidades pendentes */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-[#1E3A5F]">Mensalidades</h2>
+              <h2 className="font-semibold text-[#1E3A5F] dark:text-white">Mensalidades</h2>
               <button onClick={() => router.push('/dashboard/aluno/financeiro')} className="text-xs text-[#F97316] hover:underline">
                 Ver todas
               </button>
@@ -201,13 +203,13 @@ export default function AlunoDashboard() {
             ) : (
               <div className="space-y-3">
                 {tuitions.map((tuition) => (
-                  <div key={tuition.id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                  <div key={tuition.id} className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800 last:border-0">
                     <div>
-                      <p className="text-sm font-medium text-gray-700">{tuition.reference || 'Mensalidade'}</p>
-                      <p className="text-xs text-gray-400">Vence: {new Date(tuition.dueDate).toLocaleDateString('pt-BR')}</p>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{tuition.reference || 'Mensalidade'}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">Vence: {new Date(tuition.dueDate).toLocaleDateString('pt-BR')}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-gray-700">R$ {Number(tuition.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                      <p className="text-sm font-bold text-gray-700 dark:text-gray-200">R$ {Number(tuition.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor(tuition.status)}`}>
                         {statusLabel(tuition.status)}
                       </span>
@@ -223,20 +225,21 @@ export default function AlunoDashboard() {
         {/* Menu rápido */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
           {[
-            { label: 'Minhas Notas', icon: BookOpen, href: '/dashboard/aluno/notas', color: 'bg-blue-50 text-blue-600' },
-            { label: 'Frequência', icon: CheckSquare, href: '/dashboard/aluno/frequencia', color: 'bg-green-50 text-green-600' },
-            { label: 'Financeiro', icon: DollarSign, href: '/dashboard/aluno/financeiro', color: 'bg-orange-50 text-orange-600' },
-            { label: 'Avisos', icon: Bell, href: '/dashboard/aluno/avisos', color: 'bg-purple-50 text-purple-600' },
+            { label: 'Feed', icon: Newspaper, href: '/dashboard/feed', color: 'bg-sky-50 dark:bg-sky-950 text-sky-600' },
+            { label: 'Minhas Notas', icon: BookOpen, href: '/dashboard/aluno/notas', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600' },
+            { label: 'Frequência', icon: CheckSquare, href: '/dashboard/aluno/frequencia', color: 'bg-green-50 dark:bg-green-950 text-green-600' },
+            { label: 'Financeiro', icon: DollarSign, href: '/dashboard/aluno/financeiro', color: 'bg-orange-50 dark:bg-orange-950 text-orange-600' },
+            { label: 'Avisos', icon: Bell, href: '/dashboard/aluno/avisos', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
           ].map((item) => (
             <button
               key={item.label}
               onClick={() => router.push(item.href)}
-              className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all text-left"
+              className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all text-left"
             >
               <div className={`w-10 h-10 ${item.color} rounded-xl flex items-center justify-center mb-3`}>
                 <item.icon size={20} />
               </div>
-              <p className="text-sm font-medium text-gray-700">{item.label}</p>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{item.label}</p>
             </button>
           ))}
         </div>

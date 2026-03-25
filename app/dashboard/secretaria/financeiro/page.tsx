@@ -23,10 +23,12 @@ const statusLabel: Record<string, string> = {
 };
 
 const statusColor: Record<string, string> = {
-  pago: 'bg-green-50 text-green-700',
-  pendente: 'bg-orange-50 text-orange-700',
-  vencido: 'bg-red-50 text-red-700',
+  pago: 'bg-green-50 dark:bg-green-950 text-green-700',
+  pendente: 'bg-orange-50 dark:bg-orange-950 text-orange-700',
+  vencido: 'bg-red-50 dark:bg-red-950 text-red-700',
 };
+
+const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] dark:bg-gray-800 dark:text-gray-100";
 
 export default function SecretariaFinanceiroPage() {
   const router = useRouter();
@@ -126,19 +128,19 @@ export default function SecretariaFinanceiroPage() {
   const vencidos = tuitions.filter(t => t.status === 'vencido').length;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <header className="bg-white border-b border-gray-100 px-6 py-4">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-lg">
-              <ArrowLeft size={18} className="text-gray-600" />
+            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+              <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
             </button>
-            <h1 className="font-bold text-[#1E3A5F]">Financeiro</h1>
+            <h1 className="font-bold text-[#1E3A5F] dark:text-white">Financeiro</h1>
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => { setError(''); setShowTuitionModal(true); }}
-              className="flex items-center gap-2 border border-[#1E3A5F] text-[#1E3A5F] px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-50 transition-colors"
+              className="flex items-center gap-2 border border-[#1E3A5F] dark:border-blue-400 text-[#1E3A5F] dark:text-blue-400 px-4 py-2 rounded-xl text-sm font-medium hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
             >
               <Plus size={16} />
               Lançar mensalidade
@@ -151,43 +153,43 @@ export default function SecretariaFinanceiroPage() {
 
         {/* Resumo rápido */}
         <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-2xl p-4 border border-gray-100">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-800">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-green-50 rounded-xl flex items-center justify-center">
+              <div className="w-9 h-9 bg-green-50 dark:bg-green-950 rounded-xl flex items-center justify-center">
                 <CheckCircle size={18} className="text-green-600" />
               </div>
               <div>
-                <p className="text-xl font-bold text-[#1E3A5F]">{pagos}</p>
-                <p className="text-xs text-gray-500">Pagas</p>
+                <p className="text-xl font-bold text-[#1E3A5F] dark:text-white">{pagos}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Pagas</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-4 border border-gray-100">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-800">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-orange-50 rounded-xl flex items-center justify-center">
+              <div className="w-9 h-9 bg-orange-50 dark:bg-orange-950 rounded-xl flex items-center justify-center">
                 <Clock size={18} className="text-orange-500" />
               </div>
               <div>
-                <p className="text-xl font-bold text-[#1E3A5F]">{pendentes}</p>
-                <p className="text-xs text-gray-500">Pendentes</p>
+                <p className="text-xl font-bold text-[#1E3A5F] dark:text-white">{pendentes}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Pendentes</p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-4 border border-gray-100">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-100 dark:border-gray-800">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center">
+              <div className="w-9 h-9 bg-red-50 dark:bg-red-950 rounded-xl flex items-center justify-center">
                 <AlertTriangle size={18} className="text-red-500" />
               </div>
               <div>
                 <p className="text-xl font-bold text-red-500">{vencidos}</p>
-                <p className="text-xs text-gray-500">Vencidas</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Vencidas</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Filtro por status */}
-        <div className="flex gap-2 mb-6 bg-white rounded-xl p-1 border border-gray-100 w-fit">
+        <div className="flex gap-2 mb-6 bg-white dark:bg-gray-900 rounded-xl p-1 border border-gray-100 dark:border-gray-800 w-fit">
           {[
             { value: '', label: 'Todas' },
             { value: 'pago', label: 'Pagas' },
@@ -197,7 +199,7 @@ export default function SecretariaFinanceiroPage() {
             <button
               key={opt.value}
               onClick={() => setStatusFilter(opt.value)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${statusFilter === opt.value ? 'bg-[#1E3A5F] text-white' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${statusFilter === opt.value ? 'bg-[#1E3A5F] text-white' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
             >
               {opt.label}
             </button>
@@ -205,28 +207,28 @@ export default function SecretariaFinanceiroPage() {
         </div>
 
         {/* Tabela */}
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
           {loading ? (
             <div className="p-8 text-center">
-              <div className="w-8 h-8 border-4 border-[#1E3A5F] border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <div className="w-8 h-8 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
             </div>
           ) : tuitions.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">Nenhuma mensalidade encontrada</div>
+            <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-sm">Nenhuma mensalidade encontrada</div>
           ) : (
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100">
+              <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
                 <tr>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Aluno</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Referência</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Valor</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Vencimento</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Aluno</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">Referência</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Valor</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">Vencimento</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                 {tuitions.map((t) => (
-                  <tr key={t.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={t.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
@@ -234,24 +236,24 @@ export default function SecretariaFinanceiroPage() {
                             {t.student?.name?.charAt(0).toUpperCase() ?? '?'}
                           </span>
                         </div>
-                        <span className="text-sm font-medium text-gray-700">{t.student?.name ?? '—'}</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{t.student?.name ?? '—'}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 hidden sm:table-cell">
-                      <span className="text-sm text-gray-500">{t.reference}</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">{t.reference}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-sm font-semibold text-[#1E3A5F]">
+                      <span className="text-sm font-semibold text-[#1E3A5F] dark:text-white">
                         R$ {Number(t.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                       </span>
                     </td>
                     <td className="px-6 py-4 hidden sm:table-cell">
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
                         {new Date(t.dueDate).toLocaleDateString('pt-BR')}
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColor[t.status] ?? 'bg-gray-50 text-gray-600'}`}>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${statusColor[t.status] ?? 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
                         {statusLabel[t.status] ?? t.status}
                       </span>
                     </td>
@@ -259,7 +261,7 @@ export default function SecretariaFinanceiroPage() {
                       {t.status !== 'pago' && (
                         <button
                           onClick={() => openPaymentModal(t)}
-                          className="text-xs text-[#1E3A5F] font-medium hover:underline"
+                          className="text-xs text-[#1E3A5F] dark:text-blue-400 font-medium hover:underline"
                         >
                           Registrar pagamento
                         </button>
@@ -276,14 +278,14 @@ export default function SecretariaFinanceiroPage() {
       {/* Modal lançar mensalidade */}
       {showTuitionModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6">
-            <h2 className="text-lg font-bold text-[#1E3A5F] mb-4">Lançar mensalidade</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6">
+            <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white mb-4">Lançar mensalidade</h2>
             <form onSubmit={handleCreateTuition} className="space-y-3">
               <select
                 value={tuitionForm.studentId}
                 onChange={(e) => setTuitionForm({ ...tuitionForm, studentId: e.target.value })}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                className={inputCls}
               >
                 <option value="">Selecione o aluno</option>
                 {students.map((s) => (
@@ -296,25 +298,25 @@ export default function SecretariaFinanceiroPage() {
                 type="number"
                 placeholder="Valor (R$)"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                className={inputCls}
               />
               <input
                 value={tuitionForm.dueDate}
                 onChange={(e) => setTuitionForm({ ...tuitionForm, dueDate: e.target.value })}
                 type="date"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                className={inputCls}
               />
               <input
                 value={tuitionForm.reference}
                 onChange={(e) => setTuitionForm({ ...tuitionForm, reference: e.target.value })}
                 placeholder="Referência (ex: Março/2026)"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                className={inputCls}
               />
-              {error && <p className="text-red-500 text-xs">{error}</p>}
+              {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => { setShowTuitionModal(false); setError(''); }} className="flex-1 py-3 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50">Cancelar</button>
-                <button type="submit" disabled={saving} className="flex-1 py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium disabled:opacity-50">
+                <button type="button" onClick={() => { setShowTuitionModal(false); setError(''); }} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Cancelar</button>
+                <button type="submit" disabled={saving} className="flex-1 py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50">
                   {saving ? 'Lançando...' : 'Lançar'}
                 </button>
               </div>
@@ -326,9 +328,9 @@ export default function SecretariaFinanceiroPage() {
       {/* Modal registrar pagamento */}
       {showPaymentModal && selectedTuition && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6">
-            <h2 className="text-lg font-bold text-[#1E3A5F] mb-1">Registrar pagamento</h2>
-            <p className="text-sm text-gray-500 mb-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6">
+            <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white mb-1">Registrar pagamento</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
               {selectedTuition.student?.name} — {selectedTuition.reference} —{' '}
               R$ {Number(selectedTuition.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
             </p>
@@ -336,7 +338,7 @@ export default function SecretariaFinanceiroPage() {
               <select
                 value={paymentForm.paymentMethod}
                 onChange={(e) => setPaymentForm({ ...paymentForm, paymentMethod: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                className={inputCls}
               >
                 <option value="pix">PIX</option>
                 <option value="dinheiro">Dinheiro</option>
@@ -345,19 +347,19 @@ export default function SecretariaFinanceiroPage() {
                 <option value="transferencia">Transferência</option>
               </select>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">Data do pagamento</label>
+                <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Data do pagamento</label>
                 <input
                   value={paymentForm.paidAt}
                   onChange={(e) => setPaymentForm({ ...paymentForm, paidAt: e.target.value })}
                   type="date"
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                  className={inputCls}
                 />
               </div>
-              {error && <p className="text-red-500 text-xs">{error}</p>}
+              {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => { setShowPaymentModal(false); setError(''); }} className="flex-1 py-3 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50">Cancelar</button>
-                <button type="submit" disabled={saving} className="flex-1 py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium disabled:opacity-50">
+                <button type="button" onClick={() => { setShowPaymentModal(false); setError(''); }} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Cancelar</button>
+                <button type="submit" disabled={saving} className="flex-1 py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50">
                   {saving ? 'Registrando...' : 'Confirmar pagamento'}
                 </button>
               </div>

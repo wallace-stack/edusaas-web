@@ -21,9 +21,11 @@ const roleLabel: Record<string, string> = {
 };
 
 const roleColor: Record<string, string> = {
-  teacher: 'bg-green-50 text-green-700',
-  coordinator: 'bg-blue-50 text-blue-700',
+  teacher: 'bg-green-50 dark:bg-green-950 text-green-700',
+  coordinator: 'bg-blue-50 dark:bg-blue-950 text-blue-700',
 };
+
+const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] dark:bg-gray-800 dark:text-gray-100";
 
 export default function SecretariaUsuariosPage() {
   const router = useRouter();
@@ -89,14 +91,14 @@ export default function SecretariaUsuariosPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <header className="bg-white border-b border-gray-100 px-6 py-4">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 rounded-lg">
-              <ArrowLeft size={18} className="text-gray-600" />
+            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+              <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
             </button>
-            <h1 className="font-bold text-[#1E3A5F]">Usuários</h1>
+            <h1 className="font-bold text-[#1E3A5F] dark:text-white">Usuários</h1>
           </div>
           <button
             onClick={() => { setError(''); setShowModal(true); }}
@@ -112,55 +114,55 @@ export default function SecretariaUsuariosPage() {
 
         {/* Busca */}
         <div className="relative mb-6">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por nome ou email..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] bg-white"
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] bg-white dark:bg-gray-800 dark:text-gray-100"
           />
         </div>
 
         {/* Lista */}
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
           {loading ? (
             <div className="p-8 text-center">
-              <div className="w-8 h-8 border-4 border-[#1E3A5F] border-t-transparent rounded-full animate-spin mx-auto"></div>
+              <div className="w-8 h-8 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
             </div>
           ) : filtered.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 text-sm">Nenhum usuário encontrado</div>
+            <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-sm">Nenhum usuário encontrado</div>
           ) : (
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100">
+              <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
                 <tr>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Nome</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Email</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Função</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Status</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Nome</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">Email</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Função</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">Status</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                 {filtered.map((u) => (
-                  <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
                           <span className="text-white text-xs font-bold">{u.name.charAt(0).toUpperCase()}</span>
                         </div>
-                        <span className="text-sm font-medium text-gray-700">{u.name}</span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{u.name}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 hidden sm:table-cell">
-                      <span className="text-sm text-gray-500">{u.email}</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">{u.email}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${roleColor[u.role] ?? 'bg-gray-50 text-gray-600'}`}>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${roleColor[u.role] ?? 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
                         {roleLabel[u.role] ?? u.role}
                       </span>
                     </td>
                     <td className="px-6 py-4 hidden sm:table-cell">
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${u.isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${u.isActive ? 'bg-green-50 dark:bg-green-950 text-green-700' : 'bg-red-50 dark:bg-red-950 text-red-700'}`}>
                         {u.isActive ? 'Ativo' : 'Inativo'}
                       </span>
                     </td>
@@ -168,7 +170,7 @@ export default function SecretariaUsuariosPage() {
                       {u.isActive && (
                         <button
                           onClick={() => handleDeactivate(u.id, u.name)}
-                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-colors"
                           title="Desativar usuário"
                         >
                           <Trash2 size={16} />
@@ -186,15 +188,15 @@ export default function SecretariaUsuariosPage() {
       {/* Modal novo usuário */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6">
-            <h2 className="text-lg font-bold text-[#1E3A5F] mb-4">Novo usuário</h2>
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6">
+            <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white mb-4">Novo usuário</h2>
             <form onSubmit={handleCreate} className="space-y-3">
               <input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Nome completo"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                className={inputCls}
               />
               <input
                 value={form.email}
@@ -202,7 +204,7 @@ export default function SecretariaUsuariosPage() {
                 type="email"
                 placeholder="Email"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                className={inputCls}
               />
               <input
                 value={form.password}
@@ -210,24 +212,24 @@ export default function SecretariaUsuariosPage() {
                 type="password"
                 placeholder="Senha"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                className={inputCls}
               />
               <select
                 value={form.role}
                 onChange={(e) => setForm({ ...form, role: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                className={inputCls}
               >
                 <option value="teacher">Professor</option>
                 <option value="coordinator">Coordenador</option>
               </select>
 
-              {error && <p className="text-red-500 text-xs">{error}</p>}
+              {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
 
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => { setShowModal(false); setError(''); }}
-                  className="flex-1 py-3 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-gray-50"
+                  className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   Cancelar
                 </button>
