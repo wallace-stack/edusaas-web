@@ -3,14 +3,15 @@
 import { Pencil, Trash2, Pin } from 'lucide-react';
 
 export interface FeedPost {
-  id: number;
+  id: string;
   title: string;
   content: string;
-  type: 'news' | 'event' | 'update' | 'class_message';
+  type: 'global' | 'class_message';
   pinned: boolean;
   images?: string[];
-  author: { id: number; name: string; role: string };
-  class?: { name: string };
+  authorId: number;
+  author?: { id: number; name: string; role: string } | null;
+  schoolClass?: { name: string };
   createdAt: string;
 }
 
@@ -19,20 +20,16 @@ interface FeedCardProps {
   currentUserId: number;
   currentUserRole: string;
   onEdit: (post: FeedPost) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 const typeLabel: Record<string, string> = {
-  news: 'Notícia',
-  event: 'Evento',
-  update: 'Atualização',
+  global: 'Escola',
   class_message: 'Recado de Turma',
 };
 
 const typeColor: Record<string, string> = {
-  news: 'bg-blue-50 dark:bg-blue-950 text-blue-700',
-  event: 'bg-green-50 dark:bg-green-950 text-green-700',
-  update: 'bg-orange-50 dark:bg-orange-950 text-[#F97316]',
+  global: 'bg-blue-50 dark:bg-blue-950 text-blue-700',
   class_message: 'bg-purple-50 dark:bg-purple-950 text-purple-700',
 };
 
@@ -56,7 +53,8 @@ function timeAgo(dateStr: string): string {
 
 export default function FeedCard({ post, currentUserId, currentUserRole, onEdit, onDelete }: FeedCardProps) {
   const canEditDelete =
-    post.author.id === currentUserId ||
+    post.author?.id === currentUserId ||
+    post.authorId === currentUserId ||
     currentUserRole === 'director';
 
   const truncated =
@@ -72,11 +70,11 @@ export default function FeedCard({ post, currentUserId, currentUserRole, onEdit,
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-9 h-9 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
             <span className="text-white text-xs font-bold">
-              {post.author.name.charAt(0).toUpperCase()}
+              {(post.author?.name ?? 'U').charAt(0).toUpperCase()}
             </span>
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{post.author.name}</p>
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{post.author?.name ?? 'Usuário'}</p>
             <p className="text-xs text-gray-400 dark:text-gray-500">{timeAgo(post.createdAt)}</p>
           </div>
         </div>
@@ -91,9 +89,9 @@ export default function FeedCard({ post, currentUserId, currentUserRole, onEdit,
           <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${typeColor[post.type] ?? 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
             {typeLabel[post.type] ?? post.type}
           </span>
-          {post.class && (
+          {post.schoolClass && (
             <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-2 py-0.5 rounded-full hidden sm:inline">
-              {post.class.name}
+              {post.schoolClass.name}
             </span>
           )}
         </div>
