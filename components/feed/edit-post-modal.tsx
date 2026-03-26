@@ -79,9 +79,7 @@ export default function EditPostModal({ post, currentUserRole, onClose, onSucces
               onChange={e => setForm({ ...form, type: e.target.value as FeedPost['type'] })}
               className={inputCls}
             >
-              <option value="news">Notícia</option>
-              <option value="event">Evento</option>
-              <option value="update">Atualização</option>
+              <option value="global">Escola inteira</option>
               <option value="class_message">Recado de Turma</option>
             </select>
           )}
