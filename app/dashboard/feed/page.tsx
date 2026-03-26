@@ -11,10 +11,8 @@ import EditPostModal from '../../../components/feed/edit-post-modal';
 
 const TYPE_FILTERS = [
   { value: '', label: 'Todos' },
-  { value: 'news', label: 'Notícias' },
-  { value: 'event', label: 'Eventos' },
-  { value: 'update', label: 'Atualizações' },
-  { value: 'class_message', label: 'Recados de Turma' },
+  { value: 'global', label: 'Escola' },
+  { value: 'class_message', label: 'Turmas' },
 ];
 
 export default function FeedPage() {
