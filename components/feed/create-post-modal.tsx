@@ -72,7 +72,9 @@ export default function CreatePostModal({ userRole, onClose, onSuccess }: Create
       if (form.classId) body.classId = Number(form.classId);
 
       const res = await api.post('/feed', body);
+      console.log('FEED POST RESPONSE:', JSON.stringify(res.data));
       const postId: string = res.data?.id ?? res.data?.data?.id;
+      console.log('POST ID:', postId);
 
       if (!postId) throw new Error('Post criado mas ID não retornado');
 
