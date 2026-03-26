@@ -9,7 +9,6 @@ interface CreatePostModalProps {
   onClose: () => void;
   onSuccess: () => void;
 }
-
 interface SchoolClass {
   id: number;
   name: string;
