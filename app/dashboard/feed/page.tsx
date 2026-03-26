@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUser, clearAuth } from '../../lib/auth';
+import { getUser } from '../../lib/auth';
 import api from '../../lib/api';
-import { Newspaper, Plus, LogOut } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import FeedCard, { FeedPost } from '../../../components/feed/feed-card';
 import CreatePostModal from '../../../components/feed/create-post-modal';
 import EditPostModal from '../../../components/feed/edit-post-modal';
@@ -83,29 +83,27 @@ export default function FeedPage() {
       {/* Header */}
       <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-              <Newspaper size={18} className="text-[#1E3A5F] dark:text-white" />
-            </button>
-            <h1 className="font-bold text-[#1E3A5F] dark:text-white">Feed de Notícias</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            {canPost && (
-              <button
-                onClick={() => setShowCreate(true)}
-                className="flex items-center gap-2 bg-[#1E3A5F] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#162d4a] transition-colors"
-              >
-                <Plus size={16} />
-                <span className="hidden sm:inline">Novo Post</span>
-              </button>
-            )}
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
+            <div className="w-8 h-8 bg-[#1E3A5F] rounded-lg flex items-center justify-center">
+              <span className="text-white text-xs font-bold">E</span>
+            </div>
+            <span className="font-bold text-[#1E3A5F] dark:text-white">EduSaaS</span>
+          </button>
+
+          <h1 className="font-semibold text-gray-600 dark:text-gray-300 text-sm">Feed de Notícias</h1>
+
+          {canPost && (
             <button
-              onClick={() => { clearAuth(); router.push('/login'); }}
-              className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+              onClick={() => setShowCreate(true)}
+              className="flex items-center gap-2 bg-[#1E3A5F] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#162d4a] transition-colors"
             >
-              <LogOut size={18} />
+              <Plus size={16} />
+              <span className="hidden sm:inline">Novo Post</span>
             </button>
-          </div>
+          )}
         </div>
       </header>
 
