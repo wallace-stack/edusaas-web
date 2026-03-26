@@ -21,7 +21,7 @@ export default function CreatePostModal({ userRole, onClose, onSuccess }: Create
   const [form, setForm] = useState({
     title: '',
     content: '',
-    type: userRole === 'teacher' ? 'class_message' : 'news',
+    type: userRole === 'teacher' ? 'class_message' : 'global',
     pinned: false,
     classId: '',
   });
@@ -36,10 +36,10 @@ export default function CreatePostModal({ userRole, onClose, onSuccess }: Create
   const isTeacher = userRole === 'teacher';
 
   useEffect(() => {
-    if (isTeacher) {
+    if (form.type === 'class_message' || isTeacher) {
       api.get('/classes').then(r => setClasses(r.data)).catch(console.error);
     }
-  }, [isTeacher]);
+  }, [form.type, isTeacher]);
 
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -56,7 +56,7 @@ export default function CreatePostModal({ userRole, onClose, onSuccess }: Create
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isTeacher && !form.classId) {
+    if (form.type === 'class_message' && !form.classId) {
       setError('Selecione a turma');
       return;
     }
@@ -120,22 +120,20 @@ export default function CreatePostModal({ userRole, onClose, onSuccess }: Create
           {!isTeacher && (
             <select
               value={form.type}
-              onChange={e => setForm({ ...form, type: e.target.value })}
+              onChange={e => setForm({ ...form, type: e.target.value, classId: '' })}
               className={inputCls}
             >
-              <option value="news">Notícia</option>
-              <option value="event">Evento</option>
-              <option value="update">Atualização</option>
+              <option value="global">Escola inteira</option>
               <option value="class_message">Recado de Turma</option>
             </select>
           )}
 
-          {/* Turma — obrigatório para teacher */}
-          {isTeacher && (
+          {/* Turma — obrigatório quando type === class_message */}
+          {(isTeacher || form.type === 'class_message') && (
             <select
               value={form.classId}
               onChange={e => setForm({ ...form, classId: e.target.value })}
-              required
+              required={form.type === 'class_message'}
               className={inputCls}
             >
               <option value="">Selecione a turma *</option>
