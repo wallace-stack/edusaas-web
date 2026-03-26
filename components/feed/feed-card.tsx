@@ -14,6 +14,7 @@ export interface FeedPost {
   author?: { id: number; name: string; role: string } | null;
   schoolClass?: { name: string };
   createdAt: string;
+  updatedAt: string;
 }
 
 interface FeedCardProps {
@@ -78,7 +79,16 @@ export default function FeedCard({ post, currentUserId, currentUserRole, onEdit,
           </div>
           <div className="min-w-0">
             <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 truncate">{post.author?.name ?? 'Usuário'}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500">{timeAgo(post.createdAt)}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              {timeAgo(post.createdAt)}
+              {(() => {
+                const created = new Date(post.createdAt).getTime();
+                const updated = new Date(post.updatedAt).getTime();
+                return updated - created > 60000 ? (
+                  <span className="text-xs text-gray-400 dark:text-gray-500 italic">· editado</span>
+                ) : null;
+              })()}
+            </p>
           </div>
         </div>
 

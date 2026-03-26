@@ -103,22 +103,32 @@ export default function CreatePostModal({ userRole, onClose, onSuccess }: Create
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3">
-          <input
-            value={form.title}
-            onChange={e => setForm({ ...form, title: e.target.value })}
-            placeholder="Título"
-            required
-            className={inputCls}
-          />
+          <div className="relative">
+            <input
+              value={form.title}
+              onChange={e => setForm({ ...form, title: e.target.value.slice(0, 100) })}
+              placeholder="Título"
+              required
+              className={inputCls}
+            />
+            <span className="absolute right-3 top-3 text-xs text-gray-400">
+              {form.title.length}/100
+            </span>
+          </div>
 
-          <textarea
-            value={form.content}
-            onChange={e => setForm({ ...form, content: e.target.value })}
-            placeholder="Escreva o conteúdo da publicação..."
-            required
-            rows={5}
-            className={`${inputCls} resize-none`}
-          />
+          <div className="relative">
+            <textarea
+              value={form.content}
+              onChange={e => setForm({ ...form, content: e.target.value.slice(0, 1000) })}
+              placeholder="Escreva o conteúdo da publicação..."
+              required
+              rows={5}
+              className={`${inputCls} resize-none`}
+            />
+            <span className={`absolute right-3 bottom-3 text-xs ${form.content.length > 900 ? 'text-red-400' : 'text-gray-400'}`}>
+              {form.content.length}/1000
+            </span>
+          </div>
 
           {/* Tipo — fixo para teacher */}
           {!isTeacher && (
