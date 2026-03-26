@@ -36,7 +36,7 @@ export default function LancarNotasPage() {
 
   const loadClasses = async () => {
     try {
-      const response = await api.get('/classes');
+      const response = await api.get('/classes/my');
       setClasses(response.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -44,16 +44,12 @@ export default function LancarNotasPage() {
 
   const loadSubjectsAndStudents = async (classId: number) => {
     try {
-      const subjectsRes = await api.get(`/classes/${classId}/subjects`);
+      const [subjectsRes, studentsRes] = await Promise.all([
+        api.get(`/classes/${classId}/subjects`),
+        api.get(`/enrollment/class/${classId}`),
+      ]);
       setSubjects(subjectsRes.data);
-      let studentList: Student[];
-      try {
-        const res = await api.get(`/classes/${classId}/students`);
-        studentList = res.data;
-      } catch {
-        const res = await api.get(`/users?role=student&classId=${classId}`);
-        studentList = res.data;
-      }
+      const studentList = studentsRes.data.map((e: any) => e.student ?? e);
       setStudents(studentList);
     } catch (err) { console.error(err); }
   };
