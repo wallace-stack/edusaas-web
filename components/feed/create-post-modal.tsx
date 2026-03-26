@@ -43,7 +43,7 @@ export default function CreatePostModal({ userRole, onClose, onSuccess }: Create
 
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
-    const combined = [...images, ...files].slice(0, 2);
+    const combined = [...images, ...files].slice(0, 1);
     setImages(combined);
     setPreviews(combined.map(f => URL.createObjectURL(f)));
   };
@@ -166,13 +166,13 @@ export default function CreatePostModal({ userRole, onClose, onSuccess }: Create
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={images.length >= 2}
+                disabled={images.length >= 1}
                 className="flex items-center gap-2 text-sm text-[#1E3A5F] dark:text-blue-400 border border-[#1E3A5F] dark:border-blue-400 px-3 py-2 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <ImagePlus size={16} />
-                Adicionar imagem {images.length > 0 && `(${images.length}/2)`}
+                Adicionar imagem {images.length > 0 && `(${images.length}/1)`}
               </button>
-              <span className="text-xs text-gray-400 dark:text-gray-500">máx. 2 imagens</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">máx. 1 imagem (plano Free)</span>
             </div>
             <input
               ref={fileInputRef}

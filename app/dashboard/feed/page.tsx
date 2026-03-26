@@ -74,9 +74,10 @@ export default function FeedPage() {
   const handleSuccess = () => {
     setShowCreate(false);
     setEditPost(null);
-    setPosts([]);
-    setPage(1);
-    loadFeed(1, true);
+    setTimeout(() => {
+      setPosts([]);
+      loadFeed(1, true);
+    }, 500);
   };
 
   if (loading) {
