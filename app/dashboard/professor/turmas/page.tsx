@@ -28,7 +28,7 @@ export default function ProfessorTurmasPage() {
 
   const loadClasses = async () => {
     try {
-      const response = await api.get('/classes');
+      const response = await api.get('/classes/my');
       setClasses(response.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
