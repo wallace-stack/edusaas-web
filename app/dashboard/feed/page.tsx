@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../lib/auth';
 import api from '../../lib/api';
-import { Plus } from 'lucide-react';
+import { Plus, Newspaper } from 'lucide-react';
 import FeedCard, { FeedPost } from '../../../components/feed/feed-card';
 import CreatePostModal from '../../../components/feed/create-post-modal';
 import EditPostModal from '../../../components/feed/edit-post-modal';
