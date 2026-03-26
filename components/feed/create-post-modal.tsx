@@ -37,7 +37,8 @@ export default function CreatePostModal({ userRole, onClose, onSuccess }: Create
 
   useEffect(() => {
     if (form.type === 'class_message' || isTeacher) {
-      api.get('/classes').then(r => setClasses(r.data)).catch(console.error);
+      const endpoint = isTeacher ? '/classes/my' : '/classes';
+      api.get(endpoint).then(r => setClasses(r.data)).catch(console.error);
     }
   }, [form.type, isTeacher]);
 
