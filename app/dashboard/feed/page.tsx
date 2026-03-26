@@ -42,9 +42,17 @@ export default function FeedPage() {
       const res = await api.get(`/feed?${params}`);
       const data: FeedPost[] = res.data.data ?? res.data;
       const total: number = res.data.total ?? data.length;
-      setPosts(prev => reset ? data : [...prev, ...data]);
+      if (reset) {
+        setPosts(data);
+      } else {
+        setPosts(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const newPosts = data.filter(p => !existingIds.has(p.id));
+          return [...prev, ...newPosts];
+        });
+      }
       setPage(p);
-      setHasMore((reset ? data.length : posts.length + data.length) < total);
+      setHasMore((p * 20) < total);
     } catch (err) {
       console.error(err);
     } finally {
@@ -66,6 +74,8 @@ export default function FeedPage() {
   const handleSuccess = () => {
     setShowCreate(false);
     setEditPost(null);
+    setPosts([]);
+    setPage(1);
     loadFeed(1, true);
   };
 
