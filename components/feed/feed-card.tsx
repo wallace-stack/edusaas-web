@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Pencil, Trash2, Pin } from 'lucide-react';
 
 export interface FeedPost {
@@ -52,15 +53,17 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function FeedCard({ post, currentUserId, currentUserRole, onEdit, onDelete }: FeedCardProps) {
+  const [expanded, setExpanded] = useState(false);
+
   const canEditDelete =
     post.author?.id === currentUserId ||
     post.authorId === currentUserId ||
     currentUserRole === 'director';
 
-  const truncated =
-    post.content.length > 300
-      ? post.content.slice(0, 300) + '…'
-      : post.content;
+  const isLong = post.content.length > 300;
+  const displayContent = expanded || !isLong
+    ? post.content
+    : post.content.slice(0, 300) + '…';
 
   return (
     <div className={`bg-white dark:bg-gray-900 rounded-2xl border p-6 transition-shadow hover:shadow-sm ${post.pinned ? 'border-[#F97316]/40' : 'border-gray-100 dark:border-gray-800'}`}>
@@ -100,8 +103,16 @@ export default function FeedCard({ post, currentUserId, currentUserRole, onEdit,
       {/* Título */}
       <h3 className="font-semibold text-[#1E3A5F] dark:text-white mb-2 leading-snug">{post.title}</h3>
 
-      {/* Conteúdo truncado */}
-      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">{truncated}</p>
+      {/* Conteúdo */}
+      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed whitespace-pre-line">{displayContent}</p>
+      {isLong && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="mt-1 text-xs text-[#1E3A5F] dark:text-blue-400 hover:underline"
+        >
+          {expanded ? 'Ver menos' : 'Ver mais'}
+        </button>
+      )}
 
       {/* Imagens */}
       {post.images && post.images.length > 0 && (
