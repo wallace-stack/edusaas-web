@@ -53,7 +53,7 @@ export default function FeedPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Excluir esta publicação?')) return;
     try {
       await api.delete(`/feed/${id}`);
