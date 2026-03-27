@@ -47,6 +47,8 @@ export default function SecretariaAlunosPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [turmaFilter, setTurmaFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [transferClassId, setTransferClassId] = useState('');
+  const [transferring, setTransferring] = useState(false);
   const [form, setForm] = useState({
     name: '', email: '', password: '', phone: '', birthDate: '', classId: '',
   });
@@ -66,6 +68,29 @@ export default function SecretariaAlunosPage() {
       setClasses(classesRes.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
+  };
+
+  const handleSelectStudent = (s: Student) => {
+    setSelectedStudent(s);
+    setTransferClassId('');
+  };
+
+  const handleTransfer = async () => {
+    if (!selectedStudent || !transferClassId) return;
+    try {
+      setTransferring(true);
+      await api.post('/enrollments/transfer', {
+        studentId: selectedStudent.id,
+        newClassId: Number(transferClassId),
+      });
+      setSelectedStudent(null);
+      setTransferClassId('');
+      loadData();
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Erro ao matricular');
+    } finally {
+      setTransferring(false);
+    }
   };
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -184,7 +209,7 @@ export default function SecretariaAlunosPage() {
                     {group.students.map(s => (
                       <div
                         key={s.id}
-                        onClick={() => setSelectedStudent(s)}
+                        onClick={() => handleSelectStudent(s)}
                         className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
                       >
                         <div className="flex items-center gap-3">
@@ -308,28 +333,28 @@ export default function SecretariaAlunosPage() {
                 <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.class?.name ?? 'Não matriculado'}</p>
               </div>
               <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                <p className="text-xs text-gray-400 mb-1">Transferir para turma</p>
+                <p className="text-xs text-gray-400 mb-2">
+                  {selectedStudent?.class ? 'Transferir para outra turma' : 'Matricular em uma turma'}
+                </p>
                 <select
-                  className={inputCls}
-                  onChange={async (e) => {
-                    if (!e.target.value) return;
-                    try {
-                      await api.post(`/enrollment/transfer`, {
-                        studentId: selectedStudent.id,
-                        newClassId: Number(e.target.value),
-                      });
-                      setSelectedStudent(null);
-                      loadData();
-                    } catch (err: any) {
-                      alert(err.response?.data?.message || 'Erro ao transferir');
-                    }
-                  }}
+                  value={transferClassId}
+                  onChange={e => setTransferClassId(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] mb-2"
                 >
-                  <option value="">Selecione nova turma</option>
-                  {classes.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} — {c.year}</option>
-                  ))}
+                  <option value="">Selecione a turma</option>
+                  {classes
+                    .filter(c => c.id !== selectedStudent?.classId)
+                    .map(c => (
+                      <option key={c.id} value={c.id}>{c.name} — {c.year}</option>
+                    ))}
                 </select>
+                <button
+                  onClick={handleTransfer}
+                  disabled={!transferClassId || transferring}
+                  className="w-full py-2.5 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50 transition-colors"
+                >
+                  {transferring ? 'Salvando...' : selectedStudent?.class ? 'Confirmar transferência' : 'Matricular nesta turma'}
+                </button>
               </div>
             </div>
           </div>
