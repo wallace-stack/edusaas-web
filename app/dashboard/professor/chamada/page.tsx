@@ -39,7 +39,7 @@ export default function ChamadaPage() {
 
   const loadClasses = async () => {
     try {
-      const response = await api.get('/classes');
+      const response = await api.get('/classes/my');
       setClasses(response.data);
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
@@ -47,16 +47,14 @@ export default function ChamadaPage() {
 
   const loadSubjectsAndStudents = async (classId: number) => {
     try {
-      const subjectsRes = await api.get(`/classes/${classId}/subjects`);
+      const [subjectsRes, studentsRes] = await Promise.all([
+        api.get(`/classes/${classId}/subjects`),
+        api.get(`/enrollments/class/${classId}`),
+      ]);
       setSubjects(subjectsRes.data);
-      let studentList: Student[];
-      try {
-        const res = await api.get(`/classes/${classId}/students`);
-        studentList = res.data;
-      } catch {
-        const res = await api.get(`/users?role=student&classId=${classId}`);
-        studentList = res.data;
-      }
+      const studentList = studentsRes.data
+        .map((e: any) => e.student)
+        .filter(Boolean);
       setStudents(studentList);
       setAttendances(studentList.map((s: Student) => ({ studentId: s.id, status: 'present' as const })));
     } catch (err) { console.error(err); }
