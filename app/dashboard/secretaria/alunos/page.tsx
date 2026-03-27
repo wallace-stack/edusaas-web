@@ -342,11 +342,9 @@ export default function SecretariaAlunosPage() {
                   className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] mb-2"
                 >
                   <option value="">Selecione a turma</option>
-                  {classes
-                    .filter(c => c.id !== selectedStudent?.classId)
-                    .map(c => (
-                      <option key={c.id} value={c.id}>{c.name} — {c.year}</option>
-                    ))}
+                  {classes.map(c => (
+                    <option key={c.id} value={c.id}>{c.name} — {c.year}</option>
+                  ))}
                 </select>
                 <button
                   onClick={handleTransfer}
