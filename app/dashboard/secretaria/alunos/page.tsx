@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, Search, X, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Plus, Search, X, Eye, EyeOff, ChevronRight } from 'lucide-react';
 
 interface Student {
   id: number;
@@ -45,6 +45,8 @@ export default function SecretariaAlunosPage() {
   const [classes, setClasses] = useState<any[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [turmaFilter, setTurmaFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [form, setForm] = useState({
     name: '', email: '', password: '', phone: '', birthDate: '', classId: '',
   });
@@ -83,11 +85,6 @@ export default function SecretariaAlunosPage() {
     } finally { setSaving(false); }
   };
 
-  const filtered = students.filter(s =>
-    s.name.toLowerCase().includes(search.toLowerCase()) ||
-    s.email.toLowerCase().includes(search.toLowerCase())
-  );
-
   const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] dark:bg-gray-800 dark:text-gray-100";
 
   return (
@@ -111,61 +108,112 @@ export default function SecretariaAlunosPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-8">
-        <div className="relative mb-6">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por nome ou email..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] bg-white dark:bg-gray-800 dark:text-gray-100"
-          />
+        {/* Filtros */}
+        <div className="flex gap-3 mb-6 flex-wrap">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Buscar por nome ou email..."
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] bg-white dark:bg-gray-800 dark:text-gray-100"
+            />
+          </div>
+          <select
+            value={turmaFilter}
+            onChange={e => setTurmaFilter(e.target.value)}
+            className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+          >
+            <option value="">Todas as turmas</option>
+            <option value="sem-turma">Sem turma</option>
+            {classes.map(c => (
+              <option key={c.id} value={String(c.id)}>{c.name}</option>
+            ))}
+          </select>
+          <select
+            value={statusFilter}
+            onChange={e => setStatusFilter(e.target.value)}
+            className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+          >
+            <option value="">Todos os status</option>
+            <option value="ok">Em dia</option>
+            <option value="overdue">Inadimplente</option>
+          </select>
         </div>
 
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-          {loading ? (
-            <div className="p-8 text-center">
-              <div className="w-8 h-8 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 dark:text-gray-500 text-sm">Nenhum aluno encontrado</div>
-          ) : (
-            <table className="w-full">
-              <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
-                <tr>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Nome</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">Email</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Turma</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status Financeiro</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
-                {filtered.map((s) => (
-                  <tr key={s.id} onClick={() => setSelectedStudent(s)} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-white text-xs font-bold">{s.name.charAt(0).toUpperCase()}</span>
+        {/* Lista agrupada por turma */}
+        {loading ? (
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center">
+            <div className="w-8 h-8 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
+          </div>
+        ) : (() => {
+          const filtered = students.filter(s => {
+            const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
+              s.email.toLowerCase().includes(search.toLowerCase());
+            const matchTurma = !turmaFilter ||
+              (turmaFilter === 'sem-turma' ? !s.classId : String(s.classId) === turmaFilter);
+            const matchStatus = !statusFilter || s.financialStatus === statusFilter;
+            return matchSearch && matchTurma && matchStatus;
+          });
+
+          const groups: Record<string, { label: string; students: Student[] }> = {};
+          filtered.forEach(s => {
+            const key = s.classId ? String(s.classId) : 'sem-turma';
+            const label = s.class?.name ?? 'Sem turma';
+            if (!groups[key]) groups[key] = { label, students: [] };
+            groups[key].students.push(s);
+          });
+
+          if (filtered.length === 0) {
+            return (
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center">
+                <p className="text-gray-400 dark:text-gray-500 text-sm">Nenhum aluno encontrado</p>
+              </div>
+            );
+          }
+
+          return (
+            <div className="space-y-6">
+              {Object.entries(groups).map(([key, group]) => (
+                <div key={key} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+                  <div className="px-6 py-3 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                    <span className="text-sm font-semibold text-[#1E3A5F] dark:text-white">{group.label}</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-500">{group.students.length} aluno{group.students.length !== 1 ? 's' : ''}</span>
+                  </div>
+                  <div className="divide-y divide-gray-50 dark:divide-gray-800">
+                    {group.students.map(s => (
+                      <div
+                        key={s.id}
+                        onClick={() => setSelectedStudent(s)}
+                        className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
+                            <span className="text-white text-xs font-bold">{s.name.charAt(0).toUpperCase()}</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{s.name}</p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500">{s.email}</p>
+                          </div>
                         </div>
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{s.name}</span>
+                        <div className="flex items-center gap-3">
+                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            s.financialStatus === 'overdue'
+                              ? 'bg-red-50 dark:bg-red-950 text-red-600'
+                              : 'bg-green-50 dark:bg-green-950 text-green-600'
+                          }`}>
+                            {s.financialStatus === 'overdue' ? 'Inadimplente' : 'Em dia'}
+                          </span>
+                          <ChevronRight size={16} className="text-gray-300 dark:text-gray-600" />
+                        </div>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 hidden sm:table-cell">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">{s.email}</span>
-                    </td>
-                    <td className="px-6 py-4 hidden md:table-cell">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">{s.class?.name ?? '—'}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${financialStatusColor[s.financialStatus] ?? 'bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
-                        {financialStatusLabel[s.financialStatus] ?? s.financialStatus}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
       </main>
 
       {/* Modal: Matricular aluno */}
