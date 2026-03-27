@@ -61,7 +61,7 @@ export default function SecretariaAlunosPage() {
   const loadData = async () => {
     try {
       const [studentsRes, classesRes] = await Promise.all([
-        api.get('/secretary/students', { headers: { 'Cache-Control': 'no-cache' } }),
+        api.get('/secretary/students'),
         api.get('/secretary/classes'),
       ]);
       setStudents(studentsRes.data);
