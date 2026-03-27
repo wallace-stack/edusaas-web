@@ -4,23 +4,30 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, Search } from 'lucide-react';
+import { ArrowLeft, Plus, Search, X } from 'lucide-react';
 
 interface Student {
   id: number;
   name: string;
   email: string;
-  class?: { name: string };
-  financialStatus: 'pago' | 'pendente' | 'vencido';
+  phone?: string;
+  class?: { id: number; name: string } | null;
+  classId?: number | null;
+  financialStatus: string;
+  overdueCount: number;
 }
 
 const financialStatusLabel: Record<string, string> = {
+  ok: 'Em dia',
+  overdue: 'Inadimplente',
   pago: 'Em dia',
   pendente: 'Pendente',
   vencido: 'Inadimplente',
 };
 
 const financialStatusColor: Record<string, string> = {
+  ok: 'bg-green-50 dark:bg-green-950 text-green-700',
+  overdue: 'bg-red-50 dark:bg-red-950 text-red-700',
   pago: 'bg-green-50 dark:bg-green-950 text-green-700',
   pendente: 'bg-orange-50 dark:bg-orange-950 text-orange-700',
   vencido: 'bg-red-50 dark:bg-red-950 text-red-700',
@@ -36,6 +43,7 @@ export default function SecretariaAlunosPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [classes, setClasses] = useState<any[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [form, setForm] = useState({
     name: '', email: '', password: '', phone: '', birthDate: '', classId: '',
   });
@@ -131,7 +139,7 @@ export default function SecretariaAlunosPage() {
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                 {filtered.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <tr key={s.id} onClick={() => setSelectedStudent(s)} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
@@ -159,6 +167,7 @@ export default function SecretariaAlunosPage() {
         </div>
       </main>
 
+      {/* Modal: Matricular aluno */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
@@ -172,7 +181,17 @@ export default function SecretariaAlunosPage() {
                   Mínimo 8 caracteres, uma letra maiúscula e um número.
                 </p>
               </div>
-              <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="Telefone (opcional)" className={inputCls} />
+              <div>
+                <input
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder="Telefone (ex: 11987654321)"
+                  required
+                  maxLength={11}
+                  className={inputCls}
+                />
+                <p className="text-xs text-gray-400 mt-1">Apenas números, 10 ou 11 dígitos</p>
+              </div>
               <div>
                 <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Data de nascimento</label>
                 <input value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} type="date" className={inputCls} />
@@ -189,6 +208,65 @@ export default function SecretariaAlunosPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Detalhes do aluno */}
+      {selectedStudent && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white">Dados do Aluno</h2>
+              <button onClick={() => setSelectedStudent(null)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                <div className="w-10 h-10 bg-[#1E3A5F] rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold">{selectedStudent.name.charAt(0).toUpperCase()}</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-800 dark:text-gray-100">{selectedStudent.name}</p>
+                  <p className="text-xs text-gray-400">{selectedStudent.email}</p>
+                </div>
+              </div>
+              {selectedStudent.phone && (
+                <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                  <p className="text-xs text-gray-400 mb-0.5">Telefone</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.phone}</p>
+                </div>
+              )}
+              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                <p className="text-xs text-gray-400 mb-0.5">Turma atual</p>
+                <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.class?.name ?? 'Não matriculado'}</p>
+              </div>
+              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                <p className="text-xs text-gray-400 mb-1">Transferir para turma</p>
+                <select
+                  className={inputCls}
+                  onChange={async (e) => {
+                    if (!e.target.value) return;
+                    try {
+                      await api.post(`/enrollment/transfer`, {
+                        studentId: selectedStudent.id,
+                        newClassId: Number(e.target.value),
+                      });
+                      setSelectedStudent(null);
+                      loadData();
+                    } catch (err: any) {
+                      alert(err.response?.data?.message || 'Erro ao transferir');
+                    }
+                  }}
+                >
+                  <option value="">Selecione nova turma</option>
+                  {classes.map(c => (
+                    <option key={c.id} value={c.id}>{c.name} — {c.year}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       )}
