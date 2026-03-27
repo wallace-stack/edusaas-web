@@ -166,15 +166,20 @@ export default function SecretariaAlunosPage() {
             <form onSubmit={handleCreate} className="space-y-3">
               <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nome completo" required className={inputCls} />
               <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" placeholder="Email" required className={inputCls} />
-              <input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} type="password" placeholder="Senha de acesso" required className={inputCls} />
+              <div>
+                <input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} type="password" placeholder="Senha de acesso" required className={inputCls} />
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  Mínimo 8 caracteres, uma letra maiúscula e um número.
+                </p>
+              </div>
               <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="Telefone (opcional)" className={inputCls} />
               <div>
                 <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Data de nascimento</label>
                 <input value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} type="date" className={inputCls} />
               </div>
-              <select value={form.classId} onChange={(e) => setForm({ ...form, classId: e.target.value })} className={inputCls}>
-                <option value="">Selecione a turma (opcional)</option>
-                {classes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              <select value={form.classId} onChange={(e) => setForm({ ...form, classId: e.target.value })} required className={inputCls}>
+                <option value="">Selecione a turma *</option>
+                {classes.map((c) => <option key={c.id} value={c.id}>{c.name} — {c.year}</option>)}
               </select>
               {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
               <div className="flex gap-3 pt-2">
