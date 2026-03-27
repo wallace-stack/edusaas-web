@@ -18,6 +18,7 @@ interface User {
 const roleLabel: any = {
   director: 'Diretor',
   coordinator: 'Coordenador',
+  secretary: 'Secretaria',
   teacher: 'Professor',
   student: 'Aluno',
 };
@@ -25,6 +26,7 @@ const roleLabel: any = {
 const roleColor: any = {
   director: 'bg-purple-50 dark:bg-purple-950 text-purple-700',
   coordinator: 'bg-blue-50 dark:bg-blue-950 text-blue-700',
+  secretary: 'bg-blue-50 dark:bg-blue-950 text-blue-700',
   teacher: 'bg-green-50 dark:bg-green-950 text-green-700',
   student: 'bg-orange-50 dark:bg-orange-950 text-orange-700',
 };
@@ -129,6 +131,7 @@ export default function UsuariosPage() {
           >
             <option value="">Todos os papéis</option>
             <option value="coordinator">Coordenadores</option>
+            <option value="secretary">Secretaria</option>
             <option value="teacher">Professores</option>
             <option value="student">Alunos</option>
           </select>
@@ -230,6 +233,7 @@ export default function UsuariosPage() {
                 <option value="student">Aluno</option>
                 <option value="teacher">Professor</option>
                 <option value="coordinator">Coordenador</option>
+                <option value="secretary">Secretaria</option>
               </select>
 
               {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
