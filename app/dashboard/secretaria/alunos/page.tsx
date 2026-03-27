@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, Search, X } from 'lucide-react';
+import { ArrowLeft, Plus, Search, X, Eye, EyeOff } from 'lucide-react';
 
 interface Student {
   id: number;
@@ -44,6 +44,7 @@ export default function SecretariaAlunosPage() {
   const [error, setError] = useState('');
   const [classes, setClasses] = useState<any[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
     name: '', email: '', password: '', phone: '', birthDate: '', classId: '',
   });
@@ -176,7 +177,23 @@ export default function SecretariaAlunosPage() {
               <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nome completo" required className={inputCls} />
               <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" placeholder="Email" required className={inputCls} />
               <div>
-                <input value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} type="password" placeholder="Senha de acesso" required className={inputCls} />
+                <div className="relative">
+                  <input
+                    value={form.password}
+                    onChange={(e) => setForm({ ...form, password: e.target.value })}
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Senha de acesso"
+                    required
+                    className={inputCls}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   Mínimo 8 caracteres, uma letra maiúscula e um número.
                 </p>
