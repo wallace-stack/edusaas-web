@@ -46,10 +46,12 @@ export default function LancarNotasPage() {
     try {
       const [subjectsRes, studentsRes] = await Promise.all([
         api.get(`/classes/${classId}/subjects`),
-        api.get(`/enrollment/class/${classId}`),
+        api.get(`/enrollments/class/${classId}`),
       ]);
       setSubjects(subjectsRes.data);
-      const studentList = studentsRes.data.map((e: any) => e.student ?? e);
+      const studentList = studentsRes.data
+        .map((e: any) => e.student)
+        .filter(Boolean);
       setStudents(studentList);
     } catch (err) { console.error(err); }
   };
