@@ -278,7 +278,7 @@ export default function SecretariaAlunosPage() {
               <h2 className="text-base font-bold text-[#1E3A5F] dark:text-white">Matricular aluno</h2>
               <button onClick={() => { setShowModal(false); setError(''); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400"><X size={18} /></button>
             </div>
-            <form onSubmit={handleCreate} className="p-4 space-y-3">
+            <form onSubmit={handleCreate} className="p-4 space-y-3 overflow-x-hidden">
               {/* 1. Nome */}
               <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value.toUpperCase() })} placeholder="Nome completo" required className={inputCls} />
               {/* 2. Email */}
@@ -406,13 +406,12 @@ export default function SecretariaAlunosPage() {
                 value={form.guardianRelation}
                 onChange={e => setForm({ ...form, guardianRelation: e.target.value })}
                 required
-                className={inputCls}
+                className={`${inputCls} max-w-full`}
               >
                 <option value="">Relação com o aluno *</option>
                 <option value="pai">Pai</option>
-                <option value="mãe">Mãe</option>
-                <option value="avô">Avô</option>
-                <option value="avó">Avó</option>
+                <option value="mae">Mãe</option>
+                <option value="avo">Avô/Avó</option>
                 <option value="tio">Tio/Tia</option>
                 <option value="outro">Outro</option>
               </select>
