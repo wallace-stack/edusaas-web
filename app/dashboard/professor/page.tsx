@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, clearAuth } from '../../lib/auth';
 import api from '../../lib/api';
-import { BookOpen, Users, ClipboardList, LogOut, CheckSquare, Newspaper } from 'lucide-react';
+import { BookOpen, Users, ClipboardList, LogOut, CheckSquare, Newspaper, Bell } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 interface TeacherData {
@@ -122,6 +122,7 @@ export default function ProfessorDashboard() {
             { label: 'Lançar Notas', icon: ClipboardList, href: '/dashboard/professor/notas', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600' },
             { label: 'Registrar Chamada', icon: CheckSquare, href: '/dashboard/professor/chamada', color: 'bg-green-50 dark:bg-green-950 text-green-600' },
             { label: 'Minhas Turmas', icon: BookOpen, href: '/dashboard/professor/turmas', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
+            { label: 'Avisos da Turma', icon: Bell, href: '/dashboard/professor/notificacoes', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
           ].map((item) => (
             <button
               key={item.label}
