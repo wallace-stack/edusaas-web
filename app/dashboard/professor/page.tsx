@@ -111,9 +111,11 @@ export default function ProfessorDashboard() {
               hint: 'Ver histórico de chamadas',
             },
             {
-              value: typeof data?.avgAttendance === 'number'
-                ? `${data.avgAttendance}%`
-                : (data?.avgAttendance ?? '0%'),
+              value: data?.avgAttendance != null
+                ? (String(data.avgAttendance).includes('%')
+                  ? data.avgAttendance
+                  : `${data.avgAttendance}%`)
+                : '0%',
               label: 'Frequência média',
               icon: Users,
               color: 'bg-orange-50 dark:bg-orange-950 text-orange-600',
