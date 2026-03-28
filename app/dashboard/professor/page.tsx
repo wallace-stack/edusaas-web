@@ -8,10 +8,13 @@ import { BookOpen, Users, ClipboardList, LogOut, CheckSquare, Newspaper, Bell } 
 import { ThemeToggle } from '@/components/theme-toggle';
 
 interface TeacherData {
-  totalGradesLaunched: number;
+  totalGrades: number;
   avgGrade: number;
-  totalAttendanceRecords: number;
-  avgAttendance: string;
+  totalAttendance: number;
+  avgAttendance: number;
+  // legacy fields
+  totalGradesLaunched?: number;
+  totalAttendanceRecords?: number;
 }
 
 export default function ProfessorDashboard() {
@@ -82,37 +85,53 @@ export default function ProfessorDashboard() {
 
         {/* Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
-            <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center mb-4">
-              <ClipboardList size={20} className="text-blue-600" />
-            </div>
-            <p className="text-3xl font-bold text-[#1E3A5F] dark:text-white">{data?.totalGradesLaunched || 0}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Notas lançadas</p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
-            <div className="w-10 h-10 bg-green-50 dark:bg-green-950 rounded-xl flex items-center justify-center mb-4">
-              <BookOpen size={20} className="text-green-600" />
-            </div>
-            <p className="text-3xl font-bold text-[#1E3A5F] dark:text-white">{data?.avgGrade || 0}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Média das notas</p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
-            <div className="w-10 h-10 bg-purple-50 dark:bg-purple-950 rounded-xl flex items-center justify-center mb-4">
-              <CheckSquare size={20} className="text-purple-600" />
-            </div>
-            <p className="text-3xl font-bold text-[#1E3A5F] dark:text-white">{data?.totalAttendanceRecords || 0}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Chamadas registradas</p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
-            <div className="w-10 h-10 bg-orange-50 dark:bg-orange-950 rounded-xl flex items-center justify-center mb-4">
-              <Users size={20} className="text-orange-600" />
-            </div>
-            <p className="text-3xl font-bold text-[#1E3A5F] dark:text-white">{data?.avgAttendance || '0%'}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Frequência média</p>
-          </div>
+          {[
+            {
+              value: data?.totalGrades ?? data?.totalGradesLaunched ?? 0,
+              label: 'Notas lançadas',
+              icon: ClipboardList,
+              color: 'bg-blue-50 dark:bg-blue-950 text-blue-600',
+              href: '/dashboard/professor/notas/historico',
+              hint: 'Ver boletim da turma',
+            },
+            {
+              value: data?.avgGrade != null ? Number(data.avgGrade).toFixed(2) : '—',
+              label: 'Média das notas',
+              icon: BookOpen,
+              color: 'bg-green-50 dark:bg-green-950 text-green-600',
+              href: '/dashboard/professor/notas/historico',
+              hint: 'Ver notas detalhadas',
+            },
+            {
+              value: data?.totalAttendance ?? data?.totalAttendanceRecords ?? 0,
+              label: 'Chamadas registradas',
+              icon: CheckSquare,
+              color: 'bg-purple-50 dark:bg-purple-950 text-purple-600',
+              href: '/dashboard/professor/chamada/historico',
+              hint: 'Ver histórico de chamadas',
+            },
+            {
+              value: `${data?.avgAttendance ?? 0}%`,
+              label: 'Frequência média',
+              icon: Users,
+              color: 'bg-orange-50 dark:bg-orange-950 text-orange-600',
+              href: '/dashboard/professor/chamada/historico',
+              hint: 'Ver frequência por turma',
+            },
+          ].map(card => (
+            <button
+              key={card.label}
+              onClick={() => router.push(card.href)}
+              className="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all text-left group"
+            >
+              <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center mb-3`}>
+                <card.icon size={20} />
+              </div>
+              <p className="text-2xl font-bold text-[#1E3A5F] dark:text-white">{card.value}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{card.label}</p>
+              <p className="text-xs text-[#F97316] mt-2 opacity-0 group-hover:opacity-100 transition-opacity">{card.hint} →</p>
+            </button>
+          ))}
         </div>
 
         {/* Menu */}
