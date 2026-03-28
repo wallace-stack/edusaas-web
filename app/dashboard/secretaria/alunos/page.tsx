@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
@@ -57,9 +57,9 @@ export default function SecretariaAlunosPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [transferClassId, setTransferClassId] = useState('');
   const [transferring, setTransferring] = useState(false);
+  const loadingRef = useRef(false);
   const [form, setForm] = useState({
     name: '', email: '', password: '', phone: '', birthDate: '', classId: '',
-    document: '',
     address: '', city: '', state: '', zipCode: '',
     guardianName: '', guardianPhone: '', guardianRelation: '',
   });
@@ -70,6 +70,8 @@ export default function SecretariaAlunosPage() {
   }, []);
 
   const loadData = async () => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
     try {
       const [studentsRes, classesRes] = await Promise.all([
         api.get('/secretary/students'),
@@ -78,11 +80,13 @@ export default function SecretariaAlunosPage() {
       setStudents(studentsRes.data);
       setClasses(classesRes.data);
     } catch (err) { console.error(err); }
-    finally { setLoading(false); }
+    finally {
+      setLoading(false);
+      loadingRef.current = false;
+    }
   };
 
   const handleSelectStudent = (s: Student) => {
-    console.log('SELECTED STUDENT:', JSON.stringify(s));
     setSelectedStudent(s);
     setTransferClassId('');
   };
@@ -117,7 +121,7 @@ export default function SecretariaAlunosPage() {
       };
       await api.post('/secretary/students', body);
       setShowModal(false);
-      setForm({ name: '', email: '', password: '', phone: '', birthDate: '', classId: '', document: '', address: '', city: '', state: '', zipCode: '', guardianName: '', guardianPhone: '', guardianRelation: '' });
+      setForm({ name: '', email: '', password: '', phone: '', birthDate: '', classId: '', address: '', city: '', state: '', zipCode: '', guardianName: '', guardianPhone: '', guardianRelation: '' });
       loadData();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao matricular aluno');
@@ -296,13 +300,16 @@ export default function SecretariaAlunosPage() {
               <div>
                 <input
                   value={form.phone}
-                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  placeholder="Telefone (ex: 11987654321)"
+                  onChange={e => {
+                    const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
+                    setForm({ ...form, phone: digits });
+                  }}
+                  placeholder="Telefone (ex: 21999999999)"
                   required
-                  maxLength={11}
+                  inputMode="numeric"
                   className={inputCls}
                 />
-                <p className="text-xs text-gray-400 mt-1">Apenas números, 10 ou 11 dígitos</p>
+                <p className="text-xs text-gray-400 mt-1">Apenas números, DDD + número</p>
               </div>
               <div>
                 <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Data de nascimento</label>
@@ -314,14 +321,6 @@ export default function SecretariaAlunosPage() {
                   className={inputCls}
                 />
               </div>
-
-              {/* Documento */}
-              <input
-                value={form.document}
-                onChange={e => setForm({ ...form, document: e.target.value })}
-                placeholder="CPF (opcional)"
-                className={inputCls}
-              />
 
               {/* Endereço */}
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Endereço</p>
@@ -346,12 +345,34 @@ export default function SecretariaAlunosPage() {
                   className={inputCls}
                 />
               </div>
-              <input
-                value={form.zipCode}
-                onChange={e => setForm({ ...form, zipCode: e.target.value })}
-                placeholder="CEP (ex: 12345-678)"
-                className={inputCls}
-              />
+              <div className="relative">
+                <input
+                  value={form.zipCode}
+                  onChange={async e => {
+                    const digits = e.target.value.replace(/\D/g, '').slice(0, 8);
+                    setForm({ ...form, zipCode: digits });
+                    if (digits.length === 8) {
+                      try {
+                        const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`);
+                        const data = await res.json();
+                        if (!data.erro) {
+                          setForm(prev => ({
+                            ...prev,
+                            zipCode: digits,
+                            address: data.logradouro?.toUpperCase() || prev.address,
+                            city: data.localidade?.toUpperCase() || prev.city,
+                            state: data.uf?.toUpperCase() || prev.state,
+                          }));
+                        }
+                      } catch {}
+                    }
+                  }}
+                  placeholder="CEP (apenas números)"
+                  inputMode="numeric"
+                  maxLength={8}
+                  className={inputCls}
+                />
+              </div>
 
               {/* Responsável */}
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Responsável</p>
