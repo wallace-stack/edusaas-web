@@ -18,11 +18,13 @@ interface StaffUser {
 const roleLabel: Record<string, string> = {
   teacher: 'Professor',
   coordinator: 'Coordenador',
+  secretary: 'Secretaria',
 };
 
 const roleColor: Record<string, string> = {
   teacher: 'bg-green-50 dark:bg-green-950 text-green-700',
   coordinator: 'bg-blue-50 dark:bg-blue-950 text-blue-700',
+  secretary: 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300',
 };
 
 const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] dark:bg-gray-800 dark:text-gray-100";
