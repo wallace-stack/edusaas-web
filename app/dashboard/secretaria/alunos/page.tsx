@@ -133,8 +133,8 @@ export default function SecretariaAlunosPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 py-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
             <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
               <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
@@ -143,18 +143,18 @@ export default function SecretariaAlunosPage() {
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 bg-[#1E3A5F] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#162d4a] transition-colors"
+            className="flex items-center gap-1.5 bg-[#1E3A5F] text-white px-3 py-2 rounded-xl text-xs font-medium hover:bg-[#162d4a] transition-colors whitespace-nowrap"
           >
-            <Plus size={16} />
+            <Plus size={14} />
             Matricular aluno
           </button>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-4">
         {/* Filtros */}
-        <div className="flex gap-3 mb-6 flex-wrap">
-          <div className="relative flex-1 min-w-[200px]">
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <div className="relative flex-1">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               value={search}
@@ -163,26 +163,28 @@ export default function SecretariaAlunosPage() {
               className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] bg-white dark:bg-gray-800 dark:text-gray-100"
             />
           </div>
-          <select
-            value={turmaFilter}
-            onChange={e => setTurmaFilter(e.target.value)}
-            className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
-          >
-            <option value="">Todas as turmas</option>
-            <option value="sem-turma">Sem turma</option>
-            {classes.map(c => (
-              <option key={c.id} value={String(c.id)}>{c.name}</option>
-            ))}
-          </select>
-          <select
-            value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
-            className="px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
-          >
-            <option value="">Todos os status</option>
-            <option value="ok">Em dia</option>
-            <option value="overdue">Inadimplente</option>
-          </select>
+          <div className="flex gap-2">
+            <select
+              value={turmaFilter}
+              onChange={e => setTurmaFilter(e.target.value)}
+              className="flex-1 sm:flex-none px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+            >
+              <option value="">Todas as turmas</option>
+              <option value="sem-turma">Sem turma</option>
+              {classes.map(c => (
+                <option key={c.id} value={String(c.id)}>{c.name}</option>
+              ))}
+            </select>
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value)}
+              className="flex-1 sm:flex-none px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+            >
+              <option value="">Todos os status</option>
+              <option value="ok">Em dia</option>
+              <option value="overdue">Inadimplente</option>
+            </select>
+          </div>
         </div>
 
         {/* Lista agrupada por turma */}
@@ -237,26 +239,26 @@ export default function SecretariaAlunosPage() {
                       <div
                         key={s.id}
                         onClick={() => handleSelectStudent(s)}
-                        className="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                        className="px-4 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
                           <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-xs font-bold">{s.name.charAt(0).toUpperCase()}</span>
                           </div>
-                          <div>
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{s.name}</p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500">{s.email}</p>
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{s.name}</p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{s.email}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                             s.financialStatus === 'overdue'
                               ? 'bg-red-50 dark:bg-red-950 text-red-600'
                               : 'bg-green-50 dark:bg-green-950 text-green-600'
                           }`}>
                             {s.financialStatus === 'overdue' ? 'Inadimplente' : 'Em dia'}
                           </span>
-                          <ChevronRight size={16} className="text-gray-300 dark:text-gray-600" />
+                          <ChevronRight size={14} className="text-gray-300 dark:text-gray-600" />
                         </div>
                       </div>
                     ))}
@@ -270,10 +272,13 @@ export default function SecretariaAlunosPage() {
 
       {/* Modal: Matricular aluno */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white mb-4">Matricular aluno</h2>
-            <form onSubmit={handleCreate} className="space-y-3">
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-gray-900 px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#1E3A5F] dark:text-white">Matricular aluno</h2>
+              <button onClick={() => { setShowModal(false); setError(''); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400"><X size={18} /></button>
+            </div>
+            <form onSubmit={handleCreate} className="p-4 space-y-3">
               {/* 1. Nome */}
               <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value.toUpperCase() })} placeholder="Nome completo" required className={inputCls} />
               {/* 2. Email */}
@@ -425,7 +430,7 @@ export default function SecretariaAlunosPage() {
                 </p>
               </div>
               {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
-              <div className="flex gap-3 pt-2">
+              <div className="flex gap-3 pt-2 pb-4">
                 <button type="button" onClick={() => { setShowModal(false); setError(''); }} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Cancelar</button>
                 <button type="submit" disabled={saving} className="flex-1 py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50">
                   {saving ? 'Matriculando...' : 'Matricular'}
@@ -438,15 +443,15 @@ export default function SecretariaAlunosPage() {
 
       {/* Modal: Detalhes do aluno */}
       {selectedStudent && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white">Dados do Aluno</h2>
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[85vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-gray-900 px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#1E3A5F] dark:text-white">Dados do Aluno</h2>
               <button onClick={() => setSelectedStudent(null)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
                 <X size={18} />
               </button>
             </div>
-            <div className="space-y-3">
+            <div className="p-4 space-y-3">
               <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
                 <div className="w-10 h-10 bg-[#1E3A5F] rounded-full flex items-center justify-center">
                   <span className="text-white font-bold">{selectedStudent.name.charAt(0).toUpperCase()}</span>
