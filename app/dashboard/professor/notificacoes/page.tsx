@@ -43,6 +43,8 @@ export default function ProfessorNotificacoesPage() {
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [editNotif, setEditNotif] = useState<Notification | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
   const [form, setForm] = useState({
     title: '',
     message: '',
@@ -90,6 +92,17 @@ export default function ProfessorNotificacoesPage() {
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao criar notificação');
     } finally { setSaving(false); }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Excluir este aviso?')) return;
+    try {
+      setDeleting(id);
+      await api.delete(`/notifications/${id}`);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Erro ao excluir');
+    } finally { setDeleting(null); }
   };
 
   if (loading) {
@@ -146,15 +159,30 @@ export default function ProfessorNotificacoesPage() {
                         <span className="text-xs text-gray-400 flex-shrink-0">{timeAgo(n.createdAt)}</span>
                       </div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 whitespace-pre-line">{n.message}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.color}`}>
-                          {config.label}
-                        </span>
-                        {n.class && (
-                          <span className="text-xs text-gray-400 dark:text-gray-500">
-                            · {n.class.name}
+                      <div className="flex items-center gap-2 mt-2 justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.color}`}>
+                            {config.label}
                           </span>
-                        )}
+                          {n.class && (
+                            <span className="text-xs text-gray-400 dark:text-gray-500">· {n.class.name}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={e => { e.stopPropagation(); setEditNotif(n); }}
+                            className="text-xs text-gray-400 hover:text-[#1E3A5F] dark:hover:text-white px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={e => { e.stopPropagation(); handleDelete(n.id); }}
+                            disabled={deleting === n.id}
+                            className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 transition-colors disabled:opacity-50"
+                          >
+                            {deleting === n.id ? '...' : 'Excluir'}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -247,6 +275,57 @@ export default function ProfessorNotificacoesPage() {
                   className="flex-1 py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50"
                 >
                   {saving ? 'Enviando...' : 'Enviar aviso'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {editNotif && (
+        <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-gray-900 px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+              <h2 className="text-base font-bold text-[#1E3A5F] dark:text-white">Editar aviso</h2>
+              <button onClick={() => setEditNotif(null)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
+                <X size={18} />
+              </button>
+            </div>
+            <form onSubmit={async e => {
+              e.preventDefault();
+              try {
+                await api.patch(`/notifications/${editNotif.id}`, {
+                  title: editNotif.title,
+                  message: editNotif.message,
+                });
+                setEditNotif(null);
+                loadData();
+              } catch (err: any) {
+                alert(err.response?.data?.message || 'Erro ao editar');
+              }
+            }} className="p-4 space-y-3">
+              <input
+                value={editNotif.title}
+                onChange={e => setEditNotif({ ...editNotif, title: e.target.value })}
+                placeholder="Título"
+                required
+                className={inputCls}
+              />
+              <textarea
+                value={editNotif.message}
+                onChange={e => setEditNotif({ ...editNotif, message: e.target.value })}
+                placeholder="Mensagem"
+                required
+                rows={4}
+                className={`${inputCls} resize-none`}
+              />
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setEditNotif(null)}
+                  className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400">
+                  Cancelar
+                </button>
+                <button type="submit"
+                  className="flex-1 py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a]">
+                  Salvar alterações
                 </button>
               </div>
             </form>
