@@ -13,6 +13,8 @@ interface Student {
   phone?: string;
   document?: string;
   address?: string;
+  addressNumber?: string;
+  complement?: string;
   city?: string;
   state?: string;
   zipCode?: string;
@@ -59,7 +61,7 @@ export default function SecretariaAlunosPage() {
   const loadingRef = useRef(false);
   const [form, setForm] = useState({
     name: '', email: '', phone: '', birthDate: '', classId: '',
-    address: '', city: '', state: '', zipCode: '',
+    address: '', addressNumber: '', complement: '', city: '', state: '', zipCode: '',
     guardianName: '', guardianPhone: '', guardianRelation: '',
   });
 
@@ -120,7 +122,7 @@ export default function SecretariaAlunosPage() {
       };
       await api.post('/secretary/students', body);
       setShowModal(false);
-      setForm({ name: '', email: '', phone: '', birthDate: '', classId: '', address: '', city: '', state: '', zipCode: '', guardianName: '', guardianPhone: '', guardianRelation: '' });
+      setForm({ name: '', email: '', phone: '', birthDate: '', classId: '', address: '', addressNumber: '', complement: '', city: '', state: '', zipCode: '', guardianName: '', guardianPhone: '', guardianRelation: '' });
       loadData();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao matricular aluno');
@@ -336,10 +338,25 @@ export default function SecretariaAlunosPage() {
               <input
                 value={form.address}
                 onChange={e => setForm({ ...form, address: e.target.value.toUpperCase() })}
-                placeholder="Rua e número"
+                placeholder="Rua / Logradouro"
                 required
                 className={inputCls}
               />
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  value={form.addressNumber}
+                  onChange={e => setForm({ ...form, addressNumber: e.target.value })}
+                  placeholder="Número *"
+                  required
+                  className={inputCls}
+                />
+                <input
+                  value={form.complement}
+                  onChange={e => setForm({ ...form, complement: e.target.value.toUpperCase() })}
+                  placeholder="Complemento (apto, casa...)"
+                  className={inputCls}
+                />
+              </div>
               <div className="grid grid-cols-2 gap-2">
                 <input
                   value={form.city}
@@ -450,8 +467,11 @@ export default function SecretariaAlunosPage() {
                   <p className="text-xs text-gray-400 mb-0.5">Endereço</p>
                   <p className="text-sm text-gray-700 dark:text-gray-200">
                     {selectedStudent.address}
+                    {selectedStudent.addressNumber && `, ${selectedStudent.addressNumber}`}
+                    {selectedStudent.complement && ` - ${selectedStudent.complement}`}
                     {selectedStudent.city && `, ${selectedStudent.city}`}
                     {selectedStudent.state && ` - ${selectedStudent.state}`}
+                    {selectedStudent.zipCode && ` · CEP ${selectedStudent.zipCode}`}
                   </p>
                 </div>
               )}
