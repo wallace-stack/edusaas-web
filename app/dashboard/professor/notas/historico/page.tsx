@@ -45,8 +45,14 @@ export default function ProfessorNotasHistoricoPage() {
   }, [classFilter]);
 
   useEffect(() => {
-    if (classFilter && subjectFilter) {
-      api.get(`/grades/class/${classFilter}/subject/${subjectFilter}`).then(r => setGrades(r.data)).catch(console.error);
+    if (classFilter && subjectFilter && subjectFilter !== '') {
+      setLoading(true);
+      api.get(`/grades/class/${classFilter}/subject/${subjectFilter}`)
+        .then(r => setGrades(r.data))
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    } else {
+      setGrades([]);
     }
   }, [classFilter, subjectFilter]);
 

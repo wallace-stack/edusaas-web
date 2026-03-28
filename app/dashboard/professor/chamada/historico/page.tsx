@@ -47,7 +47,12 @@ export default function ProfessorChamadaHistoricoPage() {
   }, [classFilter, subjectFilter]);
 
   const filtered = dateFilter
-    ? records.filter(r => r.date?.startsWith(dateFilter))
+    ? records.filter(r => {
+        const recordDate = new Date(r.date);
+        const localDate = new Date(recordDate.getTime() + recordDate.getTimezoneOffset() * 60000);
+        const localDateStr = localDate.toISOString().split('T')[0];
+        return localDateStr === dateFilter;
+      })
     : records;
 
   // Agrupa por data
