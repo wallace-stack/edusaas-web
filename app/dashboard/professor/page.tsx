@@ -100,7 +100,7 @@ export default function ProfessorDashboard() {
               icon: BookOpen,
               color: 'bg-green-50 dark:bg-green-950 text-green-600',
               href: '/dashboard/professor/notas/historico',
-              hint: 'Ver notas detalhadas',
+              hint: 'Ver boletim detalhado →',
             },
             {
               value: data?.totalAttendance ?? data?.totalAttendanceRecords ?? 0,
@@ -111,12 +111,14 @@ export default function ProfessorDashboard() {
               hint: 'Ver histórico de chamadas',
             },
             {
-              value: `${data?.avgAttendance ?? 0}%`,
+              value: typeof data?.avgAttendance === 'number'
+                ? `${data.avgAttendance}%`
+                : (data?.avgAttendance ?? '0%'),
               label: 'Frequência média',
               icon: Users,
               color: 'bg-orange-50 dark:bg-orange-950 text-orange-600',
               href: '/dashboard/professor/chamada/historico',
-              hint: 'Ver frequência por turma',
+              hint: 'Ver histórico de chamadas →',
             },
           ].map(card => (
             <button
