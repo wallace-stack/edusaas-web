@@ -11,6 +11,14 @@ interface Student {
   name: string;
   email: string;
   phone?: string;
+  document?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
+  guardianName?: string;
+  guardianPhone?: string;
+  guardianRelation?: string;
   class?: { id: number; name: string } | null;
   classId?: number | null;
   financialStatus: string;
@@ -51,6 +59,9 @@ export default function SecretariaAlunosPage() {
   const [transferring, setTransferring] = useState(false);
   const [form, setForm] = useState({
     name: '', email: '', password: '', phone: '', birthDate: '', classId: '',
+    document: '',
+    address: '', city: '', state: '', zipCode: '',
+    guardianName: '', guardianPhone: '', guardianRelation: '',
   });
 
   useEffect(() => {
@@ -103,7 +114,7 @@ export default function SecretariaAlunosPage() {
         classId: form.classId ? Number(form.classId) : undefined,
       });
       setShowModal(false);
-      setForm({ name: '', email: '', password: '', phone: '', birthDate: '', classId: '' });
+      setForm({ name: '', email: '', password: '', phone: '', birthDate: '', classId: '', document: '', address: '', city: '', state: '', zipCode: '', guardianName: '', guardianPhone: '', guardianRelation: '' });
       loadData();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao matricular aluno');
@@ -286,6 +297,73 @@ export default function SecretariaAlunosPage() {
                 <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Data de nascimento</label>
                 <input value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} type="date" className={inputCls} />
               </div>
+
+              {/* Documento */}
+              <input
+                value={form.document}
+                onChange={e => setForm({ ...form, document: e.target.value })}
+                placeholder="CPF (opcional)"
+                className={inputCls}
+              />
+
+              {/* Endereço */}
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Endereço</p>
+              <input
+                value={form.address}
+                onChange={e => setForm({ ...form, address: e.target.value })}
+                placeholder="Rua e número"
+                className={inputCls}
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  value={form.city}
+                  onChange={e => setForm({ ...form, city: e.target.value })}
+                  placeholder="Cidade"
+                  className={inputCls}
+                />
+                <input
+                  value={form.state}
+                  onChange={e => setForm({ ...form, state: e.target.value })}
+                  placeholder="Estado (ex: SP)"
+                  maxLength={2}
+                  className={inputCls}
+                />
+              </div>
+              <input
+                value={form.zipCode}
+                onChange={e => setForm({ ...form, zipCode: e.target.value })}
+                placeholder="CEP (ex: 12345-678)"
+                className={inputCls}
+              />
+
+              {/* Responsável */}
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Responsável</p>
+              <input
+                value={form.guardianName}
+                onChange={e => setForm({ ...form, guardianName: e.target.value })}
+                placeholder="Nome do responsável"
+                className={inputCls}
+              />
+              <input
+                value={form.guardianPhone}
+                onChange={e => setForm({ ...form, guardianPhone: e.target.value })}
+                placeholder="Telefone do responsável"
+                className={inputCls}
+              />
+              <select
+                value={form.guardianRelation}
+                onChange={e => setForm({ ...form, guardianRelation: e.target.value })}
+                className={inputCls}
+              >
+                <option value="">Relação com o aluno</option>
+                <option value="pai">Pai</option>
+                <option value="mãe">Mãe</option>
+                <option value="avô">Avô</option>
+                <option value="avó">Avó</option>
+                <option value="tio">Tio/Tia</option>
+                <option value="outro">Outro</option>
+              </select>
+
               <select value={form.classId} onChange={(e) => setForm({ ...form, classId: e.target.value })} required className={inputCls}>
                 <option value="">Selecione a turma *</option>
                 {classes.map((c) => <option key={c.id} value={c.id}>{c.name} — {c.year}</option>)}
@@ -326,6 +404,25 @@ export default function SecretariaAlunosPage() {
                 <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
                   <p className="text-xs text-gray-400 mb-0.5">Telefone</p>
                   <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.phone}</p>
+                </div>
+              )}
+              {selectedStudent?.address && (
+                <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                  <p className="text-xs text-gray-400 mb-0.5">Endereço</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-200">
+                    {selectedStudent.address}
+                    {selectedStudent.city && `, ${selectedStudent.city}`}
+                    {selectedStudent.state && ` - ${selectedStudent.state}`}
+                  </p>
+                </div>
+              )}
+              {selectedStudent?.guardianName && (
+                <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                  <p className="text-xs text-gray-400 mb-0.5">Responsável</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.guardianName}</p>
+                  {selectedStudent.guardianPhone && (
+                    <p className="text-xs text-gray-400">{selectedStudent.guardianPhone} · {selectedStudent.guardianRelation}</p>
+                  )}
                 </div>
               )}
               <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
