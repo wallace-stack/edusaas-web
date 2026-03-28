@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, Search, X, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, Search, X, ChevronRight } from 'lucide-react';
 
 interface Student {
   id: number;
@@ -52,14 +52,13 @@ export default function SecretariaAlunosPage() {
   const [error, setError] = useState('');
   const [classes, setClasses] = useState<any[]>([]);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
   const [turmaFilter, setTurmaFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [transferClassId, setTransferClassId] = useState('');
   const [transferring, setTransferring] = useState(false);
   const loadingRef = useRef(false);
   const [form, setForm] = useState({
-    name: '', email: '', password: '', phone: '', birthDate: '', classId: '',
+    name: '', email: '', phone: '', birthDate: '', classId: '',
     address: '', city: '', state: '', zipCode: '',
     guardianName: '', guardianPhone: '', guardianRelation: '',
   });
@@ -121,7 +120,7 @@ export default function SecretariaAlunosPage() {
       };
       await api.post('/secretary/students', body);
       setShowModal(false);
-      setForm({ name: '', email: '', password: '', phone: '', birthDate: '', classId: '', address: '', city: '', state: '', zipCode: '', guardianName: '', guardianPhone: '', guardianRelation: '' });
+      setForm({ name: '', email: '', phone: '', birthDate: '', classId: '', address: '', city: '', state: '', zipCode: '', guardianName: '', guardianPhone: '', guardianRelation: '' });
       loadData();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao matricular aluno');
@@ -273,30 +272,11 @@ export default function SecretariaAlunosPage() {
           <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white mb-4">Matricular aluno</h2>
             <form onSubmit={handleCreate} className="space-y-3">
-              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value.toUpperCase() })} placeholder="Nome completo" required className={inputCls} />
-              <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" placeholder="Email" required className={inputCls} />
-              <div>
-                <div className="relative">
-                  <input
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Senha de acesso"
-                    required
-                    className={inputCls}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                  Mínimo 8 caracteres, uma letra maiúscula e um número.
-                </p>
-              </div>
+              {/* 1. Nome */}
+              <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value.toUpperCase() })} placeholder="Nome completo" required className={inputCls} />
+              {/* 2. Email */}
+              <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} type="email" placeholder="Email" required className={inputCls} />
+              {/* 3. Telefone */}
               <div>
                 <input
                   value={form.phone}
@@ -311,6 +291,7 @@ export default function SecretariaAlunosPage() {
                 />
                 <p className="text-xs text-gray-400 mt-1">Apenas números, DDD + número</p>
               </div>
+              {/* 4. Data de nascimento */}
               <div>
                 <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Data de nascimento</label>
                 <input
@@ -322,29 +303,8 @@ export default function SecretariaAlunosPage() {
                 />
               </div>
 
-              {/* Endereço */}
+              {/* 5–8. Endereço */}
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Endereço</p>
-              <input
-                value={form.address}
-                onChange={e => setForm({ ...form, address: e.target.value.toUpperCase() })}
-                placeholder="Rua e número"
-                className={inputCls}
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  value={form.city}
-                  onChange={e => setForm({ ...form, city: e.target.value.toUpperCase() })}
-                  placeholder="Cidade"
-                  className={inputCls}
-                />
-                <input
-                  value={form.state}
-                  onChange={e => setForm({ ...form, state: e.target.value })}
-                  placeholder="Estado (ex: SP)"
-                  maxLength={2}
-                  className={inputCls}
-                />
-              </div>
               <div className="relative">
                 <input
                   value={form.zipCode}
@@ -373,27 +333,60 @@ export default function SecretariaAlunosPage() {
                   className={inputCls}
                 />
               </div>
+              <input
+                value={form.address}
+                onChange={e => setForm({ ...form, address: e.target.value.toUpperCase() })}
+                placeholder="Rua e número"
+                required
+                className={inputCls}
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  value={form.city}
+                  onChange={e => setForm({ ...form, city: e.target.value.toUpperCase() })}
+                  placeholder="Cidade"
+                  required
+                  className={inputCls}
+                />
+                <input
+                  value={form.state}
+                  onChange={e => setForm({ ...form, state: e.target.value.toUpperCase() })}
+                  placeholder="Estado (ex: SP)"
+                  required
+                  maxLength={2}
+                  className={inputCls}
+                />
+              </div>
 
-              {/* Responsável */}
+              {/* 9–12. Responsável */}
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Responsável</p>
               <input
                 value={form.guardianName}
                 onChange={e => setForm({ ...form, guardianName: e.target.value.toUpperCase() })}
                 placeholder="Nome do responsável"
+                required
                 className={inputCls}
               />
-              <input
-                value={form.guardianPhone}
-                onChange={e => setForm({ ...form, guardianPhone: e.target.value })}
-                placeholder="Telefone do responsável"
-                className={inputCls}
-              />
+              <div>
+                <input
+                  value={form.guardianPhone}
+                  onChange={e => {
+                    const digits = e.target.value.replace(/\D/g, '').slice(0, 11);
+                    setForm({ ...form, guardianPhone: digits });
+                  }}
+                  placeholder="Telefone do responsável"
+                  required
+                  inputMode="numeric"
+                  className={inputCls}
+                />
+              </div>
               <select
                 value={form.guardianRelation}
                 onChange={e => setForm({ ...form, guardianRelation: e.target.value })}
+                required
                 className={inputCls}
               >
-                <option value="">Relação com o aluno</option>
+                <option value="">Relação com o aluno *</option>
                 <option value="pai">Pai</option>
                 <option value="mãe">Mãe</option>
                 <option value="avô">Avô</option>
@@ -402,10 +395,18 @@ export default function SecretariaAlunosPage() {
                 <option value="outro">Outro</option>
               </select>
 
-              <select value={form.classId} onChange={(e) => setForm({ ...form, classId: e.target.value })} required className={inputCls}>
+              {/* 13–14. Acesso */}
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Acesso</p>
+              <select value={form.classId} onChange={e => setForm({ ...form, classId: e.target.value })} required className={inputCls}>
                 <option value="">Selecione a turma *</option>
-                {classes.map((c) => <option key={c.id} value={c.id}>{c.name} — {c.year}</option>)}
+                {classes.map(c => <option key={c.id} value={c.id}>{c.name} — {c.year}</option>)}
               </select>
+              <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-xl">
+                <span className="text-blue-600 text-lg">📧</span>
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  As credenciais de acesso serão geradas automaticamente e enviadas para o email do aluno.
+                </p>
+              </div>
               {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => { setShowModal(false); setError(''); }} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Cancelar</button>

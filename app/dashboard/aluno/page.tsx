@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, clearAuth } from '../../lib/auth';
 import api from '../../lib/api';
-import { BookOpen, CheckSquare, DollarSign, Bell, LogOut, TrendingUp, AlertTriangle, Newspaper } from 'lucide-react';
+import { BookOpen, CheckSquare, DollarSign, Bell, LogOut, TrendingUp, AlertTriangle, Newspaper, ArrowLeft } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 interface Grade {
@@ -91,12 +91,20 @@ export default function AlunoDashboard() {
       <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#1E3A5F] rounded-lg flex items-center justify-center">
-              <span className="text-white text-sm font-bold">E</span>
+            <button
+              onClick={() => router.back()}
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
+            >
+              <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-[#1E3A5F] rounded-lg flex items-center justify-center">
+                <span className="text-white text-sm font-bold">E</span>
+              </div>
+              <span className="font-bold text-[#1E3A5F] dark:text-white">EduSaaS</span>
+              <span className="text-gray-300 dark:text-gray-600 hidden sm:block">|</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Portal do Aluno</span>
             </div>
-            <span className="font-bold text-[#1E3A5F] dark:text-white">EduSaaS</span>
-            <span className="text-gray-300 dark:text-gray-600">|</span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">Portal do Aluno</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
