@@ -82,6 +82,7 @@ export default function SecretariaAlunosPage() {
   };
 
   const handleSelectStudent = (s: Student) => {
+    console.log('SELECTED STUDENT:', JSON.stringify(s));
     setSelectedStudent(s);
     setTransferClassId('');
   };
@@ -109,10 +110,12 @@ export default function SecretariaAlunosPage() {
     try {
       setSaving(true);
       setError('');
-      await api.post('/secretary/students', {
+      const body = {
         ...form,
         classId: form.classId ? Number(form.classId) : undefined,
-      });
+        birthDate: form.birthDate ? new Date(form.birthDate).toISOString() : undefined,
+      };
+      await api.post('/secretary/students', body);
       setShowModal(false);
       setForm({ name: '', email: '', password: '', phone: '', birthDate: '', classId: '', document: '', address: '', city: '', state: '', zipCode: '', guardianName: '', guardianPhone: '', guardianRelation: '' });
       loadData();
@@ -200,6 +203,14 @@ export default function SecretariaAlunosPage() {
             groups[key].students.push(s);
           });
 
+          Object.values(groups).forEach(g => {
+            g.students.sort((a, b) => a.name.localeCompare(b.name));
+          });
+
+          const sortedGroups = Object.entries(groups).sort(([, a], [, b]) =>
+            a.label.localeCompare(b.label)
+          );
+
           if (filtered.length === 0) {
             return (
               <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center">
@@ -210,7 +221,7 @@ export default function SecretariaAlunosPage() {
 
           return (
             <div className="space-y-6">
-              {Object.entries(groups).map(([key, group]) => (
+              {sortedGroups.map(([key, group]) => (
                 <div key={key} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
                   <div className="px-6 py-3 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
                     <span className="text-sm font-semibold text-[#1E3A5F] dark:text-white">{group.label}</span>
@@ -258,7 +269,7 @@ export default function SecretariaAlunosPage() {
           <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white mb-4">Matricular aluno</h2>
             <form onSubmit={handleCreate} className="space-y-3">
-              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Nome completo" required className={inputCls} />
+              <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value.toUpperCase() })} placeholder="Nome completo" required className={inputCls} />
               <input value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} type="email" placeholder="Email" required className={inputCls} />
               <div>
                 <div className="relative">
@@ -295,7 +306,13 @@ export default function SecretariaAlunosPage() {
               </div>
               <div>
                 <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">Data de nascimento</label>
-                <input value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} type="date" className={inputCls} />
+                <input
+                  value={form.birthDate}
+                  onChange={e => setForm({ ...form, birthDate: e.target.value })}
+                  type="date"
+                  max={new Date().toISOString().split('T')[0]}
+                  className={inputCls}
+                />
               </div>
 
               {/* Documento */}
@@ -310,14 +327,14 @@ export default function SecretariaAlunosPage() {
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Endereço</p>
               <input
                 value={form.address}
-                onChange={e => setForm({ ...form, address: e.target.value })}
+                onChange={e => setForm({ ...form, address: e.target.value.toUpperCase() })}
                 placeholder="Rua e número"
                 className={inputCls}
               />
               <div className="grid grid-cols-2 gap-2">
                 <input
                   value={form.city}
-                  onChange={e => setForm({ ...form, city: e.target.value })}
+                  onChange={e => setForm({ ...form, city: e.target.value.toUpperCase() })}
                   placeholder="Cidade"
                   className={inputCls}
                 />
@@ -340,7 +357,7 @@ export default function SecretariaAlunosPage() {
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Responsável</p>
               <input
                 value={form.guardianName}
-                onChange={e => setForm({ ...form, guardianName: e.target.value })}
+                onChange={e => setForm({ ...form, guardianName: e.target.value.toUpperCase() })}
                 placeholder="Nome do responsável"
                 className={inputCls}
               />
