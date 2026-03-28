@@ -88,7 +88,7 @@ export default function AlunoDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#1E3A5F] rounded-lg flex items-center justify-center">
@@ -113,14 +113,14 @@ export default function AlunoDashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#1E3A5F] dark:text-white">Olá, {user?.name?.split(' ')[0]}! 👋</h1>
+          <h1 className="text-xl font-bold text-[#1E3A5F] dark:text-white">Olá, {user?.name?.split(' ')[0]}! 👋</h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Acompanhe seu desempenho escolar.</p>
         </div>
 
         {/* Cards de resumo */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
             <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center mb-4">
               <TrendingUp size={20} className="text-blue-600" />
@@ -176,7 +176,7 @@ export default function AlunoDashboard() {
                 {grades.map((grade) => (
                   <div key={grade.id} className="flex items-center justify-between py-2 border-b border-gray-50 dark:border-gray-800 last:border-0">
                     <div>
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{grade.subject?.name}</p>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">{grade.subject?.name}</p>
                       <p className="text-xs text-gray-400 dark:text-gray-500">{grade.description || grade.type}</p>
                     </div>
                     <span className={`text-lg font-bold ${Number(grade.value) >= 6 ? 'text-green-600' : 'text-red-500'}`}>
@@ -223,7 +223,7 @@ export default function AlunoDashboard() {
         </div>
 
         {/* Menu rápido */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-6">
           {[
             { label: 'Feed', icon: Newspaper, href: '/dashboard/feed', color: 'bg-sky-50 dark:bg-sky-950 text-sky-600' },
             { label: 'Minhas Notas', icon: BookOpen, href: '/dashboard/aluno/notas', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600' },
