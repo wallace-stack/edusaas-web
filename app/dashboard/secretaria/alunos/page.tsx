@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import { ArrowLeft, Plus, Search, X, ChevronRight } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Student {
   id: number;
@@ -104,7 +105,7 @@ export default function SecretariaAlunosPage() {
       setTransferClassId('');
       loadData();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Erro ao matricular');
+      toast.error(err.response?.data?.message || 'Erro ao matricular');
     } finally {
       setTransferring(false);
     }

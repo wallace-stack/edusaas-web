@@ -4,7 +4,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, CheckCircle, AlertCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface SchoolClass { id: number; name: string; year: number; }
 interface Subject { id: number; name: string; }
@@ -37,7 +38,6 @@ export default function LancarNotasPage() {
   const [loading, setLoading] = useState(true);
   const [loadingGrades, setLoadingGrades] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
@@ -196,8 +196,7 @@ export default function LancarNotasPage() {
       });
 
       await api.post('/grades/bulk', grades);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      toast.success('Notas salvas com sucesso!');
       // Recarrega para pegar IDs atualizados
       await loadStudentsAndGrades();
     } catch (err: any) {
@@ -247,14 +246,6 @@ export default function LancarNotasPage() {
       </header>
 
       <main className="max-w-4xl mx-auto px-4 py-6">
-        {/* Toast de sucesso */}
-        {success && (
-          <div className="bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800 rounded-xl p-3 flex items-center gap-2 mb-4 animate-in fade-in slide-in-from-top-2">
-            <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
-            <p className="text-sm text-green-700 dark:text-green-300 font-medium">Notas salvas com sucesso!</p>
-          </div>
-        )}
-
         {/* Filtros */}
         <div className="flex flex-wrap gap-2 mb-4">
           <select

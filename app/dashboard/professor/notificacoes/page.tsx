@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import { ArrowLeft, Bell, Plus, X, BookOpen, AlertTriangle, XCircle, Megaphone } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface SchoolClass { id: number; name: string; }
 interface Notification {
@@ -101,7 +102,7 @@ export default function ProfessorNotificacoesPage() {
       await api.delete(`/notifications/${id}`);
       setNotifications(prev => prev.filter(n => n.id !== id));
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Erro ao excluir');
+      toast.error(err.response?.data?.message || 'Erro ao excluir');
     } finally { setDeleting(null); }
   };
 
@@ -300,7 +301,7 @@ export default function ProfessorNotificacoesPage() {
                 setEditNotif(null);
                 loadData();
               } catch (err: any) {
-                alert(err.response?.data?.message || 'Erro ao editar');
+                toast.error(err.response?.data?.message || 'Erro ao editar');
               }
             }} className="p-4 space-y-3">
               <input
