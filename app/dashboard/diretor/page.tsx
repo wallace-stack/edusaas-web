@@ -63,12 +63,12 @@ export default function DiretorDashboard() {
             <button onClick={() => router.push('/dashboard/diretor/notificacoes')} className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
               <Bell size={20} />
             </button>
-            <div className="flex items-center gap-2">
+            <button onClick={() => router.push('/dashboard/perfil')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">{user?.name?.charAt(0).toUpperCase()}</span>
               </div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">{user?.name}</span>
-            </div>
+            </button>
             <ThemeToggle />
             <button onClick={() => { clearAuth(); router.push('/login'); }} className="text-gray-400 hover:text-red-500 transition-colors">
               <LogOut size={16} />

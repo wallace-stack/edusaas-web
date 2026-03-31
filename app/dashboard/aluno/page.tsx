@@ -107,12 +107,12 @@ export default function AlunoDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+            <button onClick={() => router.push('/dashboard/perfil')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">{user?.name?.charAt(0).toUpperCase()}</span>
               </div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">{user?.name}</span>
-            </div>
+            </button>
             <ThemeToggle />
             <button onClick={() => { clearAuth(); router.push('/login'); }} className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400">
               <LogOut size={16} />
