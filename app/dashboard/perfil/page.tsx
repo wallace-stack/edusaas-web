@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../lib/auth';
 import api from '../../lib/api';
-import { ArrowLeft, Save, CheckCircle, AlertCircle, User as UserIcon } from 'lucide-react';
+import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 const roleLabels: Record<string, string> = {
   director: 'Diretor(a)',
@@ -19,7 +20,6 @@ export default function PerfilPage() {
   const user = getUser();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
     name: '', phone: '', document: '', birthDate: '',
@@ -79,10 +79,9 @@ export default function PerfilPage() {
     setError('');
     try {
       await api.patch('/users/me/profile', form);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      toast.success('Perfil atualizado com sucesso!');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao salvar');
+      toast.error(err.response?.data?.message || 'Erro ao salvar');
     } finally { setSaving(false); }
   };
 
@@ -106,13 +105,6 @@ export default function PerfilPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-6">
-        {success && (
-          <div className="bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800 rounded-xl p-3 flex items-center gap-2 mb-4">
-            <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
-            <p className="text-sm text-green-700 dark:text-green-300 font-medium">Perfil atualizado com sucesso!</p>
-          </div>
-        )}
-
         {/* Avatar + info */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 mb-4 flex items-center gap-4">
           <div className="w-16 h-16 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">

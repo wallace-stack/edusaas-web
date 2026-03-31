@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import { ArrowLeft, CheckCircle, XCircle, MinusCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface SchoolClass { id: number; name: string; year: number; }
 interface Subject { id: number; name: string; }
@@ -19,8 +20,6 @@ export default function ChamadaPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
   const [attendances, setAttendances] = useState<AttendanceItem[]>([]);
   const [form, setForm] = useState({
     classId: '',
@@ -68,17 +67,15 @@ export default function ChamadaPage() {
     e.preventDefault();
     try {
       setSaving(true);
-      setError('');
       await api.post('/attendance/bulk', {
         date: form.date,
         subjectId: Number(form.subjectId),
         classId: Number(form.classId),
         attendances,
       });
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
+      toast.success('Chamada registrada com sucesso!');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao registrar chamada');
+      toast.error(err.response?.data?.message || 'Erro ao registrar chamada');
     } finally { setSaving(false); }
   };
 
@@ -105,13 +102,6 @@ export default function ChamadaPage() {
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-8">
-
-        {success && (
-          <div className="bg-green-50 dark:bg-green-950 border border-green-100 dark:border-green-800 rounded-2xl p-4 flex items-center gap-3 mb-6">
-            <CheckCircle size={20} className="text-green-500" />
-            <p className="text-sm text-green-700 dark:text-green-300 font-medium">Chamada registrada com sucesso!</p>
-          </div>
-        )}
 
         {/* Configuração da chamada */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 mb-6">
@@ -205,8 +195,6 @@ export default function ChamadaPage() {
                 })}
               </div>
             </div>
-
-            {error && <p className="text-red-500 dark:text-red-400 text-sm mb-4">{error}</p>}
 
             <button
               type="submit"

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Check, X, Zap, Sparkles, Star, ArrowRight, Shield } from 'lucide-react';
+import { toast } from 'sonner';
 
 const plans = [
   {
@@ -155,7 +156,7 @@ export default function PlanosPage() {
                 </ul>
 
                 {plan.featured ? (
-                  <button onClick={() => alert('Integração com Asaas em breve!')}
+                  <button onClick={() => toast.info('Integração com pagamento em breve!')}
                     className="w-full py-3 rounded-xl font-bold text-sm text-white glow-btn flex items-center justify-center gap-1.5"
                     style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
                     {plan.cta} <ArrowRight size={13} />

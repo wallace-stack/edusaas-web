@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import { ArrowLeft, Plus, BookOpen, Users, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface SchoolClass {
   id: number;
@@ -102,7 +103,7 @@ export default function SecretariaTurmasPage() {
       const res = await api.get(`/classes/${manageClass.id}/subjects`);
       setSubjects(res.data);
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Erro ao adicionar disciplina');
+      toast.error(err.response?.data?.message || 'Erro ao adicionar disciplina');
     } finally { setSavingSubject(false); }
   };
 
