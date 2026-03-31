@@ -22,6 +22,7 @@ export default function ProfessorDashboard() {
   const user = getUser();
   const [data, setData] = useState<TeacherData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (!user || user.role !== 'teacher') {
@@ -29,6 +30,9 @@ export default function ProfessorDashboard() {
       return;
     }
     loadDashboard();
+    api.get('/notifications/unread-count')
+      .then(r => { const c = typeof r.data === 'number' ? r.data : r.data?.count || 0; setUnreadCount(c); })
+      .catch(() => {});
   }, []);
 
   const loadDashboard = async () => {
@@ -63,6 +67,10 @@ export default function ProfessorDashboard() {
             <span className="text-sm text-gray-500 dark:text-gray-400">Painel do Professor</span>
           </div>
           <div className="flex items-center gap-4">
+            <button onClick={() => router.push('/dashboard/professor/notificacoes')} className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+              <Bell size={20} />
+              {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">{unreadCount > 9 ? '9+' : unreadCount}</span>}
+            </button>
             <button onClick={() => router.push('/dashboard/perfil')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">{user?.name?.charAt(0).toUpperCase()}</span>
