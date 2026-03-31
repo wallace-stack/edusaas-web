@@ -273,9 +273,13 @@ export default function LandingPage() {
       {/* ── FAIXA TECNOLOGIA ── */}
       <section style={{ borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0D0D14' }}>
         <div className="max-w-5xl mx-auto px-6 py-8 text-center">
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            Construído com tecnologia de ponta para máxima segurança e conforto
-          </p>
+          <div className="flex items-center justify-center gap-6 flex-wrap">
+            <span className="text-xs font-medium px-3 py-1 rounded-full border" style={{ color: 'rgba(255,255,255,0.35)', borderColor: 'rgba(255,255,255,0.08)' }}>Next.js</span>
+            <span className="text-xs font-medium px-3 py-1 rounded-full border" style={{ color: 'rgba(255,255,255,0.35)', borderColor: 'rgba(255,255,255,0.08)' }}>NestJS</span>
+            <span className="text-xs font-medium px-3 py-1 rounded-full border" style={{ color: 'rgba(255,255,255,0.35)', borderColor: 'rgba(255,255,255,0.08)' }}>MySQL</span>
+            <span className="text-xs font-medium px-3 py-1 rounded-full border" style={{ color: 'rgba(255,255,255,0.35)', borderColor: 'rgba(255,255,255,0.08)' }}>JWT Auth</span>
+            <span className="text-xs font-medium px-3 py-1 rounded-full border" style={{ color: 'rgba(255,255,255,0.35)', borderColor: 'rgba(255,255,255,0.08)' }}>Vercel</span>
+          </div>
         </div>
       </section>
 
@@ -520,7 +524,7 @@ export default function LandingPage() {
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
             <p className="text-xs" style={{ color: '#334155' }}>© 2026 EduSaaS. Todos os direitos reservados.</p>
-            <p className="text-xs mt-2 sm:mt-0" style={{ color: '#334155' }}>Construído com Next.js · Hospedado na Vercel</p>
+            <p className="text-xs mt-2 sm:mt-0" style={{ color: '#334155' }}>Feito com carinho para você</p>
           </div>
         </div>
       </footer>
