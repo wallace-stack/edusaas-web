@@ -1,43 +1,82 @@
 'use client';
 
 import Link from 'next/link';
-import { Inter } from 'next/font/google';
-import { Check, Zap, Sparkles, Star, ArrowRight } from 'lucide-react';
+import { Check, X, Zap, Sparkles, Star, ArrowRight, Shield } from 'lucide-react';
 
-const inter = Inter({ subsets: ['latin'] });
-
-const basicFeatures = [
-  'Até 50 alunos',
-  'Lançamento de notas',
-  'Controle de frequência',
-  '1 turma',
-  'Suporte por e-mail',
-];
-
-const proFeatures = [
-  'Alunos ilimitados',
-  'Gestão financeira completa',
-  'Relatórios e exportações',
-  'Suporte prioritário',
-  'Lançamento de notas',
-  'Controle de frequência',
-  'Turmas ilimitadas',
-  'Múltiplos professores',
+const plans = [
+  {
+    name: 'Free',
+    price: 'Grátis',
+    sub: 'Para sempre',
+    desc: 'Para escolas pequenas começarem',
+    featured: false,
+    features: [
+      { text: 'Até 150 alunos', included: true },
+      { text: 'Lançamento de notas', included: true },
+      { text: 'Controle de frequência', included: true },
+      { text: 'Feed de avisos', included: true },
+      { text: '1 imagem por post', included: true },
+      { text: 'Gestão financeira', included: false },
+      { text: 'Relatórios PDF', included: false },
+      { text: 'Suporte prioritário', included: false },
+    ],
+    cta: 'Começar grátis',
+    href: '/cadastro',
+  },
+  {
+    name: 'Pro',
+    price: '79',
+    cent: ',90',
+    sub: '/mês',
+    desc: 'Para escolas em crescimento',
+    featured: true,
+    features: [
+      { text: 'Até 350 alunos', included: true },
+      { text: 'Lançamento de notas', included: true },
+      { text: 'Controle de frequência', included: true },
+      { text: 'Feed de avisos', included: true },
+      { text: '2 imagens por post', included: true },
+      { text: 'Gestão financeira', included: true },
+      { text: 'Relatórios PDF', included: true },
+      { text: 'Suporte prioritário', included: false },
+    ],
+    cta: 'Assinar Pro',
+    href: '#',
+  },
+  {
+    name: 'Premium',
+    price: '149',
+    cent: ',90',
+    sub: '/mês',
+    desc: 'Para escolas que querem tudo',
+    featured: false,
+    badge: 'Trial 14 dias grátis',
+    features: [
+      { text: 'Alunos ilimitados', included: true },
+      { text: 'Lançamento de notas', included: true },
+      { text: 'Controle de frequência', included: true },
+      { text: 'Feed de avisos', included: true },
+      { text: '5 imagens por post', included: true },
+      { text: 'Gestão financeira', included: true },
+      { text: 'Relatórios PDF', included: true },
+      { text: 'Suporte prioritário', included: true },
+    ],
+    cta: 'Testar 14 dias grátis',
+    href: '/cadastro',
+  },
 ];
 
 export default function PlanosPage() {
   return (
-    <div className={inter.className} style={{ background: '#0A0A0F', minHeight: '100vh', color: '#F1F5F9', display: 'flex', flexDirection: 'column' }}>
-
+    <div style={{ background: '#0A0A0F', minHeight: '100vh', color: '#F1F5F9', display: 'flex', flexDirection: 'column' }}>
       <style>{`
-        .glow-btn { box-shadow: 0 0 20px rgba(59,130,246,0.35); transition: box-shadow 0.2s ease, transform 0.2s ease; }
+        .glow-btn { box-shadow: 0 0 20px rgba(59,130,246,0.35); transition: box-shadow 0.2s, transform 0.2s; }
         .glow-btn:hover { box-shadow: 0 0 32px rgba(59,130,246,0.5); transform: translateY(-1px); }
-        .gradient-border { background: linear-gradient(135deg,#3B82F6,#8B5CF6); padding: 1.5px; border-radius: 20px; }
+        .grad-border { background: linear-gradient(135deg,#3B82F6,#8B5CF6); padding: 1.5px; border-radius: 20px; }
       `}</style>
 
-      {/* ── NAVBAR ── */}
       <header style={{ background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
               <Zap size={15} className="text-white" />
@@ -46,105 +85,123 @@ export default function PlanosPage() {
               EduSaaS
             </span>
           </Link>
-          <Link href="/login" className="text-sm transition-colors flex items-center gap-1" style={{ color: '#94A3B8' }}
-            onMouseOver={e => (e.currentTarget as HTMLElement).style.color = '#F1F5F9'}
-            onMouseOut={e => (e.currentTarget as HTMLElement).style.color = '#94A3B8'}>
+          <Link href="/login" className="text-sm flex items-center gap-1" style={{ color: '#94A3B8' }}>
             Já tenho conta <ArrowRight size={13} />
           </Link>
         </div>
       </header>
 
-      {/* ── HERO ── */}
-      <section className="text-center px-6 pt-16 pb-12">
+      <section className="text-center px-6 pt-16 pb-10">
         <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-6 text-xs font-semibold text-white"
           style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-          <Sparkles size={11} /> Escolha seu plano
+          <Sparkles size={11} /> Planos e preços
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold mb-3">Simples e transparente</h1>
-        <p className="text-base sm:text-lg max-w-md mx-auto" style={{ color: '#94A3B8' }}>
-          Continue gerenciando sua escola sem interrupções
+        <h1 className="text-3xl sm:text-4xl font-bold mb-3">O plano certo para sua escola</h1>
+        <p className="text-base sm:text-lg max-w-lg mx-auto" style={{ color: '#94A3B8' }}>
+          Comece com trial Premium de 14 dias. Sem cartão de crédito.
         </p>
       </section>
 
-      {/* ── CARDS ── */}
-      <main className="flex-1 max-w-4xl mx-auto w-full px-6 pb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-stretch">
+      <main className="flex-1 max-w-6xl mx-auto w-full px-6 pb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 items-stretch">
+          {plans.map(plan => {
+            const inner = (
+              <div className={`rounded-[18px] p-6 sm:p-8 flex flex-col h-full ${plan.featured ? '' : 'rounded-2xl border'}`}
+                style={plan.featured ? { background: '#111118' } : { background: '#111118', borderColor: 'rgba(255,255,255,0.08)' }}>
 
-          {/* Básico */}
-          <div className="rounded-2xl border p-8 flex flex-col" style={{ background: '#111118', borderColor: 'rgba(255,255,255,0.08)' }}>
-            <span className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#64748B' }}>Básico</span>
-            <div className="flex items-end gap-1 mb-1">
-              <span className="text-4xl font-extrabold">Grátis</span>
-            </div>
-            <p className="text-sm mb-8" style={{ color: '#64748B' }}>14 dias de trial — sem cartão</p>
+                {plan.badge && (
+                  <div className="mb-4">
+                    <span className="text-[10px] font-bold px-3 py-1 rounded-full text-white"
+                      style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
+                      {plan.badge}
+                    </span>
+                  </div>
+                )}
 
-            <ul className="space-y-3 flex-1 mb-8">
-              {basicFeatures.map((f) => (
-                <li key={f} className="flex items-center gap-3 text-sm" style={{ color: '#94A3B8' }}>
-                  <Check size={14} style={{ color: '#64748B' }} strokeWidth={3} className="flex-shrink-0" />
-                  {f}
-                </li>
-              ))}
-            </ul>
+                <span className="text-xs font-semibold uppercase tracking-widest mb-3"
+                  style={plan.featured
+                    ? { background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }
+                    : { color: '#64748B' }
+                  }>
+                  {plan.name}
+                </span>
 
-            <Link href="/cadastro" className="w-full text-center py-3 rounded-xl border font-semibold text-sm transition-colors flex items-center justify-center gap-1.5"
-              style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#F1F5F9' }}
-              onMouseOver={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'}
-              onMouseOut={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
-              Começar grátis <ArrowRight size={13} />
-            </Link>
-          </div>
+                <div className="flex items-end gap-0.5 mb-1">
+                  {plan.price === 'Grátis' ? (
+                    <span className="text-3xl sm:text-4xl font-extrabold">Grátis</span>
+                  ) : (
+                    <>
+                      <span className="text-lg font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
+                      <span className="text-3xl sm:text-4xl font-extrabold">{plan.price}</span>
+                      <span className="text-sm font-medium mb-1" style={{ color: '#64748B' }}>{plan.cent}</span>
+                      <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>{plan.sub}</span>
+                    </>
+                  )}
+                </div>
+                <p className="text-sm mb-6" style={{ color: '#64748B' }}>{plan.desc}</p>
 
-          {/* Pro — gradient border */}
-          <div className="gradient-border flex flex-col relative">
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-              <span className="text-xs font-bold px-4 py-1.5 rounded-full text-white flex items-center gap-1.5"
-                style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-                <Star size={11} fill="currentColor" /> Mais popular
-              </span>
-            </div>
-            <div className="rounded-[18px] p-8 flex flex-col h-full" style={{ background: '#111118' }}>
-              <span className="text-xs font-semibold uppercase tracking-widest mb-3"
-                style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Pro
-              </span>
-              <div className="flex items-end gap-1 mb-1">
-                <span className="text-lg font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
-                <span className="text-4xl font-extrabold">97</span>
-                <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
+                <ul className="space-y-2.5 flex-1 mb-6">
+                  {plan.features.map(f => (
+                    <li key={f.text} className="flex items-center gap-3 text-sm"
+                      style={{ color: f.included ? (plan.featured ? '#F1F5F9' : '#94A3B8') : '#334155' }}>
+                      {f.included ? (
+                        <Check size={14} style={{ color: plan.featured ? '#3B82F6' : '#64748B' }} strokeWidth={3} className="flex-shrink-0" />
+                      ) : (
+                        <X size={14} style={{ color: '#334155' }} strokeWidth={2} className="flex-shrink-0" />
+                      )}
+                      <span className={f.included ? '' : 'line-through'}>{f.text}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {plan.featured ? (
+                  <button onClick={() => alert('Integração com Asaas em breve!')}
+                    className="w-full py-3 rounded-xl font-bold text-sm text-white glow-btn flex items-center justify-center gap-1.5"
+                    style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
+                    {plan.cta} <ArrowRight size={13} />
+                  </button>
+                ) : (
+                  <Link href={plan.href}
+                    className="w-full text-center py-3 rounded-xl border font-semibold text-sm transition-all flex items-center justify-center gap-1.5 hover:bg-white/5"
+                    style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#F1F5F9' }}>
+                    {plan.cta} <ArrowRight size={13} />
+                  </Link>
+                )}
               </div>
-              <p className="text-sm mb-8" style={{ color: '#64748B' }}>Tudo que sua escola precisa</p>
+            );
 
-              <ul className="space-y-3 flex-1 mb-8">
-                {proFeatures.map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-sm font-medium">
-                    <Check size={14} style={{ color: '#3B82F6' }} strokeWidth={3} className="flex-shrink-0" />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <button onClick={() => alert('Em breve!')}
-                className="w-full py-3 rounded-xl font-bold text-sm text-white glow-btn flex items-center justify-center gap-1.5"
-                style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-                Assinar agora <ArrowRight size={13} />
-              </button>
-            </div>
-          </div>
-
+            if (plan.featured) {
+              return (
+                <div key={plan.name} className="grad-border flex flex-col relative">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                    <span className="text-xs font-bold px-4 py-1.5 rounded-full text-white flex items-center gap-1.5"
+                      style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
+                      <Star size={11} fill="currentColor" /> Mais popular
+                    </span>
+                  </div>
+                  {inner}
+                </div>
+              );
+            }
+            return <div key={plan.name}>{inner}</div>;
+          })}
         </div>
 
-        <p className="text-center text-sm mt-10" style={{ color: '#475569' }}>
+        <div className="mt-10 text-center">
+          <div className="inline-flex items-center gap-2 text-sm" style={{ color: '#475569' }}>
+            <Shield size={14} />
+            Cancele a qualquer momento. Sem multa, sem burocracia.
+          </div>
+        </div>
+
+        <p className="text-center text-sm mt-6" style={{ color: '#475569' }}>
           Já tem uma conta?{' '}
-          <Link href="/login" className="font-medium hover:underline" style={{ color: '#60A5FA' }}>
-            Entrar
-          </Link>
+          <Link href="/login" className="font-medium hover:underline" style={{ color: '#60A5FA' }}>Entrar</Link>
         </p>
       </main>
 
-      {/* ── FOOTER ── */}
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
               <Zap size={13} className="text-white" />
@@ -154,17 +211,12 @@ export default function PlanosPage() {
             </span>
           </Link>
           <div className="flex items-center gap-6">
-            <Link href="/login" className="text-sm transition-colors" style={{ color: '#475569' }}
-              onMouseOver={e => (e.currentTarget as HTMLElement).style.color = '#94A3B8'}
-              onMouseOut={e => (e.currentTarget as HTMLElement).style.color = '#475569'}>Entrar</Link>
-            <Link href="/cadastro" className="text-sm transition-colors" style={{ color: '#475569' }}
-              onMouseOver={e => (e.currentTarget as HTMLElement).style.color = '#94A3B8'}
-              onMouseOut={e => (e.currentTarget as HTMLElement).style.color = '#475569'}>Cadastrar</Link>
+            <Link href="/login" className="text-sm hover:text-gray-300 transition-colors" style={{ color: '#475569' }}>Entrar</Link>
+            <Link href="/cadastro" className="text-sm hover:text-gray-300 transition-colors" style={{ color: '#475569' }}>Cadastrar</Link>
           </div>
-          <p className="text-xs" style={{ color: '#334155' }}>© 2025 EduSaaS</p>
+          <p className="text-xs" style={{ color: '#334155' }}>© 2026 EduSaaS</p>
         </div>
       </footer>
-
     </div>
   );
 }
