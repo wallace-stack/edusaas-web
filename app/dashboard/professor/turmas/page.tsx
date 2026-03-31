@@ -109,14 +109,14 @@ export default function ProfessorTurmasPage() {
                 )}
                 <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-50 dark:border-gray-800">
                   <button
-                    onClick={() => router.push(`/dashboard/professor/notas`)}
+                    onClick={() => router.push(`/dashboard/professor/notas?turmaId=${c.id}`)}
                     className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 text-xs font-medium hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
                   >
                     <ClipboardList size={14} />
                     Notas
                   </button>
                   <button
-                    onClick={() => router.push(`/dashboard/professor/chamada`)}
+                    onClick={() => router.push(`/dashboard/professor/chamada?turmaId=${c.id}`)}
                     className="flex items-center justify-center gap-1.5 py-2 rounded-xl bg-green-50 dark:bg-green-950 text-green-600 text-xs font-medium hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
                   >
                     <CheckSquare size={14} />

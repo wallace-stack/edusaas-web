@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import { ArrowLeft, AlertCircle, Trash2 } from 'lucide-react';
@@ -26,8 +26,10 @@ const emptyInstrument = (): GradeData => ({
   value: '', label: '', weight: '1', error: '', touched: false,
 });
 
-export default function LancarNotasPage() {
+function LancarNotasPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const turmaIdParam = searchParams.get('turmaId');
   const user = getUser();
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -43,7 +45,10 @@ export default function LancarNotasPage() {
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
     api.get('/classes/my')
-      .then(r => setClasses(r.data))
+      .then(r => {
+        setClasses(r.data);
+        if (turmaIdParam) setClassId(turmaIdParam);
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -455,5 +460,17 @@ export default function LancarNotasPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function LancarNotasPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <LancarNotasPage />
+    </Suspense>
   );
 }
