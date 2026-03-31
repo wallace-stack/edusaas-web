@@ -17,19 +17,19 @@ interface DashboardData {
   financial: { totalRevenue: number; totalOverdueTuitions: number; defaultRate: string; totalPaidTuitions: number };
 }
 
-const getGreeting = () => {
-  const h = new Date().getHours();
-  if (h < 12) return 'Bom dia';
-  if (h < 18) return 'Boa tarde';
-  return 'Boa noite';
-};
-
 export default function DiretorDashboard() {
   const router = useRouter();
   const user = getUser();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  const getSaudacao = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Bom dia';
+    if (h < 18) return 'Boa tarde';
+    return 'Boa noite';
+  };
 
   useEffect(() => {
     if (!user || user.role !== 'director') { router.push('/login'); return; }
@@ -84,9 +84,13 @@ export default function DiretorDashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#1E3A5F] dark:text-white">
-            {getGreeting()}, {user?.name?.split(' ')[0]}!
-          </h1>
+          {user?.name ? (
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1E3A5F] dark:text-white">
+              {getSaudacao()}, {user.name.split(' ')[0]}!
+            </h1>
+          ) : (
+            <div className="h-7 w-52 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          )}
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Resumo geral da sua escola.</p>
         </div>
 
@@ -133,9 +137,7 @@ export default function DiretorDashboard() {
             <div className="w-9 h-9 bg-emerald-50 dark:bg-emerald-950 rounded-xl flex items-center justify-center mb-3">
               <DollarSign size={18} className="text-emerald-600" />
             </div>
-            <p className="text-xl sm:text-2xl font-bold text-[#1E3A5F] dark:text-white">
-              R$ {data?.financial.totalRevenue?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '0,00'}
-            </p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1 leading-snug">Módulo financeiro disponível em breve</p>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Receita total</p>
           </div>
 

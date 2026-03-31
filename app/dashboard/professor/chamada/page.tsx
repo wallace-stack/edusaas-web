@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import { ArrowLeft, CheckCircle, XCircle, MinusCircle } from 'lucide-react';
@@ -12,8 +12,10 @@ interface Subject { id: number; name: string; }
 interface Student { id: number; name: string; }
 interface AttendanceItem { studentId: number; status: 'present' | 'absent' | 'justified'; }
 
-export default function ChamadaPage() {
+function ChamadaPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const turmaIdParam = searchParams.get('turmaId');
   const user = getUser();
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -40,6 +42,7 @@ export default function ChamadaPage() {
     try {
       const response = await api.get('/classes/my');
       setClasses(response.data);
+      if (turmaIdParam) setForm(f => ({ ...f, classId: turmaIdParam }));
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };
@@ -214,5 +217,17 @@ export default function ChamadaPage() {
 
       </main>
     </div>
+  );
+}
+
+export default function ChamadaPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <ChamadaPage />
+    </Suspense>
   );
 }

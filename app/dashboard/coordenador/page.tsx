@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, clearAuth } from '../../lib/auth';
 import api from '../../lib/api';
-import { Users, AlertTriangle, LogOut, Bell, BookOpen, TrendingDown, Newspaper, ClipboardList, UserCog } from 'lucide-react';
+import { Users, AlertTriangle, LogOut, Bell, BookOpen, TrendingDown, Newspaper, ClipboardList, UserCog, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 interface CoordinatorData {
@@ -14,19 +14,33 @@ interface CoordinatorData {
   alerts: { gradesAlert: string | null; attendanceAlert: string | null };
 }
 
-const getGreeting = () => {
-  const h = new Date().getHours();
-  if (h < 12) return 'Bom dia';
-  if (h < 18) return 'Boa tarde';
-  return 'Boa noite';
-};
-
 export default function CoordenadorDashboard() {
   const router = useRouter();
   const user = getUser();
   const [data, setData] = useState<CoordinatorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showTeachers, setShowTeachers] = useState(false);
+  const [teachers, setTeachers] = useState<{ id: number; name: string; email: string; subjects?: { subjectName: string; className: string }[] }[]>([]);
+  const [loadingTeachers, setLoadingTeachers] = useState(false);
+
+  const getSaudacao = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Bom dia';
+    if (h < 18) return 'Boa tarde';
+    return 'Boa noite';
+  };
+
+  const openTeachersDrawer = async () => {
+    setShowTeachers(true);
+    if (teachers.length > 0) return;
+    setLoadingTeachers(true);
+    try {
+      const r = await api.get('/users?role=teacher');
+      setTeachers(r.data);
+    } catch { /* silently fail */ }
+    finally { setLoadingTeachers(false); }
+  };
 
   useEffect(() => {
     if (!user || user.role !== 'coordinator') { router.push('/login'); return; }
@@ -81,21 +95,39 @@ export default function CoordenadorDashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-[#1E3A5F] dark:text-white">
-            {getGreeting()}, {user?.name?.split(' ')[0]}!
-          </h1>
+          {user?.name ? (
+            <h1 className="text-xl sm:text-2xl font-bold text-[#1E3A5F] dark:text-white">
+              {getSaudacao()}, {user.name.split(' ')[0]}!
+            </h1>
+          ) : (
+            <div className="h-7 w-52 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          )}
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Acompanhamento pedagógico da escola.</p>
         </div>
 
         {/* Cards principais */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
+          <button
+            onClick={() => router.push('/dashboard/coordenador/alunos')}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition-colors text-left"
+          >
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center mb-3">
               <Users size={18} className="text-blue-600" />
             </div>
             <p className="text-2xl sm:text-3xl font-bold text-[#1E3A5F] dark:text-white">{data?.totalStudents || 0}</p>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Alunos ativos</p>
-          </div>
+          </button>
+
+          <button
+            onClick={openTeachersDrawer}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-green-300 dark:hover:border-green-700 transition-colors text-left"
+          >
+            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-green-50 dark:bg-green-950 rounded-xl flex items-center justify-center mb-3">
+              <UserCog size={18} className="text-green-600" />
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-[#1E3A5F] dark:text-white">Professores</p>
+            <p className="text-xs sm:text-sm text-blue-500 dark:text-blue-400 mt-1">Ver lista →</p>
+          </button>
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-red-50 dark:bg-red-950 rounded-xl flex items-center justify-center mb-3">
@@ -172,6 +204,55 @@ export default function CoordenadorDashboard() {
           ))}
         </div>
       </main>
+
+      {/* Drawer de professores */}
+      {showTeachers && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowTeachers(false)} />
+          <div className="relative bg-white dark:bg-gray-900 w-full max-w-md h-full shadow-xl flex flex-col overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+              <h2 className="font-bold text-[#1E3A5F] dark:text-white">Professores</h2>
+              <button onClick={() => setShowTeachers(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                <X size={18} className="text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6 py-4">
+              {loadingTeachers ? (
+                <div className="flex justify-center py-10">
+                  <div className="w-8 h-8 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : teachers.length === 0 ? (
+                <p className="text-center text-gray-400 dark:text-gray-500 text-sm py-10">Nenhum professor encontrado</p>
+              ) : (
+                <div className="space-y-3">
+                  {teachers.map(p => (
+                    <div key={p.id} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
+                          <span className="text-white text-xs font-bold">{p.name.charAt(0).toUpperCase()}</span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{p.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{p.email}</p>
+                        </div>
+                      </div>
+                      {p.subjects && p.subjects.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {p.subjects.map((s, i) => (
+                            <span key={i} className="text-[10px] px-2 py-0.5 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-full">
+                              {s.subjectName} — {s.className}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

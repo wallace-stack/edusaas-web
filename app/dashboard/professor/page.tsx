@@ -24,6 +24,13 @@ export default function ProfessorDashboard() {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const getSaudacao = () => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Bom dia';
+    if (h < 18) return 'Boa tarde';
+    return 'Boa noite';
+  };
+
   useEffect(() => {
     if (!user || user.role !== 'teacher') {
       router.push('/login');
@@ -87,7 +94,11 @@ export default function ProfessorDashboard() {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#1E3A5F] dark:text-white">Olá, Prof. {user?.name?.split(' ')[0]}! 👋</h1>
+          {user?.name ? (
+            <h1 className="text-2xl font-bold text-[#1E3A5F] dark:text-white">{getSaudacao()}, Prof. {user.name.split(' ')[0]}!</h1>
+          ) : (
+            <div className="h-7 w-52 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          )}
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Gerencie suas turmas e lançamentos.</p>
         </div>
 
