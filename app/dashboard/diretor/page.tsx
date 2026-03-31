@@ -29,6 +29,7 @@ export default function DiretorDashboard() {
   const user = getUser();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     if (!user || user.role !== 'director') { router.push('/login'); return; }
@@ -36,6 +37,9 @@ export default function DiretorDashboard() {
       .then(r => setData(r.data))
       .catch(console.error)
       .finally(() => setLoading(false));
+    api.get('/notifications/unread-count')
+      .then(r => { const c = typeof r.data === 'number' ? r.data : r.data?.count || 0; setUnreadCount(c); })
+      .catch(() => {});
   }, []);
 
   if (loading) return (
@@ -62,6 +66,7 @@ export default function DiretorDashboard() {
           <div className="flex items-center gap-3">
             <button onClick={() => router.push('/dashboard/diretor/notificacoes')} className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
               <Bell size={20} />
+              {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">{unreadCount > 9 ? '9+' : unreadCount}</span>}
             </button>
             <button onClick={() => router.push('/dashboard/perfil')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center">
