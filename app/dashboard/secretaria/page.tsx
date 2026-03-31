@@ -76,14 +76,14 @@ export default function SecretariaDashboard() {
             <button className="relative p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
               <Bell size={20} />
             </button>
-            <div className="flex items-center gap-2">
+            <button onClick={() => router.push('/dashboard/perfil')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-[#F97316] rounded-full flex items-center justify-center">
                 <span className="text-white text-xs font-bold">
                   {user?.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">{user?.name}</span>
-            </div>
+            </button>
             <ThemeToggle />
             <button
               onClick={handleLogout}
