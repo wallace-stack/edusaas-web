@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import { ArrowLeft, Plus, Search, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface StaffUser {
   id: number;
@@ -37,7 +38,6 @@ export default function SecretariaUsuariosPage() {
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -65,13 +65,12 @@ export default function SecretariaUsuariosPage() {
     e.preventDefault();
     try {
       setSaving(true);
-      setError('');
       await api.post('/secretary/users', form);
       setShowModal(false);
       setForm({ name: '', email: '', password: '', role: 'teacher' });
       loadUsers();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao criar usuário');
+      toast.error(err.response?.data?.message || 'Erro ao criar usuário');
     } finally {
       setSaving(false);
     }
@@ -103,7 +102,7 @@ export default function SecretariaUsuariosPage() {
             <h1 className="font-bold text-[#1E3A5F] dark:text-white">Usuários</h1>
           </div>
           <button
-            onClick={() => { setError(''); setShowModal(true); }}
+            onClick={() => setShowModal(true)}
             className="flex items-center gap-2 bg-[#1E3A5F] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#162d4a] transition-colors"
           >
             <Plus size={16} />
@@ -225,12 +224,10 @@ export default function SecretariaUsuariosPage() {
                 <option value="coordinator">Coordenador</option>
               </select>
 
-              {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
-
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => { setShowModal(false); setError(''); }}
+                  onClick={() => setShowModal(false)}
                   className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   Cancelar
