@@ -1,66 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
-import api from '../../../lib/api';
-import { ArrowLeft, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
-
-interface Tuition {
-  id: number;
-  amount: number;
-  dueDate: string;
-  paidDate: string;
-  status: string;
-  reference: string;
-  paymentMethod: string;
-}
+import { ArrowLeft, DollarSign } from 'lucide-react';
 
 export default function AlunoFinanceiroPage() {
   const router = useRouter();
   const user = getUser();
-  const [tuitions, setTuitions] = useState<Tuition[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) { router.push('/login'); return; }
-    loadTuitions();
-  }, []);
-
-  const loadTuitions = async () => {
-    try {
-      const response = await api.get('/finance/tuitions/my');
-      setTuitions(response.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const paid = tuitions.filter(t => t.status === 'paid');
-  const pending = tuitions.filter(t => t.status === 'pending');
-  const overdue = tuitions.filter(t => t.status === 'overdue');
-
-  const statusConfig: any = {
-    paid: { label: 'Pago', color: 'bg-green-50 dark:bg-green-950 text-green-700', icon: CheckCircle, iconColor: 'text-green-500' },
-    pending: { label: 'Pendente', color: 'bg-orange-50 dark:bg-orange-950 text-orange-700', icon: Clock, iconColor: 'text-orange-500' },
-    overdue: { label: 'Vencido', color: 'bg-red-50 dark:bg-red-950 text-red-700', icon: AlertTriangle, iconColor: 'text-red-500' },
-  };
-
-  const paymentMethodLabel: any = {
-    pix: 'PIX',
-    cash: 'Dinheiro',
-    card: 'Cartão',
-    bank_slip: 'Boleto',
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+  if (!user) {
+    router.push('/login');
+    return null;
   }
 
   return (
@@ -70,79 +20,25 @@ export default function AlunoFinanceiroPage() {
           <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
             <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
           </button>
-          <h1 className="font-bold text-[#1E3A5F] dark:text-white">Minhas Mensalidades</h1>
+          <h1 className="font-bold text-[#1E3A5F] dark:text-white">Financeiro</h1>
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
-
-        {/* Resumo */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-green-50 dark:bg-green-950 rounded-2xl p-4 border border-green-100 dark:border-green-800 text-center">
-            <p className="text-2xl font-bold text-green-600">{paid.length}</p>
-            <p className="text-xs text-green-700 dark:text-green-400 mt-1">Pagas</p>
-          </div>
-          <div className="bg-orange-50 dark:bg-orange-950 rounded-2xl p-4 border border-orange-100 dark:border-orange-800 text-center">
-            <p className="text-2xl font-bold text-orange-500">{pending.length}</p>
-            <p className="text-xs text-orange-700 dark:text-orange-400 mt-1">Pendentes</p>
-          </div>
-          <div className="bg-red-50 dark:bg-red-950 rounded-2xl p-4 border border-red-100 dark:border-red-800 text-center">
-            <p className="text-2xl font-bold text-red-500">{overdue.length}</p>
-            <p className="text-xs text-red-700 dark:text-red-400 mt-1">Vencidas</p>
-          </div>
+      <main className="max-w-3xl mx-auto px-6 py-16 flex flex-col items-center text-center">
+        <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-950 rounded-2xl flex items-center justify-center mb-6">
+          <DollarSign size={36} className="text-emerald-600" />
         </div>
-
-        {/* Alerta de vencidas */}
-        {overdue.length > 0 && (
-          <div className="bg-red-50 dark:bg-red-950 border border-red-100 dark:border-red-800 rounded-2xl p-4 flex items-center gap-3 mb-6">
-            <AlertTriangle size={20} className="text-red-500 flex-shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-red-700 dark:text-red-400">Você tem {overdue.length} mensalidade(s) vencida(s)!</p>
-              <p className="text-xs text-red-500 dark:text-red-400">Entre em contato com a secretaria para regularizar.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Lista */}
-        {tuitions.length === 0 ? (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center">
-            <CheckCircle size={40} className="text-green-500 mx-auto mb-3" />
-            <p className="text-gray-500 dark:text-gray-400 text-sm">Nenhuma mensalidade encontrada</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {tuitions.map((tuition) => {
-              const config = statusConfig[tuition.status] || statusConfig.pending;
-              const Icon = config.icon;
-              return (
-                <div key={tuition.id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${config.color}`}>
-                      <Icon size={18} className={config.iconColor} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{tuition.reference || 'Mensalidade'}</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">
-                        {tuition.status === 'paid'
-                          ? `Pago em ${new Date(tuition.paidDate).toLocaleDateString('pt-BR')} via ${paymentMethodLabel[tuition.paymentMethod] || tuition.paymentMethod}`
-                          : `Vence em ${new Date(tuition.dueDate).toLocaleDateString('pt-BR')}`
-                        }
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-bold text-gray-700 dark:text-gray-200">
-                      R$ {Number(tuition.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                    </p>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.color}`}>
-                      {config.label}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <h2 className="text-xl font-bold text-[#1E3A5F] dark:text-white mb-3">Módulo financeiro</h2>
+        <p className="text-gray-500 dark:text-gray-400 text-sm max-w-sm leading-relaxed">
+          A integração com pagamentos estará disponível em breve.
+          Por enquanto, os dados financeiros podem ser gerenciados manualmente.
+        </p>
+        <a
+          href="mailto:suporte@edusaas.com.br"
+          className="mt-8 px-5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+        >
+          Falar com suporte
+        </a>
       </main>
     </div>
   );
