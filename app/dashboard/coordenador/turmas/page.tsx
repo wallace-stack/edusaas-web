@@ -223,7 +223,7 @@ export default function CoordenadorTurmasPage() {
             </div>
 
             <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-3">Adicionar disciplina</p>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3">Adicionar disciplina</p>
               <form onSubmit={handleAddSubject} className="space-y-3">
                 <input
                   value={subjectForm.name}

@@ -115,7 +115,7 @@ export default function CoordenadorDashboard() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
           <button
             onClick={() => router.push('/dashboard/coordenador/alunos')}
-            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 transition-colors text-left"
+            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-sm hover:scale-[1.02] transition-all duration-150 text-left"
           >
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center mb-3">
               <Users size={18} className="text-blue-600" />
@@ -126,7 +126,7 @@ export default function CoordenadorDashboard() {
 
           <button
             onClick={openTeachersSheet}
-            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-green-300 dark:hover:border-green-700 transition-colors text-left"
+            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-green-300 dark:hover:border-green-700 hover:shadow-sm hover:scale-[1.02] transition-all duration-150 text-left"
           >
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-green-50 dark:bg-green-950 rounded-xl flex items-center justify-center mb-3">
               <UserCog size={18} className="text-green-600" />
@@ -139,7 +139,10 @@ export default function CoordenadorDashboard() {
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Professores ativos</p>
           </button>
 
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
+          <button
+            onClick={() => router.push('/dashboard/coordenador/alunos')}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-red-300 dark:hover:border-red-700 hover:shadow-sm hover:scale-[1.02] transition-all duration-150 text-left"
+          >
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-red-50 dark:bg-red-950 rounded-xl flex items-center justify-center mb-3">
               <TrendingDown size={18} className="text-red-600" />
             </div>
@@ -150,9 +153,12 @@ export default function CoordenadorDashboard() {
             {riskPct > 0 && (
               <p className="text-[10px] text-red-400 mt-0.5">{riskPct}% dos alunos</p>
             )}
-          </div>
+          </button>
 
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
+          <button
+            onClick={() => router.push('/dashboard/coordenador/alunos')}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-sm hover:scale-[1.02] transition-all duration-150 text-left"
+          >
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-orange-50 dark:bg-orange-950 rounded-xl flex items-center justify-center mb-3">
               <AlertTriangle size={18} className="text-orange-600" />
             </div>
@@ -160,7 +166,7 @@ export default function CoordenadorDashboard() {
               {data?.irregularAttendance || 0}
             </p>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Frequência irregular</p>
-          </div>
+          </button>
         </div>
 
         {/* Alertas */}
@@ -175,13 +181,15 @@ export default function CoordenadorDashboard() {
           </div>
         )}
         {data?.alerts.attendanceAlert && (
-          <div className="bg-orange-50 dark:bg-orange-950 border border-orange-100 dark:border-orange-800 rounded-2xl p-4 flex items-center gap-3 mb-4">
+          <div
+            onClick={() => router.push('/dashboard/coordenador/alunos')}
+            className="bg-orange-50 dark:bg-orange-950 border border-orange-100 dark:border-orange-800 rounded-2xl p-4 flex items-center gap-3 mb-4 cursor-pointer hover:border-orange-300 dark:hover:border-orange-600 transition-colors"
+          >
             <AlertTriangle size={16} className="text-orange-500 flex-shrink-0" />
             <p className="text-sm text-orange-700 dark:text-orange-300 flex-1">{data.alerts.attendanceAlert}</p>
-            <button onClick={() => router.push('/dashboard/coordenador/alunos')}
-              className="text-xs text-orange-600 dark:text-orange-400 font-medium hover:underline flex-shrink-0">
-              Ver alunos
-            </button>
+            <span className="text-xs text-orange-600 dark:text-orange-400 font-medium flex-shrink-0">
+              Ver alunos →
+            </span>
           </div>
         )}
 
@@ -198,18 +206,18 @@ export default function CoordenadorDashboard() {
         {/* Menu */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { label: 'Feed', icon: Newspaper, href: '/dashboard/feed', color: 'bg-sky-50 dark:bg-sky-950 text-sky-600', hint: 'Mural de avisos' },
-            { label: 'Alunos', icon: Users, href: '/dashboard/coordenador/alunos', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600', hint: 'Acompanhar desempenho' },
+            { label: 'Feed', icon: Newspaper, href: '/dashboard/feed', color: 'bg-sky-50 dark:bg-sky-950 text-sky-600', hint: 'Mural da escola' },
+            { label: 'Alunos', icon: Users, href: '/dashboard/coordenador/alunos', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600', hint: 'Lista e frequência' },
             { label: 'Turmas', icon: BookOpen, href: '/dashboard/coordenador/turmas', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600', hint: 'Turmas e professores' },
-            { label: 'Avisos', icon: Bell, href: '/dashboard/coordenador/notificacoes', color: 'bg-orange-50 dark:bg-orange-950 text-orange-600', hint: 'Comunicados' },
+            { label: 'Avisos', icon: Bell, href: '/dashboard/coordenador/notificacoes', color: 'bg-orange-50 dark:bg-orange-950 text-orange-600', hint: 'Notificações institucionais' },
           ].map(item => (
             <button key={item.label} onClick={() => router.push(item.href)}
-              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all text-left group">
+              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] transition-all duration-150 text-left">
               <div className={`w-10 h-10 ${item.color} rounded-xl flex items-center justify-center mb-3`}>
                 <item.icon size={20} />
               </div>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{item.label}</p>
-              <p className="text-[11px] text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">{item.hint}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{item.hint}</p>
             </button>
           ))}
         </div>

@@ -312,7 +312,7 @@ export default function SecretariaAlunosPage() {
               </div>
 
               {/* 5–8. Endereço */}
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Endereço</p>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 pt-2">Endereço</p>
               <div className="relative">
                 <input
                   value={form.zipCode}
@@ -382,7 +382,7 @@ export default function SecretariaAlunosPage() {
               </div>
 
               {/* 9–12. Responsável */}
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Responsável</p>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 pt-2">Responsável</p>
               <input
                 value={form.guardianName}
                 onChange={e => setForm({ ...form, guardianName: e.target.value.toUpperCase() })}
@@ -418,7 +418,7 @@ export default function SecretariaAlunosPage() {
               </select>
 
               {/* 13–14. Acesso */}
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase pt-2">Acesso</p>
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 pt-2">Acesso</p>
               <select value={form.classId} onChange={e => setForm({ ...form, classId: e.target.value })} required className={inputCls}>
                 <option value="">Selecione a turma *</option>
                 {classes.map(c => <option key={c.id} value={c.id}>{c.name} — {c.year}</option>)}
