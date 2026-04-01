@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, clearAuth } from '../../lib/auth';
 import api from '../../lib/api';
-import { Users, AlertTriangle, LogOut, Bell, BookOpen, TrendingDown, Newspaper, ClipboardList, UserCog, X } from 'lucide-react';
+import { Users, AlertTriangle, LogOut, Bell, BookOpen, TrendingDown, Newspaper, UserCog } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 
 interface CoordinatorData {
   totalStudents: number;
@@ -20,9 +21,10 @@ export default function CoordenadorDashboard() {
   const [data, setData] = useState<CoordinatorData | null>(null);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [showTeachers, setShowTeachers] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [teachers, setTeachers] = useState<{ id: number; name: string; email: string; subjects?: { subjectName: string; className: string }[] }[]>([]);
   const [loadingTeachers, setLoadingTeachers] = useState(false);
+  const [totalTeachers, setTotalTeachers] = useState<number | null>(null);
 
   const getSaudacao = () => {
     const h = new Date().getHours();
@@ -31,13 +33,14 @@ export default function CoordenadorDashboard() {
     return 'Boa noite';
   };
 
-  const openTeachersDrawer = async () => {
-    setShowTeachers(true);
+  const openTeachersSheet = async () => {
+    setSheetOpen(true);
     if (teachers.length > 0) return;
     setLoadingTeachers(true);
     try {
-      const r = await api.get('/users?role=teacher');
+      const r = await api.get('/users?role=TEACHER');
       setTeachers(r.data);
+      setTotalTeachers(r.data.length);
     } catch { /* silently fail */ }
     finally { setLoadingTeachers(false); }
   };
@@ -50,6 +53,9 @@ export default function CoordenadorDashboard() {
       .finally(() => setLoading(false));
     api.get('/notifications/unread-count')
       .then(r => { const c = typeof r.data === 'number' ? r.data : r.data?.count || 0; setUnreadCount(c); })
+      .catch(() => {});
+    api.get('/users?role=TEACHER')
+      .then(r => setTotalTeachers(Array.isArray(r.data) ? r.data.length : 0))
       .catch(() => {});
   }, []);
 
@@ -119,14 +125,18 @@ export default function CoordenadorDashboard() {
           </button>
 
           <button
-            onClick={openTeachersDrawer}
+            onClick={openTeachersSheet}
             className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-green-300 dark:hover:border-green-700 transition-colors text-left"
           >
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-green-50 dark:bg-green-950 rounded-xl flex items-center justify-center mb-3">
               <UserCog size={18} className="text-green-600" />
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-[#1E3A5F] dark:text-white">Professores</p>
-            <p className="text-xs sm:text-sm text-blue-500 dark:text-blue-400 mt-1">Ver lista →</p>
+            {totalTeachers === null ? (
+              <div className="h-8 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-1" />
+            ) : (
+              <p className="text-2xl sm:text-3xl font-bold text-[#1E3A5F] dark:text-white">{totalTeachers}</p>
+            )}
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Professores ativos</p>
           </button>
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
@@ -205,54 +215,51 @@ export default function CoordenadorDashboard() {
         </div>
       </main>
 
-      {/* Drawer de professores */}
-      {showTeachers && (
-        <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowTeachers(false)} />
-          <div className="relative bg-white dark:bg-gray-900 w-full max-w-md h-full shadow-xl flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-              <h2 className="font-bold text-[#1E3A5F] dark:text-white">Professores</h2>
-              <button onClick={() => setShowTeachers(false)} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-                <X size={18} className="text-gray-500 dark:text-gray-400" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto px-6 py-4">
-              {loadingTeachers ? (
-                <div className="flex justify-center py-10">
-                  <div className="w-8 h-8 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : teachers.length === 0 ? (
-                <p className="text-center text-gray-400 dark:text-gray-500 text-sm py-10">Nenhum professor encontrado</p>
-              ) : (
-                <div className="space-y-3">
-                  {teachers.map(p => (
-                    <div key={p.id} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
-                          <span className="text-white text-xs font-bold">{p.name.charAt(0).toUpperCase()}</span>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{p.name}</p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">{p.email}</p>
-                        </div>
+      {/* Sheet de professores */}
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent side="right" className="flex flex-col p-0">
+          <SheetHeader>
+            <SheetTitle>Professores</SheetTitle>
+            <SheetDescription>
+              {totalTeachers !== null ? `${totalTeachers} professor${totalTeachers !== 1 ? 'es' : ''} ativo${totalTeachers !== 1 ? 's' : ''}` : 'Carregando…'}
+            </SheetDescription>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            {loadingTeachers ? (
+              <div className="flex justify-center py-10">
+                <div className="w-8 h-8 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : teachers.length === 0 ? (
+              <p className="text-center text-gray-400 dark:text-gray-500 text-sm py-10">Nenhum professor encontrado</p>
+            ) : (
+              <div className="space-y-3">
+                {teachers.map(p => (
+                  <div key={p.id} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-xs font-bold">{p.name.charAt(0).toUpperCase()}</span>
                       </div>
-                      {p.subjects && p.subjects.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {p.subjects.map((s, i) => (
-                            <span key={i} className="text-[10px] px-2 py-0.5 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-full">
-                              {s.subjectName} — {s.className}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <div>
+                        <p className="text-sm font-medium text-gray-800 dark:text-gray-100">{p.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{p.email}</p>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    {p.subjects && p.subjects.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {p.subjects.map((s, i) => (
+                          <span key={i} className="text-[10px] px-2 py-0.5 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 rounded-full border border-blue-100 dark:border-blue-900">
+                            {s.subjectName} — {s.className}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
