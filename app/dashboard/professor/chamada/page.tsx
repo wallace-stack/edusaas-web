@@ -34,6 +34,13 @@ function ChamadaPage() {
     loadClasses();
   }, []);
 
+  // Safety net: se searchParams hidratar depois do fetch de turmas, aplica o param
+  useEffect(() => {
+    if (turmaIdParam && classes.length > 0) {
+      setForm(f => ({ ...f, classId: turmaIdParam }));
+    }
+  }, [turmaIdParam, classes]);
+
   useEffect(() => {
     if (form.classId) loadSubjectsAndStudents(Number(form.classId));
   }, [form.classId]);

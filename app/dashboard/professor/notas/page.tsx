@@ -53,6 +53,13 @@ function LancarNotasPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Safety net: se searchParams hidratar depois do fetch de turmas, aplica o param
+  useEffect(() => {
+    if (turmaIdParam && classes.length > 0) {
+      setClassId(turmaIdParam);
+    }
+  }, [turmaIdParam, classes]);
+
   useEffect(() => {
     if (classId) {
       api.get(`/classes/${classId}/subjects`)
