@@ -473,9 +473,9 @@ export default function LandingPage() {
         <div ref={ctaRef} style={fadeStyle} className="max-w-2xl mx-auto text-center">
           <div className="rounded-3xl border p-12"
             style={{ background: 'linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08))', borderColor: 'rgba(59,130,246,0.2)' }}>
-            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Pronto para começar?</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Pronto para transformar sua escola?</h2>
             <p className="mb-8 leading-relaxed" style={{ color: '#94A3B8' }}>
-              Crie sua conta em menos de 2 minutos e experimente todos os recursos gratuitamente por 14 dias.
+              Comece grátis hoje. Sem cartão de crédito.
             </p>
             <Link href="/cadastro" className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl font-bold text-white text-base glow-btn"
               style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>

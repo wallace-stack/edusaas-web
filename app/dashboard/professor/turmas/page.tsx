@@ -64,9 +64,14 @@ export default function ProfessorTurmasPage() {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         {classes.length === 0 ? (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center">
-            <BookOpen size={40} className="text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-400 dark:text-gray-500 text-sm">Nenhuma turma atribuída</p>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+              <BookOpen size={28} className="text-gray-400 dark:text-gray-500" />
+            </div>
+            <h3 className="font-medium text-lg text-gray-700 dark:text-gray-200 mb-1">Você não tem turmas atribuídas</h3>
+            <p className="text-sm text-gray-400 dark:text-gray-500 max-w-xs">
+              Fale com a coordenação para ser alocado em uma turma.
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
