@@ -95,7 +95,7 @@ export default function DiretorDashboard() {
         </div>
 
         {/* Pessoas */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
           {[
             { value: data?.people.totalStudents || 0, label: 'Alunos', icon: GraduationCap, color: 'bg-blue-50 dark:bg-blue-950 text-blue-600' },
             { value: data?.people.totalTeachers || 0, label: 'Professores', icon: BookOpen, color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
@@ -106,7 +106,7 @@ export default function DiretorDashboard() {
                 <c.icon size={18} />
               </div>
               <p className="text-2xl sm:text-3xl font-bold text-[#1E3A5F] dark:text-white">{c.value}</p>
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">{c.label}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{c.label}</p>
             </div>
           ))}
         </div>
@@ -137,8 +137,8 @@ export default function DiretorDashboard() {
             <div className="w-9 h-9 bg-emerald-50 dark:bg-emerald-950 rounded-xl flex items-center justify-center mb-3">
               <DollarSign size={18} className="text-emerald-600" />
             </div>
-            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1 leading-snug">Módulo financeiro disponível em breve</p>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Receita total</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 leading-snug">Em breve</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Módulo financeiro</p>
           </div>
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
@@ -171,20 +171,20 @@ export default function DiretorDashboard() {
         {/* Menu */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
           {[
-            { label: 'Feed', icon: Newspaper, href: '/dashboard/feed', color: 'bg-sky-50 dark:bg-sky-950 text-sky-600', hint: 'Mural de avisos' },
-            { label: 'Secretaria', icon: UserCog, href: '/dashboard/secretaria/alunos', color: 'bg-teal-50 dark:bg-teal-950 text-teal-600', hint: 'Gerenciar alunos' },
-            { label: 'Usuários', icon: Users, href: '/dashboard/diretor/usuarios', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600', hint: 'Equipe da escola' },
-            { label: 'Turmas', icon: BookOpen, href: '/dashboard/diretor/turmas', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600', hint: 'Turmas e disciplinas' },
-            { label: 'Financeiro', icon: DollarSign, href: '/dashboard/diretor/financeiro', color: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600', hint: 'Mensalidades' },
-            { label: 'Avisos', icon: Bell, href: '/dashboard/diretor/notificacoes', color: 'bg-orange-50 dark:bg-orange-950 text-orange-600', hint: 'Comunicados' },
+            { label: 'Feed',        icon: Newspaper,  href: '/dashboard/feed',                    color: 'bg-sky-50 dark:bg-sky-950 text-sky-600',         hint: 'Mural da escola' },
+            { label: 'Secretaria',  icon: UserCog,    href: '/dashboard/secretaria/alunos',        color: 'bg-teal-50 dark:bg-teal-950 text-teal-600',      hint: 'Gestão administrativa' },
+            { label: 'Usuários',    icon: Users,      href: '/dashboard/diretor/usuarios',         color: 'bg-blue-50 dark:bg-blue-950 text-blue-600',      hint: 'Equipe e acessos' },
+            { label: 'Turmas',      icon: BookOpen,   href: '/dashboard/diretor/turmas',           color: 'bg-purple-50 dark:bg-purple-950 text-purple-600',hint: 'Turmas e disciplinas' },
+            { label: 'Financeiro',  icon: DollarSign, href: '/dashboard/diretor/financeiro',       color: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600', hint: 'Em breve' },
+            { label: 'Avisos',      icon: Bell,       href: '/dashboard/diretor/notificacoes',     color: 'bg-orange-50 dark:bg-orange-950 text-orange-600',hint: 'Avisos institucionais' },
           ].map(item => (
             <button key={item.label} onClick={() => router.push(item.href)}
-              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all text-left group">
+              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 text-left">
               <div className={`w-10 h-10 ${item.color} rounded-xl flex items-center justify-center mb-3`}>
                 <item.icon size={20} />
               </div>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{item.label}</p>
-              <p className="text-[11px] text-gray-400 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">{item.hint}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{item.hint}</p>
             </button>
           ))}
         </div>
