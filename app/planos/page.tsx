@@ -7,8 +7,9 @@ import { toast } from 'sonner';
 
 const faqItems = [
   { q: 'Posso cancelar a qualquer momento?', a: 'Sim, sem multa ou fidelidade. O cancelamento pode ser feito diretamente no painel, a qualquer hora.' },
-  { q: 'O trial requer cartão de crédito?', a: 'Não. 14 dias grátis sem cartão. Você só é cobrado se decidir assinar um plano pago.' },
-  { q: 'O que acontece após o trial?', a: 'Você escolhe um plano ou continua no Free com limite de 150 alunos. Nenhum dado é perdido.' },
+  { q: 'O trial exige cartão de crédito?', a: 'Não. 14 dias grátis sem cartão. Você só é cobrado se decidir assinar um plano pago.' },
+  { q: 'O que acontece após o trial?', a: 'Você escolhe um plano pago ou continua no Free com até 150 alunos. Nenhum dado é perdido.' },
+  { q: 'Consigo migrar dados de outro sistema?', a: 'Sim. Nossa equipe apoia a migração de dados gratuitamente nos planos Pro e Premium.' },
 ];
 
 function FaqRow({ q, a }: { q: string; a: string }) {
@@ -223,10 +224,10 @@ export default function PlanosPage() {
           </div>
         </div>
 
-        {/* FAQ rápido */}
-        <div className="mt-14 max-w-2xl mx-auto">
-          <h2 className="text-xl font-bold text-center mb-6">Dúvidas rápidas</h2>
-          <div className="flex flex-col gap-2">
+        {/* FAQ */}
+        <div className="mt-16 max-w-2xl mx-auto">
+          <h3 className="text-xl font-bold text-center mb-8">Perguntas frequentes</h3>
+          <div className="flex flex-col">
             {faqItems.map(f => <FaqRow key={f.q} q={f.q} a={f.a} />)}
           </div>
         </div>

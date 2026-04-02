@@ -139,15 +139,20 @@ export default function FeedPage() {
 
         {/* Lista de posts */}
         {posts.length === 0 ? (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-12 text-center">
-            <Newspaper size={40} className="text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-gray-400 dark:text-gray-500 text-sm">Nenhuma publicação ainda</p>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
+              <Newspaper size={28} className="text-gray-400 dark:text-gray-500" />
+            </div>
+            <h3 className="font-medium text-lg text-gray-700 dark:text-gray-200 mb-1">Nenhuma publicação ainda</h3>
+            <p className="text-sm text-gray-400 dark:text-gray-500 max-w-xs">
+              Seja o primeiro a compartilhar algo com a escola.
+            </p>
             {canPost && (
               <button
                 onClick={() => setShowCreate(true)}
-                className="mt-4 text-sm text-[#F97316] hover:underline"
+                className="mt-5 text-sm text-[#F97316] font-medium hover:underline"
               >
-                Criar primeira publicação
+                Criar primeira publicação →
               </button>
             )}
           </div>
