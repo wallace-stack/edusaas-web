@@ -171,23 +171,29 @@ export default function CoordenadorDashboard() {
 
         {/* Alertas */}
         {data?.alerts.gradesAlert && (
-          <div className="bg-red-50 dark:bg-red-950 border border-red-100 dark:border-red-800 rounded-2xl p-4 flex items-center gap-3 mb-3">
-            <AlertTriangle size={16} className="text-red-500 flex-shrink-0" />
-            <p className="text-sm text-red-700 dark:text-red-300 flex-1">{data.alerts.gradesAlert}</p>
-            <button onClick={() => router.push('/dashboard/coordenador/alunos')}
-              className="text-xs text-red-600 dark:text-red-400 font-medium hover:underline flex-shrink-0">
-              Ver alunos
-            </button>
+          <div
+            onClick={() => router.push('/dashboard/coordenador/alunos')}
+            className="bg-red-50 dark:bg-red-950 border border-red-100 dark:border-red-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3 cursor-pointer hover:border-red-300 dark:hover:border-red-600 transition-colors"
+          >
+            <div className="flex items-center gap-3 flex-1">
+              <AlertTriangle size={16} className="text-red-500 flex-shrink-0" />
+              <p className="text-sm text-red-700 dark:text-red-300">{data.alerts.gradesAlert}</p>
+            </div>
+            <span className="text-xs text-red-600 dark:text-red-400 font-medium self-end sm:self-auto flex-shrink-0">
+              Ver alunos →
+            </span>
           </div>
         )}
         {data?.alerts.attendanceAlert && (
           <div
             onClick={() => router.push('/dashboard/coordenador/alunos')}
-            className="bg-orange-50 dark:bg-orange-950 border border-orange-100 dark:border-orange-800 rounded-2xl p-4 flex items-center gap-3 mb-4 cursor-pointer hover:border-orange-300 dark:hover:border-orange-600 transition-colors"
+            className="bg-orange-50 dark:bg-orange-950 border border-orange-100 dark:border-orange-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4 cursor-pointer hover:border-orange-300 dark:hover:border-orange-600 transition-colors"
           >
-            <AlertTriangle size={16} className="text-orange-500 flex-shrink-0" />
-            <p className="text-sm text-orange-700 dark:text-orange-300 flex-1">{data.alerts.attendanceAlert}</p>
-            <span className="text-xs text-orange-600 dark:text-orange-400 font-medium flex-shrink-0">
+            <div className="flex items-center gap-3 flex-1">
+              <AlertTriangle size={16} className="text-orange-500 flex-shrink-0" />
+              <p className="text-sm text-orange-700 dark:text-orange-300">{data.alerts.attendanceAlert}</p>
+            </div>
+            <span className="text-xs text-orange-600 dark:text-orange-400 font-medium self-end sm:self-auto flex-shrink-0">
               Ver alunos →
             </span>
           </div>

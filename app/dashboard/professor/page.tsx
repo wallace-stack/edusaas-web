@@ -63,15 +63,15 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#1E3A5F] rounded-lg flex items-center justify-center">
               <span className="text-white text-sm font-bold">E</span>
             </div>
             <span className="font-bold text-[#1E3A5F] dark:text-white">EduSaaS</span>
-            <span className="text-gray-300 dark:text-gray-600">|</span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">Painel do Professor</span>
+            <span className="text-gray-300 dark:text-gray-600 hidden sm:inline">|</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">Painel do Professor</span>
           </div>
           <div className="flex items-center gap-4">
             <button onClick={() => router.push('/dashboard/professor/notificacoes')} className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
@@ -92,7 +92,7 @@ export default function ProfessorDashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-8">
           {user?.name ? (
             <h1 className="text-2xl font-bold text-[#1E3A5F] dark:text-white">{getSaudacao()}, Prof. {user.name.split(' ')[0]}!</h1>
@@ -103,7 +103,7 @@ export default function ProfessorDashboard() {
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {[
             {
               value: data?.totalGrades ?? data?.totalGradesLaunched ?? 0,
@@ -111,7 +111,6 @@ export default function ProfessorDashboard() {
               icon: ClipboardList,
               color: 'bg-blue-50 dark:bg-blue-950 text-blue-600',
               href: '/dashboard/professor/notas/historico',
-              hint: 'Ver boletim da turma',
             },
             {
               value: data?.avgGrade != null ? Number(data.avgGrade).toFixed(2) : '—',
@@ -119,7 +118,6 @@ export default function ProfessorDashboard() {
               icon: BookOpen,
               color: 'bg-green-50 dark:bg-green-950 text-green-600',
               href: '/dashboard/professor/notas/historico',
-              hint: 'Ver boletim detalhado →',
             },
             {
               value: data?.totalAttendance ?? data?.totalAttendanceRecords ?? 0,
@@ -127,7 +125,6 @@ export default function ProfessorDashboard() {
               icon: CheckSquare,
               color: 'bg-purple-50 dark:bg-purple-950 text-purple-600',
               href: '/dashboard/professor/chamada/historico',
-              hint: 'Ver histórico de chamadas',
             },
             {
               value: data?.avgAttendance != null
@@ -139,42 +136,41 @@ export default function ProfessorDashboard() {
               icon: Users,
               color: 'bg-orange-50 dark:bg-orange-950 text-orange-600',
               href: '/dashboard/professor/chamada/historico',
-              hint: 'Ver histórico de chamadas →',
             },
           ].map(card => (
             <button
               key={card.label}
               onClick={() => router.push(card.href)}
-              className="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all text-left group"
+              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 text-left"
             >
-              <div className={`w-10 h-10 ${card.color} rounded-xl flex items-center justify-center mb-3`}>
-                <card.icon size={20} />
+              <div className={`w-9 h-9 sm:w-10 sm:h-10 ${card.color} rounded-xl flex items-center justify-center mb-3`}>
+                <card.icon size={18} />
               </div>
-              <p className="text-2xl font-bold text-[#1E3A5F] dark:text-white">{card.value}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{card.label}</p>
-              <p className="text-xs text-[#F97316] mt-2 opacity-0 group-hover:opacity-100 transition-opacity">{card.hint} →</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[#1E3A5F] dark:text-white">{card.value}</p>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">{card.label}</p>
             </button>
           ))}
         </div>
 
         {/* Menu */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           {[
-            { label: 'Feed', icon: Newspaper, href: '/dashboard/feed', color: 'bg-sky-50 dark:bg-sky-950 text-sky-600' },
-            { label: 'Lançar Notas', icon: ClipboardList, href: '/dashboard/professor/notas', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600' },
-            { label: 'Registrar Chamada', icon: CheckSquare, href: '/dashboard/professor/chamada', color: 'bg-green-50 dark:bg-green-950 text-green-600' },
-            { label: 'Minhas Turmas', icon: BookOpen, href: '/dashboard/professor/turmas', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
-            { label: 'Avisos da Turma', icon: Bell, href: '/dashboard/professor/notificacoes', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
+            { label: 'Feed',              icon: Newspaper,     href: '/dashboard/feed',                       color: 'bg-sky-50 dark:bg-sky-950 text-sky-600',        hint: 'Mural da escola' },
+            { label: 'Lançar Notas',      icon: ClipboardList, href: '/dashboard/professor/notas',            color: 'bg-blue-50 dark:bg-blue-950 text-blue-600',     hint: 'Notas por turma' },
+            { label: 'Registrar Chamada', icon: CheckSquare,   href: '/dashboard/professor/chamada',          color: 'bg-green-50 dark:bg-green-950 text-green-600',  hint: 'Frequência diária' },
+            { label: 'Minhas Turmas',     icon: BookOpen,      href: '/dashboard/professor/turmas',           color: 'bg-purple-50 dark:bg-purple-950 text-purple-600',hint: 'Turmas e disciplinas' },
+            { label: 'Avisos da Turma',   icon: Bell,          href: '/dashboard/professor/notificacoes',     color: 'bg-orange-50 dark:bg-orange-950 text-orange-600',hint: 'Avisos institucionais' },
           ].map((item) => (
             <button
               key={item.label}
               onClick={() => router.push(item.href)}
-              className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 hover:border-gray-200 dark:hover:border-gray-600 hover:shadow-sm transition-all text-left"
+              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 text-left"
             >
               <div className={`w-10 h-10 ${item.color} rounded-xl flex items-center justify-center mb-3`}>
                 <item.icon size={20} />
               </div>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{item.label}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{item.hint}</p>
             </button>
           ))}
         </div>

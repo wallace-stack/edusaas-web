@@ -236,7 +236,7 @@ export default function LandingPage() {
             Plataforma Educacional SaaS
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold leading-tight mb-6 tracking-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-7xl font-extrabold leading-tight mb-6 tracking-tight">
             Gerencie sua escola<br />
             <span style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
               de forma inteligente
@@ -247,12 +247,12 @@ export default function LandingPage() {
             Uma plataforma completa para diretores, coordenadores, professores e alunos. Tudo integrado, seguro e pronto para usar.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-            <Link href="/cadastro" className="px-8 py-4 rounded-2xl font-bold text-white text-base glow-btn flex items-center justify-center gap-2"
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 justify-center mb-6">
+            <Link href="/cadastro" className="w-full sm:w-auto px-8 py-4 rounded-2xl font-bold text-white text-base glow-btn flex items-center justify-center gap-2"
               style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
               Começar 14 dias grátis <ArrowRight size={16} />
             </Link>
-            <Link href="/planos" className="px-8 py-4 rounded-2xl font-medium text-sm border transition-colors flex items-center justify-center gap-1"
+            <Link href="/planos" className="w-full sm:w-auto px-8 py-4 rounded-2xl font-medium text-sm border transition-colors flex items-center justify-center gap-1"
               style={{ color: '#94A3B8', borderColor: 'rgba(255,255,255,0.1)', background: 'transparent' }}
               onMouseOver={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLElement).style.color = '#F1F5F9'; }}
               onMouseOut={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.1)'; (e.currentTarget as HTMLElement).style.color = '#94A3B8'; }}>
