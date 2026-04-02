@@ -1,8 +1,36 @@
 'use client';
 
 import Link from 'next/link';
-import { Check, X, Zap, Sparkles, Star, ArrowRight, Shield } from 'lucide-react';
+import { useState } from 'react';
+import { Check, X, Zap, Sparkles, Star, ArrowRight, Shield, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
+
+const faqItems = [
+  { q: 'Posso cancelar a qualquer momento?', a: 'Sim, sem multa ou fidelidade. O cancelamento pode ser feito diretamente no painel, a qualquer hora.' },
+  { q: 'O trial requer cartão de crédito?', a: 'Não. 14 dias grátis sem cartão. Você só é cobrado se decidir assinar um plano pago.' },
+  { q: 'O que acontece após o trial?', a: 'Você escolhe um plano ou continua no Free com limite de 150 alunos. Nenhum dado é perdido.' },
+];
+
+function FaqRow({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <button
+      onClick={() => setOpen(!open)}
+      className="w-full text-left rounded-2xl border transition-colors"
+      style={{ background: open ? '#111118' : 'transparent', borderColor: open ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.06)' }}
+    >
+      <div className="flex items-center justify-between px-5 py-4">
+        <span className="text-sm font-medium" style={{ color: '#F1F5F9' }}>{q}</span>
+        <ChevronDown size={16} className={`flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} style={{ color: open ? '#3B82F6' : '#64748B' }} />
+      </div>
+      {open && (
+        <div className="px-5 pb-4">
+          <p className="text-sm leading-relaxed" style={{ color: '#94A3B8' }}>{a}</p>
+        </div>
+      )}
+    </button>
+  );
+}
 
 const plans = [
   {
@@ -73,7 +101,7 @@ export default function PlanosPage() {
       <style>{`
         .glow-btn { box-shadow: 0 0 20px rgba(59,130,246,0.35); transition: box-shadow 0.2s, transform 0.2s; }
         .glow-btn:hover { box-shadow: 0 0 32px rgba(59,130,246,0.5); transform: translateY(-1px); }
-        .grad-border { background: linear-gradient(135deg,#3B82F6,#8B5CF6); padding: 1.5px; border-radius: 20px; }
+        .grad-border { background: linear-gradient(135deg,#3B82F6,#8B5CF6); padding: 2px; border-radius: 20px; box-shadow: 0 0 32px rgba(59,130,246,0.2); }
       `}</style>
 
       <header style={{ background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50 }}>
@@ -195,7 +223,15 @@ export default function PlanosPage() {
           </div>
         </div>
 
-        <p className="text-center text-sm mt-6" style={{ color: '#475569' }}>
+        {/* FAQ rápido */}
+        <div className="mt-14 max-w-2xl mx-auto">
+          <h2 className="text-xl font-bold text-center mb-6">Dúvidas rápidas</h2>
+          <div className="flex flex-col gap-2">
+            {faqItems.map(f => <FaqRow key={f.q} q={f.q} a={f.a} />)}
+          </div>
+        </div>
+
+        <p className="text-center text-sm mt-10" style={{ color: '#475569' }}>
           Já tem uma conta?{' '}
           <Link href="/login" className="font-medium hover:underline" style={{ color: '#60A5FA' }}>Entrar</Link>
         </p>

@@ -218,12 +218,13 @@ export default function CoordenadorDashboard() {
             { label: 'Avisos', icon: Bell, href: '/dashboard/coordenador/notificacoes', color: 'bg-orange-50 dark:bg-orange-950 text-orange-600', hint: 'Notificações institucionais' },
           ].map(item => (
             <button key={item.label} onClick={() => router.push(item.href)}
-              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] transition-all duration-150 text-left">
+              className="relative bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 text-left">
               <div className={`w-10 h-10 ${item.color} rounded-xl flex items-center justify-center mb-3`}>
                 <item.icon size={20} />
               </div>
               <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{item.label}</p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{item.hint}</p>
+              <span className="absolute bottom-3 right-3 text-gray-300 dark:text-gray-600 text-xs">→</span>
             </button>
           ))}
         </div>

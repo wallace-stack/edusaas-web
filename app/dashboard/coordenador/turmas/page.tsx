@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, BookOpen, Users, X } from 'lucide-react';
+import { ArrowLeft, BookOpen, Users, X, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SchoolClass {
@@ -13,6 +13,7 @@ interface SchoolClass {
   year: number;
   shift?: string;
   totalStudents?: number;
+  totalSubjects?: number;
   teacher?: { name: string };
 }
 
@@ -27,17 +28,45 @@ interface Teacher {
   name: string;
 }
 
+interface ClassStudent {
+  id: number;
+  name: string;
+  situation?: string;
+}
+
+const situationConfig: Record<string, { label: string; cls: string }> = {
+  APPROVED:  { label: 'Aprovado',    cls: 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300' },
+  RECOVERY:  { label: 'Recuperação', cls: 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300' },
+  FAILED:    { label: 'Reprovado',   cls: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' },
+  NO_GRADES: { label: 'Sem notas',   cls: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
+};
+
 export default function CoordenadorTurmasPage() {
   const router = useRouter();
   const user = getUser();
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [classStudents, setClassStudents] = useState<Record<number, ClassStudent[]>>({});
+  const [loadingStudents, setLoadingStudents] = useState<number | null>(null);
 
   const [manageClass, setManageClass] = useState<SchoolClass | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [subjectForm, setSubjectForm] = useState({ name: '', teacherId: '' });
   const [savingSubject, setSavingSubject] = useState(false);
+
+  const toggleExpand = async (c: SchoolClass) => {
+    if (expandedId === c.id) { setExpandedId(null); return; }
+    setExpandedId(c.id);
+    if (classStudents[c.id]) return;
+    setLoadingStudents(c.id);
+    try {
+      const r = await api.get(`/classes/${c.id}/students`);
+      setClassStudents(prev => ({ ...prev, [c.id]: r.data }));
+    } catch { setClassStudents(prev => ({ ...prev, [c.id]: [] })); }
+    finally { setLoadingStudents(null); }
+  };
 
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
@@ -133,51 +162,91 @@ export default function CoordenadorTurmasPage() {
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
                 <tr>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Turma</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">Ano</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Turno</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">Professor</th>
-                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Alunos</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400">Turma</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 hidden sm:table-cell">Ano</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 hidden md:table-cell">Turno</th>
+                  <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 hidden sm:table-cell">Alunos</th>
                   <th className="px-6 py-3"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
+              <tbody>
                 {classes.map((c) => (
-                  <tr key={c.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-purple-50 dark:bg-purple-950 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <BookOpen size={16} className="text-purple-600" />
+                  <>
+                    <tr
+                      key={c.id}
+                      onClick={() => toggleExpand(c)}
+                      className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-purple-50 dark:bg-purple-950 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <BookOpen size={16} className="text-purple-600" />
+                          </div>
+                          <div>
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{c.name}</span>
+                            {c.totalSubjects != null && (
+                              <p className="text-[11px] text-gray-400">{c.totalSubjects} disciplina{c.totalSubjects !== 1 ? 's' : ''}</p>
+                            )}
+                          </div>
                         </div>
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-200">{c.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 hidden sm:table-cell">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">{c.year}</span>
-                    </td>
-                    <td className="px-6 py-4 hidden md:table-cell">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        {c.shift ? (shiftLabel[c.shift] || c.shift) : '—'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 hidden sm:table-cell">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">{c.teacher?.name || '—'}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-1">
-                        <Users size={14} className="text-gray-400 dark:text-gray-500" />
-                        <span className="text-sm text-gray-700 dark:text-gray-200 font-medium">{c.totalStudents ?? '—'}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => openManageModal(c)}
-                        className="text-xs text-[#1E3A5F] dark:text-blue-400 border border-[#1E3A5F] dark:border-blue-400 px-3 py-1.5 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors whitespace-nowrap"
-                      >
-                        Gerenciar disciplinas
-                      </button>
-                    </td>
-                  </tr>
+                      </td>
+                      <td className="px-6 py-4 hidden sm:table-cell">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">{c.year}</span>
+                      </td>
+                      <td className="px-6 py-4 hidden md:table-cell">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          {c.shift ? (shiftLabel[c.shift] || c.shift) : '—'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 hidden sm:table-cell">
+                        <div className="flex items-center gap-1">
+                          <Users size={14} className="text-gray-400 dark:text-gray-500" />
+                          <span className="text-sm text-gray-700 dark:text-gray-200 font-medium">{c.totalStudents ?? '—'}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 justify-end">
+                          <button
+                            onClick={e => { e.stopPropagation(); openManageModal(c); }}
+                            className="text-xs text-[#1E3A5F] dark:text-blue-400 border border-[#1E3A5F] dark:border-blue-400 px-3 py-1.5 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors whitespace-nowrap"
+                          >
+                            Disciplinas
+                          </button>
+                          <ChevronDown
+                            size={16}
+                            className={`text-gray-400 transition-transform duration-200 ${expandedId === c.id ? 'rotate-180' : ''}`}
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                    {expandedId === c.id && (
+                      <tr key={`expand-${c.id}`} className="bg-gray-50 dark:bg-gray-800/50">
+                        <td colSpan={5} className="px-6 py-3">
+                          {loadingStudents === c.id ? (
+                            <div className="flex justify-center py-3">
+                              <div className="w-5 h-5 border-2 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin" />
+                            </div>
+                          ) : (classStudents[c.id] ?? []).length === 0 ? (
+                            <p className="text-xs text-gray-400 dark:text-gray-500 py-2">Nenhum aluno matriculado nesta turma.</p>
+                          ) : (
+                            <div className="flex flex-wrap gap-2 py-1">
+                              {(classStudents[c.id] ?? []).map(s => {
+                                const sit = s.situation ? situationConfig[s.situation] : null;
+                                return (
+                                  <div key={s.id} className="flex items-center gap-1.5 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-700 rounded-lg px-3 py-1.5">
+                                    <span className="text-xs text-gray-700 dark:text-gray-200">{s.name}</span>
+                                    {sit && (
+                                      <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${sit.cls}`}>{sit.label}</span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </>
                 ))}
               </tbody>
             </table>
