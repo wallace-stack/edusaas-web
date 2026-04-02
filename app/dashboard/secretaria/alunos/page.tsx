@@ -251,7 +251,16 @@ export default function SecretariaAlunosPage() {
                             <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{s.email}</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+                        <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                          {(s as any).situation && (s as any).situation !== 'NO_GRADES' && (
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium hidden sm:inline ${
+                              (s as any).situation === 'APPROVED' ? 'bg-green-50 dark:bg-green-950 text-green-700'
+                              : (s as any).situation === 'RECOVERY' ? 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700'
+                              : 'bg-red-50 dark:bg-red-950 text-red-700'
+                            }`}>
+                              {(s as any).situation === 'APPROVED' ? 'Aprovado' : (s as any).situation === 'RECOVERY' ? 'Recuperação' : 'Reprovado'}
+                            </span>
+                          )}
                           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                             s.financialStatus === 'overdue'
                               ? 'bg-red-50 dark:bg-red-950 text-red-600'
