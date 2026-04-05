@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Search, Users } from 'lucide-react';
+import { ArrowLeft, Search, Users, AlertTriangle } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 
 interface Student {
@@ -56,6 +56,8 @@ function SituationBadge({ situation }: { situation?: string }) {
 
 export default function DiretorAlunosPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const filtroUrl = searchParams.get('filtro');
   const user = getUser();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,7 +109,16 @@ export default function DiretorAlunosPage() {
       s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.email.toLowerCase().includes(search.toLowerCase());
     const matchTurma = !turmaFilter || (s.className ?? s.class?.name) === turmaFilter;
-    return matchSearch && matchTurma;
+
+    // Filtro via URL (?filtro=baixa-frequencia ou ?filtro=risco-academico)
+    let matchFiltroUrl = true;
+    if (filtroUrl === 'baixa-frequencia') {
+      matchFiltroUrl = s.attendanceRate != null && s.attendanceRate < 75;
+    } else if (filtroUrl === 'risco-academico') {
+      matchFiltroUrl = s.situation === 'RECOVERY' || s.situation === 'FAILED';
+    }
+
+    return matchSearch && matchTurma && matchFiltroUrl;
   });
 
   return (
@@ -125,6 +136,22 @@ export default function DiretorAlunosPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        {filtroUrl && (
+          <div className="flex items-center gap-2 mb-4 px-4 py-2.5 bg-orange-50 dark:bg-orange-950 border border-orange-100 dark:border-orange-800 rounded-xl">
+            <AlertTriangle size={14} className="text-orange-500 flex-shrink-0" />
+            <span className="text-sm text-orange-700 dark:text-orange-300 flex-1">
+              {filtroUrl === 'baixa-frequencia' && 'Mostrando alunos com frequência abaixo de 75%'}
+              {filtroUrl === 'risco-academico' && 'Mostrando alunos em recuperação ou reprovados'}
+            </span>
+            <button
+              onClick={() => router.push(window.location.pathname)}
+              className="text-xs text-orange-600 dark:text-orange-400 font-medium hover:underline"
+            >
+              Limpar filtro
+            </button>
+          </div>
+        )}
+
         {/* Filtros */}
         <div className="flex flex-col sm:flex-row gap-2 mb-4">
           <div className="relative flex-1">

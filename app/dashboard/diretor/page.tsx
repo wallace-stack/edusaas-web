@@ -153,7 +153,37 @@ export default function DiretorDashboard() {
           </div>
         </div>
 
-        {/* Alerta de inadimplência */}
+        {/* Alertas acadêmicos */}
+        {data && attNum < 75 && (
+          <div className="bg-orange-50 dark:bg-orange-950 border border-orange-100 dark:border-orange-800 rounded-2xl p-4 flex items-center gap-3 mb-4">
+            <AlertTriangle size={18} className="text-orange-500 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-orange-700 dark:text-orange-300">
+                Frequência média abaixo de 75% ({data.academic.avgAttendance})
+              </p>
+            </div>
+            <button
+              onClick={() => router.push('/dashboard/diretor/alunos?filtro=baixa-frequencia')}
+              className="text-xs text-orange-600 dark:text-orange-400 font-medium hover:underline flex-shrink-0">
+              Ver alunos
+            </button>
+          </div>
+        )}
+        {data && avgGrade < 6 && (
+          <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-100 dark:border-yellow-800 rounded-2xl p-4 flex items-center gap-3 mb-4">
+            <AlertTriangle size={18} className="text-yellow-500 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-yellow-700 dark:text-yellow-300">
+                Média geral abaixo de 6.0 ({avgGrade}) — alunos em risco acadêmico
+              </p>
+            </div>
+            <button
+              onClick={() => router.push('/dashboard/diretor/alunos?filtro=risco-academico')}
+              className="text-xs text-yellow-600 dark:text-yellow-400 font-medium hover:underline flex-shrink-0">
+              Ver alunos
+            </button>
+          </div>
+        )}
         {data && data.financial.totalOverdueTuitions > 0 && (
           <div className="bg-red-50 dark:bg-red-950 border border-red-100 dark:border-red-800 rounded-2xl p-4 flex items-center gap-3 mb-4">
             <AlertTriangle size={18} className="text-red-500 flex-shrink-0" />
