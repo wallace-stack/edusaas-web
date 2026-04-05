@@ -35,10 +35,10 @@ interface StudentDetail {
 }
 
 const situationConfig: Record<string, { label: string; cls: string }> = {
-  APPROVED:  { label: 'Aprovado',     cls: 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300' },
-  RECOVERY:  { label: 'Recuperação',  cls: 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300' },
-  FAILED:    { label: 'Reprovado',    cls: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' },
-  NO_GRADES: { label: 'Sem notas',    cls: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
+  APPROVED:  { label: 'Aprovado',    cls: 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300' },
+  RECOVERY:  { label: 'Recuperação', cls: 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300' },
+  FAILED:    { label: 'Reprovado',   cls: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' },
+  NO_GRADES: { label: 'Sem notas',   cls: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
 };
 
 function AttBadge({ rate }: { rate?: number }) {
@@ -53,7 +53,7 @@ function SituationBadge({ situation }: { situation?: string }) {
   return <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${cfg.cls}`}>{cfg.label}</span>;
 }
 
-export default function CoordenadorAlunosPage() {
+export default function DiretorAlunosPage() {
   const router = useRouter();
   const user = getUser();
   const [students, setStudents] = useState<Student[]>([]);
@@ -102,7 +102,8 @@ export default function CoordenadorAlunosPage() {
   )) as string[];
 
   const filtered = students.filter(s => {
-    const matchSearch = s.name.toLowerCase().includes(search.toLowerCase()) ||
+    const matchSearch =
+      s.name.toLowerCase().includes(search.toLowerCase()) ||
       s.email.toLowerCase().includes(search.toLowerCase());
     const matchTurma = !turmaFilter || (s.className ?? s.class?.name) === turmaFilter;
     return matchSearch && matchTurma;
@@ -201,7 +202,11 @@ export default function CoordenadorAlunosPage() {
                         <SituationBadge situation={s.situation} />
                       </td>
                       <td className="px-4 sm:px-6 py-3.5">
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.isActive ? 'bg-green-50 dark:bg-green-950 text-green-700' : 'bg-red-50 dark:bg-red-950 text-red-700'}`}>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          s.isActive
+                            ? 'bg-green-50 dark:bg-green-950 text-green-700'
+                            : 'bg-red-50 dark:bg-red-950 text-red-700'
+                        }`}>
                           {s.isActive ? 'Ativo' : 'Inativo'}
                         </span>
                       </td>
@@ -214,7 +219,7 @@ export default function CoordenadorAlunosPage() {
         </div>
       </main>
 
-      {/* Sheet de detalhe */}
+      {/* Sheet de detalhe do aluno */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetContent side="right" className="flex flex-col p-0">
           <SheetHeader>
@@ -254,7 +259,8 @@ export default function CoordenadorAlunosPage() {
                       detail.attendanceRate == null ? 'text-gray-400'
                       : detail.attendanceRate >= 75 ? 'text-green-600'
                       : detail.attendanceRate >= 60 ? 'text-yellow-600'
-                      : 'text-red-600'}`}>
+                      : 'text-red-600'
+                    }`}>
                       {detail.attendanceRate != null ? `${detail.attendanceRate}%` : '—'}
                     </p>
                   </div>
@@ -264,7 +270,8 @@ export default function CoordenadorAlunosPage() {
                       detail.avgGrade == null ? 'text-gray-400'
                       : detail.avgGrade >= 7 ? 'text-green-600'
                       : detail.avgGrade >= 5 ? 'text-yellow-600'
-                      : 'text-red-600'}`}>
+                      : 'text-red-600'
+                    }`}>
                       {detail.avgGrade != null ? Number(detail.avgGrade).toFixed(1) : '—'}
                     </p>
                   </div>
