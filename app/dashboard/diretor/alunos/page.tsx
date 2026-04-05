@@ -204,11 +204,11 @@ export default function DiretorAlunosPage() {
                       </td>
                       <td className="px-4 sm:px-6 py-3.5">
                         <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                          s.isActive
+                          Boolean(s.isActive)
                             ? 'bg-green-50 dark:bg-green-950 text-green-700'
                             : 'bg-red-50 dark:bg-red-950 text-red-700'
                         }`}>
-                          {s.isActive ? 'Ativo' : 'Inativo'}
+                          {Boolean(s.isActive) ? 'Ativo' : 'Inativo'}
                         </span>
                       </td>
                     </tr>
