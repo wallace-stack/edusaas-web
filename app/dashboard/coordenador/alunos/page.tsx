@@ -26,6 +26,7 @@ interface StudentDetail {
   className?: string;
   attendanceRate?: number;
   avgGrade?: number;
+  gradeAverage?: number | null;
   situation?: string;
   classYear?: number | string;
   phone?: string | null;
@@ -261,11 +262,11 @@ export default function CoordenadorAlunosPage() {
                   <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center">
                     <p className="text-xs text-gray-400 mb-1">Média</p>
                     <p className={`text-lg font-bold ${
-                      detail.avgGrade == null ? 'text-gray-400'
-                      : detail.avgGrade >= 7 ? 'text-green-600'
-                      : detail.avgGrade >= 5 ? 'text-yellow-600'
+                      (detail.avgGrade ?? detail.gradeAverage) == null ? 'text-gray-400'
+                      : (detail.avgGrade ?? detail.gradeAverage)! >= 7 ? 'text-green-600'
+                      : (detail.avgGrade ?? detail.gradeAverage)! >= 5 ? 'text-yellow-600'
                       : 'text-red-600'}`}>
-                      {detail.avgGrade != null ? Number(detail.avgGrade).toFixed(1) : '—'}
+                      {(detail.avgGrade ?? detail.gradeAverage) != null ? Number(detail.avgGrade ?? detail.gradeAverage).toFixed(1) : '—'}
                     </p>
                   </div>
                   <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-center">
