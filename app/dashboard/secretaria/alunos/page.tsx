@@ -68,13 +68,13 @@ export default function SecretariaAlunosPage() {
   });
 
   useEffect(() => {
+    console.log('USER:', getUser());
+    console.log('TOKEN:', Cookies.get('token'));
     if (!user) { router.push('/login'); return; }
     loadData();
   }, []);
 
   const loadData = async () => {
-    console.log('TOKEN DO COOKIE:', Cookies.get('token'));
-    console.log('SCHOOL ID:', user?.schoolId);
     if (loadingRef.current) return;
     loadingRef.current = true;
     try {
