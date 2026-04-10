@@ -6,6 +6,7 @@ import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import { ArrowLeft, Plus, Search, X, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
+import Cookies from 'js-cookie';
 
 interface Student {
   id: number;
@@ -72,6 +73,8 @@ export default function SecretariaAlunosPage() {
   }, []);
 
   const loadData = async () => {
+    console.log('TOKEN DO COOKIE:', Cookies.get('token'));
+    console.log('SCHOOL ID:', user?.schoolId);
     if (loadingRef.current) return;
     loadingRef.current = true;
     try {
