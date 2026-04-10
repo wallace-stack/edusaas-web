@@ -8,6 +8,7 @@ const api = axios.create({
 // Adiciona o token automaticamente em todas as requisições
 api.interceptors.request.use((config) => {
   const token = Cookies.get('token');
+  console.log('[API] token presente:', !!token, '| primeiros chars:', token?.substring(0, 20));
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
