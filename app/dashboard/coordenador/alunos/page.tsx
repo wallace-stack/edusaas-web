@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
@@ -55,6 +55,18 @@ function SituationBadge({ situation }: { situation?: string }) {
 }
 
 export default function CoordenadorAlunosPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <CoordenadorAlunosContent />
+    </Suspense>
+  );
+}
+
+function CoordenadorAlunosContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filtroUrl = searchParams.get('filtro');
