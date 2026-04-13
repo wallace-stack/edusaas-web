@@ -456,44 +456,36 @@ export default function SecretariaTurmasPage() {
                   </div>
 
                   {/* Endereço */}
-                  {(selectedStudent.address || selectedStudent.city) && (
-                    <div className="bg-gray-50 dark:bg-gray-800/60 rounded-2xl p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <MapPin size={14} className="text-[#1E3A5F] dark:text-blue-400" />
-                        <p className="text-xs font-semibold text-[#1E3A5F] dark:text-blue-400 uppercase tracking-wider">Endereço</p>
-                      </div>
-                      <div className="space-y-2.5">
-                        {(selectedStudent.address || selectedStudent.addressNumber) && (
-                          <InfoRow
-                            label="Logradouro"
-                            value={[selectedStudent.address, selectedStudent.addressNumber].filter(Boolean).join(', ')}
-                          />
-                        )}
-                        {(selectedStudent.city || selectedStudent.state) && (
-                          <InfoRow
-                            label="Cidade / Estado"
-                            value={[selectedStudent.city, selectedStudent.state].filter(Boolean).join(' — ')}
-                          />
-                        )}
-                        <InfoRow label="CEP" value={selectedStudent.zipCode} />
-                      </div>
+                  <div className="bg-gray-50 dark:bg-gray-800/60 rounded-2xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <MapPin size={14} className="text-[#1E3A5F] dark:text-blue-400" />
+                      <p className="text-xs font-semibold text-[#1E3A5F] dark:text-blue-400 uppercase tracking-wider">Endereço</p>
                     </div>
-                  )}
+                    <div className="space-y-2.5">
+                      <InfoRow
+                        label="Logradouro"
+                        value={[selectedStudent.address, selectedStudent.addressNumber].filter(Boolean).join(', ') || null}
+                      />
+                      <InfoRow
+                        label="Cidade / Estado"
+                        value={[selectedStudent.city, selectedStudent.state].filter(Boolean).join(' — ') || null}
+                      />
+                      <InfoRow label="CEP" value={selectedStudent.zipCode} />
+                    </div>
+                  </div>
 
                   {/* Responsável */}
-                  {(selectedStudent.guardianName || selectedStudent.guardianPhone) && (
-                    <div className="bg-gray-50 dark:bg-gray-800/60 rounded-2xl p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Phone size={14} className="text-[#1E3A5F] dark:text-blue-400" />
-                        <p className="text-xs font-semibold text-[#1E3A5F] dark:text-blue-400 uppercase tracking-wider">Responsável / Contato de Urgência</p>
-                      </div>
-                      <div className="space-y-2.5">
-                        <InfoRow label="Nome" value={selectedStudent.guardianName} />
-                        <InfoRow label="Parentesco" value={selectedStudent.guardianRelation} />
-                        <InfoRow label="Telefone" value={selectedStudent.guardianPhone} />
-                      </div>
+                  <div className="bg-gray-50 dark:bg-gray-800/60 rounded-2xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Phone size={14} className="text-[#1E3A5F] dark:text-blue-400" />
+                      <p className="text-xs font-semibold text-[#1E3A5F] dark:text-blue-400 uppercase tracking-wider">Responsável / Contato de Urgência</p>
                     </div>
-                  )}
+                    <div className="space-y-2.5">
+                      <InfoRow label="Nome" value={selectedStudent.guardianName} />
+                      <InfoRow label="Parentesco" value={selectedStudent.guardianRelation} />
+                      <InfoRow label="Telefone" value={selectedStudent.guardianPhone} />
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

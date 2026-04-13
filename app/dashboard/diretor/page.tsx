@@ -101,7 +101,7 @@ export default function DiretorDashboard() {
             { value: data?.people.totalTeachers || 0, label: 'Professores', icon: BookOpen, color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
             { value: data?.people.totalCoordinators || 0, label: 'Coordenadores', icon: Users, color: 'bg-orange-50 dark:bg-orange-950 text-orange-600' },
           ].map(c => (
-            <div key={c.label} className="bg-white dark:bg-gray-900 rounded-2xl p-3 sm:p-6 border border-gray-100 dark:border-gray-800">
+            <div key={c.label} className="bg-white dark:bg-gray-900 rounded-2xl p-3 sm:p-6 border border-gray-100 dark:border-gray-800 hover:opacity-80 transition-opacity duration-200">
               <div className={`w-8 h-8 sm:w-10 sm:h-10 ${c.color} rounded-xl flex items-center justify-center mb-2 sm:mb-3`}>
                 <c.icon size={16} className="sm:hidden" />
                 <c.icon size={18} className="hidden sm:block" />
@@ -210,7 +210,7 @@ export default function DiretorDashboard() {
             { label: 'Avisos',      icon: Bell,       href: '/dashboard/diretor/notificacoes',     color: 'bg-orange-50 dark:bg-orange-950 text-orange-600',hint: 'Avisos institucionais' },
           ].map(item => (
             <button key={item.label} onClick={() => router.push(item.href)}
-              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 text-left">
+              className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] hover:opacity-80 active:scale-[0.98] transition-all duration-200 text-left">
               <div className={`w-10 h-10 ${item.color} rounded-xl flex items-center justify-center mb-3`}>
                 <item.icon size={20} />
               </div>
