@@ -121,11 +121,11 @@ function CoordenadorAlunosContent() {
       s.email.toLowerCase().includes(search.toLowerCase());
     const matchTurma = !turmaFilter || (s.className ?? s.class?.name) === turmaFilter;
 
-    // Filtro via URL (?filtro=baixa-frequencia ou ?filtro=risco-academico)
+    // Filtro via URL (?filtro=frequencia_irregular ou ?filtro=risco_academico)
     let matchFiltroUrl = true;
-    if (filtroUrl === 'baixa-frequencia') {
+    if (filtroUrl === 'frequencia_irregular') {
       matchFiltroUrl = s.attendanceRate != null && s.attendanceRate < 75;
-    } else if (filtroUrl === 'risco-academico') {
+    } else if (filtroUrl === 'risco_academico') {
       matchFiltroUrl = s.situation === 'RECOVERY' || s.situation === 'FAILED';
     }
 
@@ -148,17 +148,17 @@ function CoordenadorAlunosContent() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
         {filtroUrl && (
-          <div className="flex items-center gap-2 mb-4 px-4 py-2.5 bg-orange-50 dark:bg-orange-950 border border-orange-100 dark:border-orange-800 rounded-xl">
-            <AlertTriangle size={14} className="text-orange-500 flex-shrink-0" />
-            <span className="text-sm text-orange-700 dark:text-orange-300 flex-1">
-              {filtroUrl === 'baixa-frequencia' && 'Mostrando alunos com frequência abaixo de 75%'}
-              {filtroUrl === 'risco-academico' && 'Mostrando alunos em recuperação ou reprovados'}
+          <div className="flex items-center gap-2 mb-4 px-4 py-2.5 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-xl">
+            <AlertTriangle size={14} className="text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+            <span className="text-sm text-yellow-800 dark:text-yellow-300 flex-1">
+              {filtroUrl === 'frequencia_irregular' && '⚠️ Exibindo: alunos com frequência irregular (abaixo de 75%)'}
+              {filtroUrl === 'risco_academico' && '⚠️ Exibindo: alunos em risco acadêmico (recuperação ou reprovados)'}
             </span>
             <button
               onClick={() => router.push(window.location.pathname)}
-              className="text-xs text-orange-600 dark:text-orange-400 font-medium hover:underline"
+              className="text-xs text-yellow-700 dark:text-yellow-400 font-medium hover:underline flex-shrink-0"
             >
-              Limpar filtro
+              ✕ Limpar filtro
             </button>
           </div>
         )}
