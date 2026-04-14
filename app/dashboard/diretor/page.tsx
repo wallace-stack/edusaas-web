@@ -10,11 +10,16 @@ import {
   ClipboardList, UserCog, CheckSquare
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut, Bar } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 interface DashboardData {
   people: { totalStudents: number; totalTeachers: number; totalCoordinators: number };
   academic: { avgGrade: number; avgAttendance: string; totalGrades: number; totalAttendanceRecords: number };
   financial: { totalRevenue: number; totalOverdueTuitions: number; defaultRate: string; totalPaidTuitions: number };
+  attendance?: { regularStudents: number; irregularStudents: number; avgRate: number; classAttendance: { className: string; avgRate: number }[] };
 }
 
 export default function DiretorDashboard() {
@@ -196,6 +201,69 @@ export default function DiretorDashboard() {
               className="text-xs text-red-600 dark:text-red-400 font-medium hover:underline flex-shrink-0">
               Ver detalhes
             </button>
+          </div>
+        )}
+
+        {/* Gráficos de frequência */}
+        {data?.attendance && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+            {/* Rosca — frequência geral */}
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4">
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência Geral da Escola</p>
+              <div className="flex items-center gap-6">
+                <div className="relative" style={{ width: 140, height: 140, flexShrink: 0 }}>
+                  <Doughnut
+                    data={{
+                      labels: ['Em dia', 'Irregular'],
+                      datasets: [{ data: [data.attendance.regularStudents, data.attendance.irregularStudents], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }],
+                    }}
+                    options={{ responsive: true, maintainAspectRatio: false, cutout: '65%', animation: { duration: 700 }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx: any) => ` ${ctx.label}: ${ctx.raw} aluno${ctx.raw !== 1 ? 's' : ''}` } } } }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div className="text-center">
+                      <p className="text-lg font-bold text-[#1E3A5F] dark:text-white">{data.attendance.avgRate}%</p>
+                      <p className="text-[9px] text-gray-400">em dia</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0" />
+                    <span className="text-gray-600 dark:text-gray-300">{data.attendance.regularStudents} em dia</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0" />
+                    <span className="text-gray-600 dark:text-gray-300">{data.attendance.irregularStudents} irregular{data.attendance.irregularStudents !== 1 ? 's' : ''}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Barras — frequência por turma */}
+            {data.attendance.classAttendance?.length > 0 && (
+              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência Média por Turma</p>
+                <div style={{ height: 180 }}>
+                  <Bar
+                    data={{
+                      labels: data.attendance.classAttendance.map(c => c.className),
+                      datasets: [{
+                        label: 'Frequência %',
+                        data: data.attendance.classAttendance.map(c => c.avgRate),
+                        backgroundColor: data.attendance.classAttendance.map(c => c.avgRate >= 85 ? '#6366f1' : c.avgRate >= 75 ? '#f59e0b' : '#ef4444'),
+                        borderWidth: 0,
+                        borderRadius: 6,
+                      }],
+                    }}
+                    options={{
+                      responsive: true, maintainAspectRatio: false, animation: { duration: 700 },
+                      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx: any) => ` ${ctx.raw}% de frequência` } } },
+                      scales: { y: { min: 0, max: 100, ticks: { callback: (v: any) => `${v}%` }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } },
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
 
