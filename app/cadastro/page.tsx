@@ -10,7 +10,7 @@ import {
   Building2, FileText, Phone, User,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
-import api from '../lib/api';
+import api, { registerApi } from '../lib/api';
 import { setAuth, getDashboardRoute } from '../lib/auth';
 
 /* ── CNPJ ─────────────────────────────────────── */
@@ -84,6 +84,7 @@ export default function CadastroPage() {
   const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [cnpjVal, setCnpjVal] = useState('');
   const [phoneVal, setPhoneVal] = useState('');
@@ -91,20 +92,38 @@ export default function CadastroPage() {
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) });
 
   const onSubmit = async (data: RegisterForm) => {
+    setLoading(true);
+    setError('');
+    setLoadingMsg('');
+
+    // Após 5s sem resposta, avisa sobre cold start do servidor
+    const slowTimer = setTimeout(() => {
+      setLoadingMsg('Aguardando o servidor acordar… isso pode levar até 30 segundos na primeira vez.');
+    }, 5_000);
+
     try {
-      setLoading(true); setError('');
       const payload = { ...data, cnpj: data.cnpj.replace(/\D/g,''), phone: data.phone?.replace(/\D/g,'') || undefined };
-      const response = await api.post('/auth/register', payload);
+      const response = await registerApi.post('/auth/register', payload);
       const { access_token, user } = response.data;
       setAuth(access_token, user);
       router.push(getDashboardRoute(user.role));
     } catch (err: any) {
-      const status = err.response?.status;
-      if (status === 409) setError('E-mail ou CNPJ já cadastrado. Tente fazer login.');
-      else if (status === 400) setError('Verifique os dados informados e tente novamente.');
-      else setError(err.response?.data?.message || 'Erro ao cadastrar. Tente novamente.');
+      const status = err?.response?.status;
+      const msg    = err?.response?.data?.message;
+
+      if (status === 409) {
+        setError('E-mail ou CNPJ já cadastrado. Tente fazer login ou use outros dados.');
+      } else if (status === 400) {
+        setError(msg || 'Dados inválidos. Verifique o formulário e tente novamente.');
+      } else if (err?.code === 'ECONNABORTED' || !err?.response) {
+        setError('O servidor demorou para responder. Aguarde alguns segundos e tente novamente.');
+      } else {
+        setError(msg || 'Erro ao cadastrar. Tente novamente.');
+      }
     } finally {
+      clearTimeout(slowTimer);
       setLoading(false);
+      setLoadingMsg('');
     }
   };
 
@@ -257,6 +276,12 @@ export default function CadastroPage() {
               <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Cadastrando...</>
             ) : 'Começar 14 dias grátis'}
           </button>
+
+          {loadingMsg && (
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', textAlign: 'center', marginTop: '8px' }}>
+              ⏳ {loadingMsg}
+            </p>
+          )}
         </form>
 
         <div style={{ marginTop: '24px', textAlign: 'center' }}>
