@@ -143,8 +143,10 @@ export default function DiretorDashboard() {
             <div className="w-9 h-9 bg-emerald-50 dark:bg-emerald-950 rounded-xl flex items-center justify-center mb-3">
               <DollarSign size={18} className="text-emerald-600" />
             </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 leading-snug">Em breve</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Módulo financeiro</p>
+            <p className="text-2xl sm:text-3xl font-bold text-emerald-600">
+              {data?.financial?.defaultRate || '0%'}
+            </p>
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Taxa de inadimplência</p>
           </div>
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
@@ -274,7 +276,7 @@ export default function DiretorDashboard() {
             { label: 'Secretaria',  icon: UserCog,    href: '/dashboard/secretaria/alunos',        color: 'bg-teal-50 dark:bg-teal-950 text-teal-600',      hint: 'Gestão administrativa' },
             { label: 'Usuários',    icon: Users,      href: '/dashboard/diretor/usuarios',         color: 'bg-blue-50 dark:bg-blue-950 text-blue-600',      hint: 'Equipe e acessos' },
             { label: 'Turmas',      icon: BookOpen,   href: '/dashboard/diretor/turmas',           color: 'bg-purple-50 dark:bg-purple-950 text-purple-600',hint: 'Turmas e disciplinas' },
-            { label: 'Financeiro',  icon: DollarSign, href: '/dashboard/diretor/financeiro',       color: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600', hint: 'Em breve' },
+            { label: 'Financeiro',  icon: DollarSign, href: '/dashboard/diretor/financeiro',       color: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600', hint: 'Receitas e inadimplência' },
             { label: 'Avisos',      icon: Bell,       href: '/dashboard/diretor/notificacoes',     color: 'bg-orange-50 dark:bg-orange-950 text-orange-600',hint: 'Avisos institucionais' },
           ].map(item => (
             <button key={item.label} onClick={() => router.push(item.href)}

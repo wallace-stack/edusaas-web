@@ -6,15 +6,20 @@ import { getUser, clearAuth } from '../../lib/auth';
 import api from '../../lib/api';
 import { BookOpen, Users, ClipboardList, LogOut, CheckSquare, Newspaper, Bell } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Filler, Tooltip, Legend } from 'chart.js';
+import { Bar, Line } from 'react-chartjs-2';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Filler, Tooltip, Legend);
 
 interface TeacherData {
   totalGrades: number;
   avgGrade: number;
   totalAttendance: number;
-  avgAttendance: number;
-  // legacy fields
+  avgAttendance: number | string;
   totalGradesLaunched?: number;
   totalAttendanceRecords?: number;
+  classAttendance?: { className: string; avgRate: number }[];
+  subjectAvgGrades?: { subjectName: string; avgGrade: number }[];
 }
 
 export default function ProfessorDashboard() {
@@ -151,6 +156,76 @@ export default function ProfessorDashboard() {
             </button>
           ))}
         </div>
+
+        {/* Mini gráficos clicáveis */}
+        {data && ((data.classAttendance?.length ?? 0) > 0 || (data.subjectAvgGrades?.length ?? 0) > 0) && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+            {/* Frequência das Turmas */}
+            {(data.classAttendance?.length ?? 0) > 0 && (
+              <button
+                onClick={() => router.push('/dashboard/professor/chamada/historico')}
+                className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
+              >
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                  Frequência — clique para detalhes
+                </p>
+                <div style={{ height: 180 }}>
+                  <Bar
+                    data={{
+                      labels: data.classAttendance!.map(c => c.className),
+                      datasets: [{
+                        label: 'Frequência %',
+                        data: data.classAttendance!.map(c => c.avgRate),
+                        backgroundColor: data.classAttendance!.map(c => c.avgRate >= 75 ? '#22c55e' : '#ef4444'),
+                        borderWidth: 0,
+                        borderRadius: 6,
+                      }],
+                    }}
+                    options={{
+                      responsive: true, maintainAspectRatio: false, animation: { duration: 700 },
+                      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx: any) => ` ${ctx.raw}%` } } },
+                      scales: { y: { min: 0, max: 100, ticks: { callback: (v: any) => `${v}%`, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } },
+                    }}
+                  />
+                </div>
+              </button>
+            )}
+
+            {/* Médias por Disciplina */}
+            {(data.subjectAvgGrades?.length ?? 0) > 0 && (
+              <button
+                onClick={() => router.push('/dashboard/professor/notas')}
+                className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
+              >
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                  Notas — clique para detalhes
+                </p>
+                <div style={{ height: 180 }}>
+                  <Line
+                    data={{
+                      labels: data.subjectAvgGrades!.map(s => s.subjectName),
+                      datasets: [{
+                        label: 'Média',
+                        data: data.subjectAvgGrades!.map(s => s.avgGrade),
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99,102,241,0.12)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        borderWidth: 2,
+                      }],
+                    }}
+                    options={{
+                      responsive: true, maintainAspectRatio: false, animation: { duration: 700 },
+                      plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx: any) => ` Média: ${ctx.raw}` } } },
+                      scales: { y: { min: 0, max: 10, ticks: { font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } },
+                    }}
+                  />
+                </div>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Menu */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">

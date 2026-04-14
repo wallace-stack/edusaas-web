@@ -17,6 +17,7 @@ interface CoordinatorData {
   atRiskStudents: number;
   irregularAttendance: number;
   classAttendance: { className: string; avgRate: number }[];
+  academicSituation?: { approved: number; recovery: number; failed: number; noGrades: number };
   alerts: { gradesAlert: string | null; attendanceAlert: string | null };
 }
 
@@ -214,48 +215,47 @@ export default function CoordenadorDashboard() {
           </div>
         )}
 
-        {/* Gráficos de frequência */}
+        {/* Mini gráficos clicáveis */}
         {data && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-            {/* Rosca — frequência geral */}
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência Geral da Escola</p>
-              <div className="flex items-center gap-6">
-                <div className="relative" style={{ width: 140, height: 140, flexShrink: 0 }}>
-                  <Doughnut
-                    data={{
-                      labels: ['Em dia', 'Irregular'],
-                      datasets: [{ data: [data.totalStudents - data.irregularAttendance, data.irregularAttendance], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }],
-                    }}
-                    options={{ responsive: true, maintainAspectRatio: false, cutout: '65%', animation: { duration: 700 }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx: any) => ` ${ctx.label}: ${ctx.raw} aluno${ctx.raw !== 1 ? 's' : ''}` } } } }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <div className="text-center">
-                      <p className="text-lg font-bold text-[#1E3A5F] dark:text-white">
-                        {data.totalStudents > 0 ? Math.round(((data.totalStudents - data.irregularAttendance) / data.totalStudents) * 100) : 0}%
-                      </p>
-                      <p className="text-[9px] text-gray-400">em dia</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
+            {/* Rosca — situação acadêmica */}
+            {data.academicSituation && (
+              <button
+                onClick={() => router.push('/dashboard/coordenador/alunos')}
+                className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
+              >
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Situação Acadêmica — clique para ver alunos</p>
+                <div className="flex items-center gap-4">
+                  <div className="relative" style={{ width: 120, height: 120, flexShrink: 0 }}>
+                    <Doughnut
+                      data={{
+                        labels: ['Aprovados', 'Recuperação', 'Reprovados', 'Sem notas'],
+                        datasets: [{ data: [data.academicSituation.approved, data.academicSituation.recovery, data.academicSituation.failed, data.academicSituation.noGrades], backgroundColor: ['#22c55e', '#f59e0b', '#ef4444', '#e5e7eb'], borderWidth: 0 }],
+                      }}
+                      options={{ responsive: true, maintainAspectRatio: false, cutout: '60%', animation: { duration: 700 }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx: any) => ` ${ctx.label}: ${ctx.raw}` } } } }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <p className="text-sm font-bold text-[#1E3A5F] dark:text-white">{data.academicSituation.approved}</p>
                     </div>
                   </div>
-                </div>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-green-500 flex-shrink-0" />
-                    <span className="text-gray-600 dark:text-gray-300">{data.totalStudents - data.irregularAttendance} em dia</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-red-500 flex-shrink-0" />
-                    <span className="text-gray-600 dark:text-gray-300">{data.irregularAttendance} irregular{data.irregularAttendance !== 1 ? 's' : ''}</span>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-green-500 flex-shrink-0" /><span className="text-gray-600 dark:text-gray-300">{data.academicSituation.approved} aprovados</span></div>
+                    <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-yellow-500 flex-shrink-0" /><span className="text-gray-600 dark:text-gray-300">{data.academicSituation.recovery} recuperação</span></div>
+                    <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0" /><span className="text-gray-600 dark:text-gray-300">{data.academicSituation.failed} reprovados</span></div>
+                    {data.academicSituation.noGrades > 0 && <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-gray-300 flex-shrink-0" /><span className="text-gray-400">{data.academicSituation.noGrades} sem notas</span></div>}
                   </div>
                 </div>
-              </div>
-            </div>
+              </button>
+            )}
 
             {/* Barras — frequência por turma */}
-            {data.classAttendance?.length > 0 && (
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência Média por Turma</p>
-                <div style={{ height: 180 }}>
+            {(data.classAttendance?.length ?? 0) > 0 && (
+              <button
+                onClick={() => router.push('/dashboard/coordenador/alunos?filtro=frequencia_irregular')}
+                className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
+              >
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência por Turma — clique para ver irregulares</p>
+                <div style={{ height: 150 }}>
                   <Bar
                     data={{
                       labels: data.classAttendance.map(c => c.className),
@@ -270,11 +270,11 @@ export default function CoordenadorDashboard() {
                     options={{
                       responsive: true, maintainAspectRatio: false, animation: { duration: 700 },
                       plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx: any) => ` ${ctx.raw}% de frequência` } } },
-                      scales: { y: { min: 0, max: 100, ticks: { callback: (v: any) => `${v}%` }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } },
+                      scales: { y: { min: 0, max: 100, ticks: { callback: (v: any) => `${v}%`, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } },
                     }}
                   />
                 </div>
-              </div>
+              </button>
             )}
           </div>
         )}
