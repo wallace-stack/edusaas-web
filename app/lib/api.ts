@@ -1,8 +1,17 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+  baseURL: BASE,
+});
+
+// Instância dedicada para /auth/register — timeout maior porque o Render free
+// pode demorar até 50s para acordar do cold start.
+export const registerApi = axios.create({
+  baseURL: BASE,
+  timeout: 60_000,
 });
 
 // Adiciona o token automaticamente em todas as requisições
