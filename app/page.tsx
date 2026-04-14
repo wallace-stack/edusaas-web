@@ -36,17 +36,101 @@ const testimonials = [
 
 const faqs = [
   { q: 'Preciso de cartão de crédito para o trial?',      a: 'Não. O trial de 14 dias é completamente gratuito e não exige nenhum dado de pagamento. Você só é cobrado se decidir assinar um plano.' },
-  { q: 'Quantos alunos posso cadastrar?',                 a: 'No plano gratuito (trial), até 150 alunos. No Pro, até 350 alunos. No Premium, alunos ilimitados.' },
-  { q: 'Como funciona o período de trial?',               a: 'Ao criar sua conta, você tem acesso a todos os recursos do plano gratuito por 14 dias. No final do trial, pode escolher o plano Pro ou Premium para continuar usando.' },
+  { q: 'Quantos alunos posso cadastrar?',                 a: 'No Starter até 150 alunos, no Pro até 500, no Escola até 1.000. O plano Rede não tem limite — entre em contato para um orçamento.' },
+  { q: 'Como funciona o período de trial?',               a: 'Ao criar sua conta, você tem 14 dias de acesso completo sem cartão de crédito. No final do trial, escolha o plano que melhor atende sua escola.' },
   { q: 'Posso cancelar quando quiser?',                   a: 'Sim. O cancelamento pode ser feito a qualquer momento diretamente pelo painel, sem multas ou burocracia.' },
-  { q: 'Tem suporte?',                                    a: 'Sim, nosso suporte é 100% humanizado. Atendemos por e-mail em todos os planos e por chat com prioridade no plano Premium.' },
-  { q: 'Qual a diferença entre Pro e Premium?',           a: 'O Pro suporta até 350 alunos e 2 imagens por post. O Premium oferece alunos ilimitados, 5 imagens por post e acesso antecipado a novos recursos.' },
-  { q: 'Como funciona o pagamento?',                      a: 'Os pagamentos são processados mensalmente via Asaas. Aceitamos boleto, Pix e cartão de crédito.' },
+  { q: 'Qual a diferença entre mensal e anual?',          a: 'No plano anual você paga 20% menos. O valor é cobrado à vista uma vez por ano via boleto, Pix ou cartão de crédito.' },
+  { q: 'Tem suporte?',                                    a: 'Sim. Suporte por e-mail no Starter, WhatsApp prioritário no Pro e no Escola, e gerente de conta dedicado no Rede.' },
+  { q: 'Como funciona o pagamento?',                      a: 'Os pagamentos são processados via Asaas. Aceitamos boleto, Pix e cartão de crédito em todos os planos.' },
 ];
 
-const freeFeats    = ['Até 150 alunos', 'Lançamento de notas', 'Controle de frequência', '1 imagem por post no feed', 'Suporte por e-mail', 'Trial de 14 dias'];
-const proFeats     = ['Até 350 alunos', 'Gestão financeira completa', 'Lançamento de notas', 'Controle de frequência', '2 imagens por post no feed', 'Feed de notícias', 'Turmas ilimitadas', 'Suporte prioritário'];
-const premiumFeats = ['Alunos ilimitados', 'Tudo do plano Pro', '5 imagens por post no feed', 'Relatórios avançados', 'Suporte prioritário via chat', 'Acesso antecipado a novos recursos'];
+const PLANS = [
+  {
+    id: 'starter',
+    name: 'Starter',
+    badge: '14 dias grátis',
+    badgeGradient: 'linear-gradient(135deg,#10B981,#059669)',
+    monthlyPrice: 97,
+    subtitle: 'Para escolas pequenas',
+    features: [
+      'Até 150 alunos',
+      'Lançamento de notas e frequência',
+      'Dashboard diretor e coordenador',
+      'Wizard de onboarding',
+      'Suporte por e-mail',
+      'Trial 14 dias grátis',
+    ],
+    cta: 'Começar grátis →',
+    ctaHref: '/cadastro',
+    highlight: false,
+    checkColor: '#10B981',
+    ctaStyle: { borderColor: 'rgba(255,255,255,0.12)', color: '#F1F5F9', background: 'transparent' } as React.CSSProperties,
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    badge: '⭐ Mais popular',
+    badgeGradient: 'linear-gradient(135deg,#3B82F6,#8B5CF6)',
+    monthlyPrice: 197,
+    subtitle: 'Para escolas em crescimento',
+    features: [
+      'Até 500 alunos',
+      'Tudo do Starter',
+      'Módulo financeiro com gráficos',
+      'Relatórios avançados Chart.js',
+      'Drawer de alunos com dados pessoais',
+      'Suporte prioritário por WhatsApp',
+    ],
+    cta: 'Começar grátis →',
+    ctaHref: '/cadastro',
+    highlight: true,
+    checkColor: '#3B82F6',
+    ctaStyle: { background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)', color: '#fff' } as React.CSSProperties,
+  },
+  {
+    id: 'escola',
+    name: 'Escola',
+    badge: null,
+    badgeGradient: 'linear-gradient(135deg,#A78BFA,#F97316)',
+    monthlyPrice: 397,
+    subtitle: 'Para escolas que precisam do máximo',
+    features: [
+      'Até 1.000 alunos',
+      'Tudo do Pro',
+      'Importação de alunos via CSV',
+      'Relatórios para secretaria de educação',
+      'Múltiplos coordenadores',
+      'Suporte via chat em horário comercial',
+    ],
+    cta: 'Começar grátis →',
+    ctaHref: '/cadastro',
+    highlight: false,
+    checkColor: '#A78BFA',
+    ctaStyle: { background: 'linear-gradient(135deg,#8B5CF6,#F97316)', color: '#fff' } as React.CSSProperties,
+  },
+  {
+    id: 'rede',
+    name: 'Rede',
+    badge: null,
+    badgeGradient: 'linear-gradient(135deg,#F97316,#EF4444)',
+    monthlyPrice: 797,
+    pricePrefix: 'A partir de ',
+    subtitle: 'Para redes e franquias',
+    features: [
+      'Múltiplas unidades',
+      'Painel centralizado (em breve)',
+      'Tudo do plano Escola',
+      'Treinamento da equipe incluído',
+      'SLA 99% garantido',
+      'Gerente de conta dedicado',
+    ],
+    cta: 'Falar com especialista →',
+    ctaHref: 'https://wa.me/5511999999999?text=Olá%2C+tenho+interesse+no+plano+Rede+do+EduSaaS',
+    highlight: false,
+    checkColor: '#F97316',
+    ctaStyle: { background: 'linear-gradient(135deg,#F97316,#EF4444)', color: '#fff' } as React.CSSProperties,
+  },
+];
 
 /* ─── HOOK FADE-IN ───────────────────────────── */
 
@@ -148,6 +232,7 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isAnnual, setIsAnnual] = useState(false);
 
   const heroRef  = useFadeIn();
   const featRef  = useFadeIn();
@@ -366,91 +451,152 @@ export default function LandingPage() {
 
       {/* ── PLANOS ── */}
       <section id="planos" className="py-24 px-6" style={{ background: '#0D0D14' }}>
-        <div ref={planosRef} style={fadeStyle} className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
+        <div ref={planosRef} style={fadeStyle} className="max-w-7xl mx-auto">
+          <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">Planos simples e transparentes</h2>
             <p style={{ color: '#94A3B8' }}>Comece grátis, escale quando precisar. Sem surpresas.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-stretch">
 
-            {/* Free */}
-            <div className="rounded-2xl border p-8 flex flex-col" style={{ background: '#111118', borderColor: 'rgba(255,255,255,0.08)' }}>
-              <span className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: '#64748B' }}>Gratuito</span>
-              <div className="flex items-end gap-1 mb-1"><span className="text-4xl font-extrabold">Grátis</span></div>
-              <p className="text-sm mb-8" style={{ color: '#64748B' }}>14 dias de trial — sem cartão</p>
-              <ul className="space-y-3 flex-1 mb-8">
-                {freeFeats.map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-sm" style={{ color: '#94A3B8' }}>
-                    <Check size={14} style={{ color: '#64748B' }} strokeWidth={3} />{f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/cadastro" className="w-full text-center py-3 rounded-xl border font-semibold text-sm transition-colors"
-                style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#F1F5F9' }}
-                onMouseOver={e => (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'}
-                onMouseOut={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}>
-                Começar grátis
-              </Link>
-            </div>
+          {/* Toggle mensal / anual */}
+          <div className="flex items-center justify-center gap-3 mb-12">
+            <span className="text-sm font-medium" style={{ color: isAnnual ? '#64748B' : '#F1F5F9' }}>Mensal</span>
+            <button
+              onClick={() => setIsAnnual(a => !a)}
+              className="relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none"
+              style={{ background: isAnnual ? 'linear-gradient(135deg,#3B82F6,#8B5CF6)' : 'rgba(255,255,255,0.12)' }}
+              aria-label="Alternar cobrança anual"
+            >
+              <span
+                className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300"
+                style={{ transform: isAnnual ? 'translateX(26px)' : 'translateX(2px)' }}
+              />
+            </button>
+            <span className="text-sm font-medium" style={{ color: isAnnual ? '#F1F5F9' : '#64748B' }}>
+              Anual
+            </span>
+            {isAnnual && (
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full"
+                style={{ background: 'rgba(16,185,129,0.15)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)' }}>
+                20% OFF
+              </span>
+            )}
+          </div>
 
-            {/* Pro — destaque */}
-            <div className="gradient-border flex flex-col" style={{ position: 'relative' }}>
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                <span className="text-xs font-bold px-4 py-1.5 rounded-full text-white flex items-center gap-1.5"
-                  style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-                  <Star size={11} fill="currentColor" /> Mais popular
-                </span>
-              </div>
-              <div className="rounded-[18px] p-8 flex flex-col h-full" style={{ background: '#111118' }}>
-                <span className="text-xs font-semibold uppercase tracking-widest mb-3"
-                  style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Pro</span>
-                <div className="flex items-end gap-1 mb-1">
-                  <span className="text-lg font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
-                  <span className="text-4xl font-extrabold">79</span>
-                  <span className="text-xl font-bold">,90</span>
-                  <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
+          {/* Grid 4 planos */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
+            {PLANS.map((plan) => {
+              const p = plan as typeof plan & { pricePrefix?: string };
+              const price     = p.monthlyPrice ? (isAnnual ? Math.round(p.monthlyPrice * 0.8) : p.monthlyPrice) : null;
+              const annualSavings = p.monthlyPrice ? Math.round(p.monthlyPrice * 0.2 * 12) : 0;
+              const isWA      = p.ctaHref.startsWith('https://wa');
+
+              return p.highlight ? (
+                /* ── Pro (destaque com borda gradiente) ── */
+                <div key={p.id} className="gradient-border flex flex-col relative">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                    <span className="text-xs font-bold px-4 py-1.5 rounded-full text-white flex items-center gap-1.5 whitespace-nowrap"
+                      style={{ background: p.badgeGradient }}>
+                      <Star size={11} fill="currentColor" /> {p.badge}
+                    </span>
+                  </div>
+                  <div className="rounded-[18px] p-6 flex flex-col h-full" style={{ background: '#111118' }}>
+                    <span className="text-xs font-semibold uppercase tracking-widest mb-3"
+                      style={{ background: p.badgeGradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                      {p.name}
+                    </span>
+                    <div className="flex flex-wrap items-end gap-1 mb-1">
+                      {price !== null ? (
+                        <>
+                          {p.pricePrefix && <span className="text-xs font-medium self-center mb-1.5" style={{ color: '#64748B' }}>{p.pricePrefix}</span>}
+                          <span className="text-base font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
+                          <span className="text-4xl font-extrabold">{price}</span>
+                          <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
+                        </>
+                      ) : (
+                        <span className="text-2xl font-extrabold" style={{ color: '#94A3B8' }}>Sob consulta</span>
+                      )}
+                    </div>
+                    {isAnnual && price !== null && (
+                      <p className="text-xs mb-1" style={{ color: '#10B981' }}>Economize R$ {annualSavings}/ano</p>
+                    )}
+                    <p className="text-sm mb-6" style={{ color: '#64748B' }}>{p.subtitle}</p>
+                    <ul className="space-y-2.5 flex-1 mb-6">
+                      {p.features.map((f) => (
+                        <li key={f} className="flex items-center gap-2.5 text-sm font-medium">
+                          <Check size={13} style={{ color: p.checkColor, flexShrink: 0 }} strokeWidth={3} />{f}
+                        </li>
+                      ))}
+                    </ul>
+                    {isWA ? (
+                      <a href={p.ctaHref} target="_blank" rel="noopener noreferrer"
+                        className="w-full text-center py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5"
+                        style={p.ctaStyle}>
+                        {p.cta}
+                      </a>
+                    ) : (
+                      <Link href={p.ctaHref}
+                        className="w-full text-center py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5"
+                        style={p.ctaStyle}>
+                        {p.cta}
+                      </Link>
+                    )}
+                  </div>
                 </div>
-                <p className="text-sm mb-8" style={{ color: '#64748B' }}>Para escolas em crescimento</p>
-                <ul className="space-y-3 flex-1 mb-8">
-                  {proFeats.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm font-medium">
-                      <Check size={14} style={{ color: '#3B82F6' }} strokeWidth={3} />{f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/planos" className="w-full text-center py-3 rounded-xl font-bold text-sm text-white glow-btn flex items-center justify-center gap-1.5"
-                  style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-                  Assinar Pro <ArrowRight size={14} />
-                </Link>
-              </div>
-            </div>
-
-            {/* Premium */}
-            <div className="rounded-2xl border p-8 flex flex-col" style={{ background: '#111118', borderColor: 'rgba(255,255,255,0.08)' }}>
-              <span className="text-xs font-semibold uppercase tracking-widest mb-3"
-                style={{ background: 'linear-gradient(90deg,#A78BFA,#F97316)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Premium</span>
-              <div className="flex items-end gap-1 mb-1">
-                <span className="text-lg font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
-                <span className="text-4xl font-extrabold">149</span>
-                <span className="text-xl font-bold">,90</span>
-                <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
-              </div>
-              <p className="text-sm mb-8" style={{ color: '#64748B' }}>Para escolas que precisam do máximo</p>
-              <ul className="space-y-3 flex-1 mb-8">
-                {premiumFeats.map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-sm font-medium">
-                    <Check size={14} style={{ color: '#A78BFA' }} strokeWidth={3} />{f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/planos" className="w-full text-center py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-1.5"
-                style={{ background: 'linear-gradient(135deg,#8B5CF6,#F97316)', boxShadow: '0 0 20px rgba(139,92,246,0.35)', transition: 'box-shadow 0.2s ease, transform 0.2s ease' }}
-                onMouseOver={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 32px rgba(139,92,246,0.5)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'; }}
-                onMouseOut={e => { (e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px rgba(139,92,246,0.35)'; (e.currentTarget as HTMLElement).style.transform = 'translateY(0)'; }}>
-                Assinar Premium <ArrowRight size={14} />
-              </Link>
-            </div>
-
+              ) : (
+                /* ── Outros planos ── */
+                <div key={p.id} className="rounded-2xl border p-6 flex flex-col"
+                  style={{ background: '#111118', borderColor: 'rgba(255,255,255,0.08)', position: 'relative' }}>
+                  {p.badge && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
+                      <span className="text-xs font-bold px-4 py-1.5 rounded-full text-white whitespace-nowrap"
+                        style={{ background: p.badgeGradient }}>
+                        {p.badge}
+                      </span>
+                    </div>
+                  )}
+                  <span className="text-xs font-semibold uppercase tracking-widest mb-3"
+                    style={{ background: p.badgeGradient, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                    {p.name}
+                  </span>
+                  <div className="flex flex-wrap items-end gap-1 mb-1">
+                    {price !== null ? (
+                      <>
+                        {p.pricePrefix && <span className="text-xs font-medium self-center mb-1.5" style={{ color: '#64748B' }}>{p.pricePrefix}</span>}
+                        <span className="text-base font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
+                        <span className="text-4xl font-extrabold">{price}</span>
+                        <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
+                      </>
+                    ) : (
+                      <span className="text-2xl font-extrabold" style={{ color: '#94A3B8' }}>Sob consulta</span>
+                    )}
+                  </div>
+                  {isAnnual && price !== null && (
+                    <p className="text-xs mb-1" style={{ color: '#10B981' }}>Economize R$ {annualSavings}/ano</p>
+                  )}
+                  <p className="text-sm mb-6" style={{ color: '#64748B' }}>{p.subtitle}</p>
+                  <ul className="space-y-2.5 flex-1 mb-6">
+                    {p.features.map((f) => (
+                      <li key={f} className="flex items-center gap-2.5 text-sm" style={{ color: '#94A3B8' }}>
+                        <Check size={13} style={{ color: p.checkColor, flexShrink: 0 }} strokeWidth={3} />{f}
+                      </li>
+                    ))}
+                  </ul>
+                  {isWA ? (
+                    <a href={p.ctaHref} target="_blank" rel="noopener noreferrer"
+                      className="w-full text-center py-3 rounded-xl font-bold text-sm border flex items-center justify-center gap-1.5 transition-colors"
+                      style={p.ctaStyle}>
+                      {p.cta}
+                    </a>
+                  ) : (
+                    <Link href={p.ctaHref}
+                      className="w-full text-center py-3 rounded-xl font-bold text-sm border flex items-center justify-center gap-1.5 transition-colors"
+                      style={p.ctaStyle}>
+                      {p.cta}
+                    </Link>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
