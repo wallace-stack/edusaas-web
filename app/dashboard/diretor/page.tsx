@@ -12,6 +12,7 @@ import {
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
+import OnboardingWizard from '@/components/OnboardingWizard';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -28,6 +29,7 @@ export default function DiretorDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showWizard, setShowWizard] = useState(false);
 
   const getSaudacao = () => {
     const h = new Date().getHours();
@@ -39,7 +41,13 @@ export default function DiretorDashboard() {
   useEffect(() => {
     if (!user || user.role !== 'director') { router.push('/login'); return; }
     api.get('/metrics/director')
-      .then(r => setData(r.data))
+      .then(r => {
+        setData(r.data);
+        const p = r.data?.people;
+        if (p && (p.totalTeachers === 0 || p.totalStudents === 0)) {
+          setShowWizard(true);
+        }
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
     api.get('/notifications/unread-count')
@@ -58,6 +66,12 @@ export default function DiretorDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
+      {showWizard && (
+        <OnboardingWizard onClose={() => {
+          setShowWizard(false);
+          api.get('/metrics/director').then(r => setData(r.data)).catch(() => {});
+        }} />
+      )}
       <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
