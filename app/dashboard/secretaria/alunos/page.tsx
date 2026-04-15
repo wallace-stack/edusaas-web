@@ -348,6 +348,7 @@ export default function SecretariaAlunosPage() {
         <ImportarAlunosCSV
           onClose={() => setShowImport(false)}
           onSuccess={loadData}
+          classes={classes}
         />
       )}
 
