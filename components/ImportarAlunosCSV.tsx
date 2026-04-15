@@ -199,6 +199,12 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
                 </p>
               </div>
             )}
+            <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-3">
+              <span className="text-amber-500 text-base shrink-0">⚠️</span>
+              <p className="text-xs text-amber-700 dark:text-amber-300">
+                <strong>Use apenas o template de importação.</strong> O arquivo exportado (com 16 colunas) não é compatível com a importação. Baixe o template acima para preencher.
+              </p>
+            </div>
           </div>
 
           {/* Drop zone */}
