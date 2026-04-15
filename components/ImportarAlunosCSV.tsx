@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import Papa from 'papaparse';
 import api from '@/app/lib/api';
 import {
   Upload, FileText, Download, CheckCircle2,
@@ -99,62 +98,71 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
     setResult(null);
     setAlunos([]);
 
-    const tryParse = (delimiter: string, encoding: string) => {
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
-        encoding,
-        delimiter,
-        transformHeader: (header: string, index: number) => {
-          const normalized = header.trim().toLowerCase().replace(/\s+/g, '_');
-          return normalized || `col_${index}`;
-        },
-        complete: (res) => {
-          const headers = res.meta.fields ?? [];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = (e.target?.result as string) ?? '';
 
-          // Se só tem 1 coluna com delimitador vírgula, tenta ponto-e-vírgula
-          if (headers.length <= 1 && delimiter === ',') {
-            tryParse(';', encoding);
-            return;
-          }
+      // Detecta delimitador: conta vírgulas e ponto-e-vírgulas na primeira linha
+      const firstLine = text.split('\n')[0] ?? '';
+      const delimiter = (firstLine.match(/;/g)?.length ?? 0) > (firstLine.match(/,/g)?.length ?? 0) ? ';' : ',';
 
-          // Se ainda tem 1 coluna, arquivo está mal formatado
-          if (headers.length <= 1) {
-            setParseError('Arquivo não reconhecido. Use "Salvar como → CSV UTF-8 (delimitado por vírgulas)" no Excel, ou use o Google Sheets.');
-            return;
-          }
+      const lines = text
+        .split('\n')
+        .map(l => l.replace(/\r/g, '').trim())
+        .filter(l => l && !l.startsWith('#'));
 
-          const rows = (res.data as any[])
-            .filter((row: any) => {
-              const firstVal = String(Object.values(row)[0] ?? '');
-              return !firstVal.startsWith('#') && firstVal.trim() !== '';
-            })
-            .map((row): AlunoRow => ({
-              name:          (row.nome        || row.name          || row['nome_']        || '').trim(),
-              email:         (row.email       || row['e-mail']     || '').trim().toLowerCase(),
-              className:     (row.turma       || row.class         || row.turma_          || '').trim(),
-              phone:         (row.telefone    || row.phone         || row.fone            || '').trim() || undefined,
-              document:      (row.cpf         || row.document      || '').trim() || undefined,
-              birthDate:     parseDateBR(row.data_nascimento || row.data || row.birthDate || row.nascimento),
-              guardianName:  (row.responsavel || row.guardianName  || row.responsavel_    || '').trim() || undefined,
-              guardianPhone: (row.telefone_responsavel || row.guardianPhone || row.tel_responsavel || '').trim() || undefined,
-            }));
+      if (lines.length < 2) {
+        setParseError('Arquivo vazio ou sem dados além do cabeçalho.');
+        return;
+      }
 
-          console.log('Parsed com delimiter:', JSON.stringify(delimiter), '| Rows:', rows.length, '| Headers:', headers);
+      // Pula a linha de cabeçalho (linha 0), processa a partir da linha 1
+      const dataLines = lines.slice(1);
 
-          if (rows.length === 0) {
-            setParseError('Nenhum aluno encontrado no arquivo. Verifique se o arquivo tem dados além do cabeçalho.');
-            return;
-          }
+      const rows: AlunoRow[] = [];
+      for (const line of dataLines) {
+        // Split respeitando campos entre aspas
+        const cols = line.match(/("([^"]|"")*"|[^,;]*)/g)
+          ?.filter((_, i) => i % 2 === 0)
+          .map(c => c.replace(/^"|"$/g, '').replace(/""/g, '"').trim())
+          ?? line.split(delimiter).map(c => c.trim());
 
-          setAlunos(rows);
-        },
-        error: () => setParseError('Erro ao ler o arquivo CSV.'),
-      });
+        // Índices fixos: 0=nome, 1=email, 2=turma, 3=telefone, 4=cpf, 5=data_nascimento, 6=responsavel, 7=telefone_responsavel
+        const name          = cols[0] ?? '';
+        const email         = (cols[1] ?? '').toLowerCase();
+        const className     = cols[2] ?? '';
+        const phone         = cols[3] ?? '';
+        const document      = cols[4] ?? '';
+        const birthDateRaw  = cols[5] ?? '';
+        const guardianName  = cols[6] ?? '';
+        const guardianPhone = cols[7] ?? '';
+
+        if (!name && !email) continue; // linha vazia
+
+        rows.push({
+          name,
+          email,
+          className,
+          phone:         phone || undefined,
+          document:      document || undefined,
+          birthDate:     parseDateBR(birthDateRaw) || undefined,
+          guardianName:  guardianName || undefined,
+          guardianPhone: guardianPhone || undefined,
+        });
+      }
+
+      console.log('Delimiter detectado:', delimiter, '| Rows:', rows.length, rows[0]);
+
+      if (rows.length === 0) {
+        setParseError('Nenhum aluno encontrado. Verifique se o arquivo tem dados além do cabeçalho.');
+        return;
+      }
+
+      setAlunos(rows);
     };
 
-    // Começa tentando vírgula
-    tryParse(',', 'UTF-8');
+    reader.onerror = () => setParseError('Erro ao ler o arquivo.');
+    reader.readAsText(file, 'UTF-8');
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
