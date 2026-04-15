@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, Search, X, ChevronRight, Upload } from 'lucide-react';
+import { ArrowLeft, Plus, Search, X, ChevronRight, Upload, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
 import ImportarAlunosCSV from '@/components/ImportarAlunosCSV';
@@ -145,6 +145,27 @@ export default function SecretariaAlunosPage() {
     } finally { setSaving(false); }
   };
 
+  const handleExportCSV = async () => {
+    try {
+      const token = Cookies.get('token');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'https://edusaas-api-tbig.onrender.com'}/secretary/students/export`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (!response.ok) throw new Error('Erro ao exportar');
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `alunos_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('CSV exportado com sucesso!');
+    } catch {
+      toast.error('Erro ao exportar CSV');
+    }
+  };
+
   const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] dark:bg-gray-800 dark:text-gray-100";
 
   return (
@@ -164,6 +185,13 @@ export default function SecretariaAlunosPage() {
             >
               <Upload size={14} />
               Importar CSV
+            </button>
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center gap-1.5 border border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-400 px-3 py-2 rounded-xl text-xs font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors whitespace-nowrap"
+            >
+              <Download size={14} />
+              Exportar CSV
             </button>
             <button
               onClick={() => setShowModal(true)}
