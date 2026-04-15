@@ -62,6 +62,7 @@ export default function SecretariaAlunosPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [transferClassId, setTransferClassId] = useState('');
   const [transferring, setTransferring] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const loadingRef = useRef(false);
   const [form, setForm] = useState({
     name: '', email: '', phone: '', birthDate: '', classId: '',
@@ -76,9 +77,10 @@ export default function SecretariaAlunosPage() {
     loadData();
   }, []);
 
-  const loadData = async () => {
+  const loadData = async (attempt = 1) => {
     if (loadingRef.current) return;
     loadingRef.current = true;
+    setLoadError('');
     try {
       const [studentsRes, classesRes] = await Promise.all([
         api.get('/secretary/students'),
@@ -86,8 +88,16 @@ export default function SecretariaAlunosPage() {
       ]);
       setStudents(studentsRes.data);
       setClasses(classesRes.data);
-    } catch (err) { console.error(err); }
-    finally {
+    } catch (err: any) {
+      console.error(err);
+      const isNetworkErr = !err.response || err.code === 'ECONNABORTED';
+      if (isNetworkErr && attempt < 3) {
+        loadingRef.current = false;
+        setTimeout(() => loadData(attempt + 1), 3_000);
+        return;
+      }
+      setLoadError('Erro ao carregar. Tente recarregar a página.');
+    } finally {
       setLoading(false);
       loadingRef.current = false;
     }
@@ -204,8 +214,19 @@ export default function SecretariaAlunosPage() {
 
         {/* Lista agrupada por turma */}
         {loading ? (
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center space-y-2">
             <div className="w-8 h-8 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
+            <p className="text-xs text-gray-400 dark:text-gray-500">Conectando ao servidor…</p>
+          </div>
+        ) : loadError ? (
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-red-100 dark:border-red-900 p-8 text-center space-y-3">
+            <p className="text-sm text-red-500">{loadError}</p>
+            <button
+              onClick={() => { setLoading(true); loadData(); }}
+              className="px-4 py-2 rounded-xl bg-[#1E3A5F] text-white text-xs font-medium hover:bg-[#162d4a] transition-colors"
+            >
+              Tentar novamente
+            </button>
           </div>
         ) : (() => {
           const filtered = students.filter(s => {
