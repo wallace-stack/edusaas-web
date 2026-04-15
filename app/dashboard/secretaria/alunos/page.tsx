@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, Search, X, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Plus, Search, X, ChevronRight, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
+import ImportarAlunosCSV from '@/components/ImportarAlunosCSV';
 
 interface Student {
   id: number;
@@ -52,6 +53,7 @@ export default function SecretariaAlunosPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [classes, setClasses] = useState<any[]>([]);
@@ -145,13 +147,22 @@ export default function SecretariaAlunosPage() {
             </button>
             <h1 className="font-bold text-[#1E3A5F] dark:text-white">Alunos</h1>
           </div>
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex items-center gap-1.5 bg-[#1E3A5F] text-white px-3 py-2 rounded-xl text-xs font-medium hover:bg-[#162d4a] transition-colors whitespace-nowrap"
-          >
-            <Plus size={14} />
-            Matricular aluno
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowImport(true)}
+              className="flex items-center gap-1.5 border border-[#1E3A5F] text-[#1E3A5F] dark:border-indigo-400 dark:text-indigo-400 px-3 py-2 rounded-xl text-xs font-medium hover:bg-[#1E3A5F]/5 transition-colors whitespace-nowrap"
+            >
+              <Upload size={14} />
+              Importar CSV
+            </button>
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-1.5 bg-[#1E3A5F] text-white px-3 py-2 rounded-xl text-xs font-medium hover:bg-[#162d4a] transition-colors whitespace-nowrap"
+            >
+              <Plus size={14} />
+              Matricular aluno
+            </button>
+          </div>
         </div>
       </header>
 
@@ -282,6 +293,14 @@ export default function SecretariaAlunosPage() {
           );
         })()}
       </main>
+
+      {/* Modal: Importar CSV */}
+      {showImport && (
+        <ImportarAlunosCSV
+          onClose={() => setShowImport(false)}
+          onSuccess={loadData}
+        />
+      )}
 
       {/* Modal: Matricular aluno */}
       {showModal && (
