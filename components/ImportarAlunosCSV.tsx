@@ -39,7 +39,6 @@ interface Props {
 
 function downloadTemplate(classes?: Array<{ id: number; name: string; year?: number }>) {
   const BOM = '\uFEFF';
-  const instrucoes = '# OBRIGATÓRIOS: nome, email, turma | OPCIONAIS: telefone, cpf, data_nascimento, responsavel, telefone_responsavel';
   const cabecalho  = 'nome,email,turma,telefone,cpf,data_nascimento,responsavel,telefone_responsavel';
 
   let linhasExemplo: string[];
@@ -60,7 +59,7 @@ function downloadTemplate(classes?: Array<{ id: number; name: string; year?: num
     ];
   }
 
-  const csvContent = BOM + [instrucoes, cabecalho, ...linhasExemplo].join('\n');
+  const csvContent = BOM + [cabecalho, ...linhasExemplo].join('\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -104,7 +103,12 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
       skipEmptyLines: true,
       encoding: 'UTF-8',
       complete: (res) => {
-        const rows = (res.data as any[]).map((row): AlunoRow => ({
+        const rows = (res.data as any[])
+          .filter((row: any) => {
+            const firstVal = Object.values(row)[0] as string ?? '';
+            return !firstVal.startsWith('#');
+          })
+          .map((row): AlunoRow => ({
           name:         (row.nome       || row.name         || '').trim(),
           email:        (row.email                          || '').trim().toLowerCase(),
           className:    (row.turma      || row.class        || '').trim(),
@@ -114,6 +118,7 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
           guardianName: (row.responsavel || row.guardianName || '').trim() || undefined,
           guardianPhone:(row.telefone_responsavel || row.guardianPhone || '').trim() || undefined,
         }));
+        console.log('Rows parsed:', rows.length, rows[0]);
         setAlunos(rows);
       },
       error: () => setParseError('Erro ao ler o arquivo CSV.'),
