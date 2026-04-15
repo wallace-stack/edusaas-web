@@ -36,14 +36,16 @@ interface Props {
   onSuccess?: () => void; // callback para recarregar lista
 }
 
-const TEMPLATE_CSV = [
-  'nome,email,turma,telefone,cpf,data_nascimento,responsavel,telefone_responsavel',
-  'João Silva,joao.silva@escola.com,1º Ano A,(11)99999-0001,111.222.333-01,15/03/2012,Maria Silva,(11)98888-0001',
-  'Ana Costa,ana.costa@escola.com,2º Ano B,(11)99999-0002,444.555.666-02,22/07/2011,Pedro Costa,(11)97777-0002',
-].join('\n');
-
 function downloadTemplate() {
-  const blob = new Blob(['\uFEFF' + TEMPLATE_CSV], { type: 'text/csv;charset=utf-8' });
+  const BOM = '\uFEFF';
+  const instrucoes = '# OBRIGATÓRIOS: nome, email, turma | OPCIONAIS: telefone, cpf, data_nascimento, responsavel, telefone_responsavel';
+  const cabecalho  = 'nome,email,turma,telefone,cpf,data_nascimento,responsavel,telefone_responsavel';
+  const exemplo1   = 'João Silva,joao.silva@escola.com,1º Ano A,(11)99999-0001,111.222.333-01,15/03/2012,Maria Silva,(11)98888-0001';
+  const exemplo2   = 'Ana Costa,ana.costa@escola.com,1º Ano A,(11)99999-0002,,22/07/2011,,';
+  const exemplo3   = 'Carlos Souza,carlos.souza@escola.com,2º Ano B,,,,,';
+  const csvContent = BOM + [instrucoes, cabecalho, exemplo1, exemplo2, exemplo3].join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -152,14 +154,19 @@ export default function ImportarAlunosCSV({ onClose, onSuccess }: Props) {
 
         <div className="px-6 py-5 space-y-5">
 
-          {/* Botão template */}
-          <button
-            onClick={downloadTemplate}
-            className="flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
-          >
-            <Download size={15} />
-            Baixar template CSV
-          </button>
+          {/* Botão template + aviso */}
+          <div className="space-y-1.5">
+            <button
+              onClick={downloadTemplate}
+              className="flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
+            >
+              <Download size={15} />
+              Baixar template CSV
+            </button>
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              ⚠️ O nome da turma deve ser exatamente igual ao cadastrado (ex: &apos;1º Ano A&apos;, não &apos;1 Ano A&apos;)
+            </p>
+          </div>
 
           {/* Drop zone */}
           {!result && (
