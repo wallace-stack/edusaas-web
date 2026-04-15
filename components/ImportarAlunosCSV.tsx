@@ -105,6 +105,10 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
         skipEmptyLines: true,
         encoding,
         delimiter,
+        transformHeader: (header: string, index: number) => {
+          const normalized = header.trim().toLowerCase().replace(/\s+/g, '_');
+          return normalized || `col_${index}`;
+        },
         complete: (res) => {
           const headers = res.meta.fields ?? [];
 
@@ -126,14 +130,14 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
               return !firstVal.startsWith('#') && firstVal.trim() !== '';
             })
             .map((row): AlunoRow => ({
-              name:          (row.nome        || row.name          || '').trim(),
-              email:         (row.email                            || '').trim().toLowerCase(),
-              className:     (row.turma       || row.class         || '').trim(),
-              phone:         (row.telefone    || row.phone         || '').trim() || undefined,
+              name:          (row.nome        || row.name          || row['nome_']        || '').trim(),
+              email:         (row.email       || row['e-mail']     || '').trim().toLowerCase(),
+              className:     (row.turma       || row.class         || row.turma_          || '').trim(),
+              phone:         (row.telefone    || row.phone         || row.fone            || '').trim() || undefined,
               document:      (row.cpf         || row.document      || '').trim() || undefined,
-              birthDate:     parseDateBR(row.data_nascimento || row.birthDate),
-              guardianName:  (row.responsavel || row.guardianName  || '').trim() || undefined,
-              guardianPhone: (row.telefone_responsavel || row.guardianPhone || '').trim() || undefined,
+              birthDate:     parseDateBR(row.data_nascimento || row.data || row.birthDate || row.nascimento),
+              guardianName:  (row.responsavel || row.guardianName  || row.responsavel_    || '').trim() || undefined,
+              guardianPhone: (row.telefone_responsavel || row.guardianPhone || row.tel_responsavel || '').trim() || undefined,
             }));
 
           console.log('Parsed com delimiter:', JSON.stringify(delimiter), '| Rows:', rows.length, '| Headers:', headers);
