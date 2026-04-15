@@ -100,61 +100,77 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const text = (e.target?.result as string) ?? '';
+      let text = (e.target?.result as string) ?? '';
 
-      // Detecta delimitador: conta vírgulas e ponto-e-vírgulas na primeira linha
-      const firstLine = text.split('\n')[0] ?? '';
-      const delimiter = (firstLine.match(/;/g)?.length ?? 0) > (firstLine.match(/,/g)?.length ?? 0) ? ';' : ',';
+      // Remove BOM se presente
+      text = text.replace(/^\uFEFF/, '');
 
+      // Detecta delimitador pela primeira linha com dados
+      const firstLine = text.split(/\r?\n/).find(l => l.trim() && !l.startsWith('#')) ?? '';
+      const semicolons = (firstLine.match(/;/g) ?? []).length;
+      const commas     = (firstLine.match(/,/g) ?? []).length;
+      const delimiter  = semicolons > commas ? ';' : ',';
+
+      console.log('Delimiter:', delimiter, '| First line:', firstLine.slice(0, 80));
+
+      // Divide em linhas, remove CR, ignora vazias e comentários
       const lines = text
-        .split('\n')
-        .map(l => l.replace(/\r/g, '').trim())
+        .split(/\r?\n/)
+        .map(l => l.trim())
         .filter(l => l && !l.startsWith('#'));
+
+      console.log('Total lines (sem cabeçalho e comentários):', lines.length);
 
       if (lines.length < 2) {
         setParseError('Arquivo vazio ou sem dados além do cabeçalho.');
         return;
       }
 
-      // Pula a linha de cabeçalho (linha 0), processa a partir da linha 1
-      const dataLines = lines.slice(1);
+      // Função para dividir uma linha CSV respeitando aspas
+      const splitLine = (line: string): string[] => {
+        const result: string[] = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') {
+            if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+            else inQuotes = !inQuotes;
+          } else if (ch === delimiter && !inQuotes) {
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += ch;
+          }
+        }
+        result.push(current.trim());
+        return result;
+      };
 
+      // Pula cabeçalho (lines[0]), processa dados
       const rows: AlunoRow[] = [];
-      for (const line of dataLines) {
-        // Split respeitando campos entre aspas
-        const cols = line.match(/("([^"]|"")*"|[^,;]*)/g)
-          ?.filter((_, i) => i % 2 === 0)
-          .map(c => c.replace(/^"|"$/g, '').replace(/""/g, '"').trim())
-          ?? line.split(delimiter).map(c => c.trim());
-
-        // Índices fixos: 0=nome, 1=email, 2=turma, 3=telefone, 4=cpf, 5=data_nascimento, 6=responsavel, 7=telefone_responsavel
-        const name          = cols[0] ?? '';
-        const email         = (cols[1] ?? '').toLowerCase();
-        const className     = cols[2] ?? '';
-        const phone         = cols[3] ?? '';
-        const document      = cols[4] ?? '';
-        const birthDateRaw  = cols[5] ?? '';
-        const guardianName  = cols[6] ?? '';
-        const guardianPhone = cols[7] ?? '';
-
-        if (!name && !email) continue; // linha vazia
+      for (let i = 1; i < lines.length; i++) {
+        const cols = splitLine(lines[i]);
+        const name  = cols[0] ?? '';
+        const email = (cols[1] ?? '').toLowerCase();
+        if (!name && !email) continue;
 
         rows.push({
           name,
           email,
-          className,
-          phone:         phone || undefined,
-          document:      document || undefined,
-          birthDate:     parseDateBR(birthDateRaw) || undefined,
-          guardianName:  guardianName || undefined,
-          guardianPhone: guardianPhone || undefined,
+          className:     cols[2] ?? '',
+          phone:         cols[3] || undefined,
+          document:      cols[4] || undefined,
+          birthDate:     parseDateBR(cols[5]) || undefined,
+          guardianName:  cols[6] || undefined,
+          guardianPhone: cols[7] || undefined,
         });
       }
 
-      console.log('Delimiter detectado:', delimiter, '| Rows:', rows.length, rows[0]);
+      console.log('Rows parsed:', rows.length, rows[0]);
 
       if (rows.length === 0) {
-        setParseError('Nenhum aluno encontrado. Verifique se o arquivo tem dados além do cabeçalho.');
+        setParseError('Nenhum aluno encontrado. Verifique se preencheu os dados abaixo do cabeçalho.');
         return;
       }
 
