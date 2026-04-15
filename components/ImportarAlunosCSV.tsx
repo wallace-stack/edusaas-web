@@ -97,39 +97,60 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
     setParseError('');
     setFileName(file.name);
     setResult(null);
+    setAlunos([]);
 
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      encoding: 'UTF-8',
-      delimiter: '',        // autodetect: tenta , ; \t
-      complete: (res) => {
-        // Se só tem 1 coluna, provavelmente o delimitador está errado
-        const headers = res.meta.fields ?? [];
-        if (headers.length <= 1) {
-          setParseError('Arquivo não reconhecido. Dica: ao salvar no Excel, use "CSV UTF-8 (delimitado por vírgulas)" — não "CSV (separado por ponto e vírgula)".');
-          return;
-        }
-        const rows = (res.data as any[])
-          .filter((row: any) => {
-            const firstVal = Object.values(row)[0] as string ?? '';
-            return !firstVal.startsWith('#');
-          })
-          .map((row): AlunoRow => ({
-          name:         (row.nome       || row.name         || '').trim(),
-          email:        (row.email                          || '').trim().toLowerCase(),
-          className:    (row.turma      || row.class        || '').trim(),
-          phone:        (row.telefone   || row.phone        || '').trim() || undefined,
-          document:     (row.cpf        || row.document     || '').trim() || undefined,
-          birthDate:    parseDateBR(row.data_nascimento || row.birthDate),
-          guardianName: (row.responsavel || row.guardianName || '').trim() || undefined,
-          guardianPhone:(row.telefone_responsavel || row.guardianPhone || '').trim() || undefined,
-        }));
-        console.log('Rows parsed:', rows.length, rows[0]);
-        setAlunos(rows);
-      },
-      error: () => setParseError('Erro ao ler o arquivo CSV.'),
-    });
+    const tryParse = (delimiter: string, encoding: string) => {
+      Papa.parse(file, {
+        header: true,
+        skipEmptyLines: true,
+        encoding,
+        delimiter,
+        complete: (res) => {
+          const headers = res.meta.fields ?? [];
+
+          // Se só tem 1 coluna com delimitador vírgula, tenta ponto-e-vírgula
+          if (headers.length <= 1 && delimiter === ',') {
+            tryParse(';', encoding);
+            return;
+          }
+
+          // Se ainda tem 1 coluna, arquivo está mal formatado
+          if (headers.length <= 1) {
+            setParseError('Arquivo não reconhecido. Use "Salvar como → CSV UTF-8 (delimitado por vírgulas)" no Excel, ou use o Google Sheets.');
+            return;
+          }
+
+          const rows = (res.data as any[])
+            .filter((row: any) => {
+              const firstVal = String(Object.values(row)[0] ?? '');
+              return !firstVal.startsWith('#') && firstVal.trim() !== '';
+            })
+            .map((row): AlunoRow => ({
+              name:          (row.nome        || row.name          || '').trim(),
+              email:         (row.email                            || '').trim().toLowerCase(),
+              className:     (row.turma       || row.class         || '').trim(),
+              phone:         (row.telefone    || row.phone         || '').trim() || undefined,
+              document:      (row.cpf         || row.document      || '').trim() || undefined,
+              birthDate:     parseDateBR(row.data_nascimento || row.birthDate),
+              guardianName:  (row.responsavel || row.guardianName  || '').trim() || undefined,
+              guardianPhone: (row.telefone_responsavel || row.guardianPhone || '').trim() || undefined,
+            }));
+
+          console.log('Parsed com delimiter:', JSON.stringify(delimiter), '| Rows:', rows.length, '| Headers:', headers);
+
+          if (rows.length === 0) {
+            setParseError('Nenhum aluno encontrado no arquivo. Verifique se o arquivo tem dados além do cabeçalho.');
+            return;
+          }
+
+          setAlunos(rows);
+        },
+        error: () => setParseError('Erro ao ler o arquivo CSV.'),
+      });
+    };
+
+    // Começa tentando vírgula
+    tryParse(',', 'UTF-8');
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
