@@ -23,8 +23,8 @@ export function getUser(): User | null {
 }
 
 export function setAuth(token: string, user: User): void {
-  Cookies.set('token', token, { expires: 1, sameSite: 'lax', secure: false });
-  Cookies.set('user', JSON.stringify(user), { expires: 1, sameSite: 'lax', secure: false });
+  Cookies.set('token', token, { expires: 7, sameSite: 'lax', secure: false });
+  Cookies.set('user', JSON.stringify(user), { expires: 7, sameSite: 'lax', secure: false });
 }
 
 export function clearAuth(): void {

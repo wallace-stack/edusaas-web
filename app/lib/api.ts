@@ -21,20 +21,51 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  // Marca o início e agenda banner de "conectando..." após 8s sem resposta
+  (config as any)._startTime = Date.now();
+  const timer = setTimeout(() => dispatchSlowApi(true), 8_000);
+  (config as any)._slowTimer = timer;
   return config;
 });
 
-// Se retornar 401 ou 402, redireciona para login ou planos
+// Despacha evento customizado para o banner de "conectando..."
+function dispatchSlowApi(slow: boolean) {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent('api:slow', { detail: { slow } }));
+}
+
+// Somente faz logout em 401 REAL — nunca em timeout ou sem resposta
+// (timeout = ECONNABORTED, sem resposta = !error.response)
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    clearTimeout((response.config as any)._slowTimer);
+    dispatchSlowApi(false);
+    return response;
+  },
   (error) => {
-    if (error.response?.status === 401) {
+    clearTimeout((error.config as any)?._slowTimer);
+    dispatchSlowApi(false);
+
+    // Timeout ou API dormindo (Render cold start) — NÃO limpa sessão
+    if (!error.response || error.code === 'ECONNABORTED') {
+      return Promise.reject(error);
+    }
+
+    // 401 real → sessão expirada, redireciona para login
+    if (error.response.status === 401) {
       Cookies.remove('token');
-      window.location.href = '/login';
+      Cookies.remove('user');
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
     }
-    if (error.response?.status === 402) {
-      window.location.href = '/planos';
+
+    if (error.response.status === 402) {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/planos';
+      }
     }
+
     return Promise.reject(error);
   },
 );
