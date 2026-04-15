@@ -33,18 +33,34 @@ interface ImportResult {
 
 interface Props {
   onClose: () => void;
-  onSuccess?: () => void; // callback para recarregar lista
+  onSuccess?: () => void;
+  classes?: Array<{ id: number; name: string; year?: number }>;
 }
 
-function downloadTemplate() {
+function downloadTemplate(classes?: Array<{ id: number; name: string; year?: number }>) {
   const BOM = '\uFEFF';
   const instrucoes = '# OBRIGATÓRIOS: nome, email, turma | OPCIONAIS: telefone, cpf, data_nascimento, responsavel, telefone_responsavel';
   const cabecalho  = 'nome,email,turma,telefone,cpf,data_nascimento,responsavel,telefone_responsavel';
-  const exemplo1   = 'João Silva,joao.silva@escola.com,1º Ano A,(11)99999-0001,111.222.333-01,15/03/2012,Maria Silva,(11)98888-0001';
-  const exemplo2   = 'Ana Costa,ana.costa@escola.com,1º Ano A,(11)99999-0002,,22/07/2011,,';
-  const exemplo3   = 'Carlos Souza,carlos.souza@escola.com,2º Ano B,,,,,';
-  const csvContent = BOM + [instrucoes, cabecalho, exemplo1, exemplo2, exemplo3].join('\n');
 
+  let linhasExemplo: string[];
+  if (classes && classes.length > 0) {
+    const turma1 = classes[0]?.name ?? '1º Ano A';
+    const turma2 = classes[1]?.name ?? turma1;
+    const turma3 = classes[2]?.name ?? turma1;
+    linhasExemplo = [
+      `João Silva,joao.silva@escola.com,${turma1},(11)99999-0001,111.222.333-01,15/03/2012,Maria Silva,(11)98888-0001`,
+      `Ana Costa,ana.costa@escola.com,${turma2},(11)99999-0002,,22/07/2011,,`,
+      `Carlos Souza,carlos.souza@escola.com,${turma3},,,,,`,
+    ];
+  } else {
+    linhasExemplo = [
+      'João Silva,joao.silva@escola.com,1º Ano A,(11)99999-0001,111.222.333-01,15/03/2012,Maria Silva,(11)98888-0001',
+      'Ana Costa,ana.costa@escola.com,1º Ano A,(11)99999-0002,,22/07/2011,,',
+      'Carlos Souza,carlos.souza@escola.com,2º Ano B,,,,,',
+    ];
+  }
+
+  const csvContent = BOM + [instrucoes, cabecalho, ...linhasExemplo].join('\n');
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -64,7 +80,7 @@ function parseDateBR(val?: string): string | undefined {
   return val;
 }
 
-export default function ImportarAlunosCSV({ onClose, onSuccess }: Props) {
+export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName]     = useState('');
   const [alunos, setAlunos]         = useState<AlunoRow[]>([]);
@@ -154,10 +170,10 @@ export default function ImportarAlunosCSV({ onClose, onSuccess }: Props) {
 
         <div className="px-6 py-5 space-y-5">
 
-          {/* Botão template + aviso */}
+          {/* Botão template + aviso + turmas disponíveis */}
           <div className="space-y-1.5">
             <button
-              onClick={downloadTemplate}
+              onClick={() => downloadTemplate(classes)}
               className="flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline"
             >
               <Download size={15} />
@@ -166,6 +182,23 @@ export default function ImportarAlunosCSV({ onClose, onSuccess }: Props) {
             <p className="text-xs text-amber-600 dark:text-amber-400">
               ⚠️ O nome da turma deve ser exatamente igual ao cadastrado (ex: &apos;1º Ano A&apos;, não &apos;1 Ano A&apos;)
             </p>
+            {classes && classes.length > 0 && (
+              <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3">
+                <p className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1.5">
+                  Turmas disponíveis nesta escola:
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {classes.map(c => (
+                    <span key={c.id} className="text-xs bg-white dark:bg-blue-900 text-blue-700 dark:text-blue-200 border border-blue-200 dark:border-blue-700 px-2 py-0.5 rounded-full font-mono">
+                      {c.name}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-1.5">
+                  Use o nome exato como aparece acima, incluindo acentos e espaços.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Drop zone */}
