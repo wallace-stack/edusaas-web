@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2, Zap } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
-import api from '../lib/api';
+import api, { registerApi } from '../lib/api';
 import { setAuth, getDashboardRoute } from '../lib/auth';
 
 const loginSchema = z.object({
@@ -33,13 +33,15 @@ export default function LoginPage() {
     try {
       setLoading(true);
       setError('');
-      const response = await api.post('/auth/login', data);
+      const response = await registerApi.post('/auth/login', data);
       const { access_token, user } = response.data;
       setAuth(access_token, user);
       router.push(getDashboardRoute(user.role));
     } catch (err: any) {
       const status = err.response?.status;
-      if (status === 401) {
+      if (!err.response || err.code === 'ECONNABORTED') {
+        setError('Servidor acordando… aguarde 10 segundos e tente novamente.');
+      } else if (status === 401) {
         setError('E-mail ou senha incorretos.');
       } else if (status === 403) {
         setError('Usuário inativo. Entre em contato com o suporte.');
