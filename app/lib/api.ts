@@ -7,12 +7,33 @@ const api = axios.create({
   baseURL: BASE,
 });
 
-// Instância dedicada para /auth/register — timeout maior porque o Render free
+// Instância dedicada para /auth/register e /auth/login — timeout maior porque o Render free
 // pode demorar até 50s para acordar do cold start.
 export const registerApi = axios.create({
   baseURL: BASE,
   timeout: 60_000,
 });
+
+// registerApi também dispara o banner de slow (mesmo mecanismo de api)
+registerApi.interceptors.request.use((config) => {
+  (config as any)._startTime = Date.now();
+  const timer = setTimeout(() => dispatchSlowApi(true), 8_000);
+  (config as any)._slowTimer = timer;
+  return config;
+});
+
+registerApi.interceptors.response.use(
+  (response) => {
+    clearTimeout((response.config as any)._slowTimer);
+    dispatchSlowApi(false);
+    return response;
+  },
+  (error) => {
+    clearTimeout((error.config as any)?._slowTimer);
+    dispatchSlowApi(false);
+    return Promise.reject(error);
+  },
+);
 
 // Adiciona o token automaticamente em todas as requisições
 api.interceptors.request.use((config) => {

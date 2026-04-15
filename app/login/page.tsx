@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -22,6 +22,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState('');
+  const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     register,
@@ -33,6 +35,10 @@ export default function LoginPage() {
     try {
       setLoading(true);
       setError('');
+      setLoadingMsg('');
+      slowTimerRef.current = setTimeout(() => {
+        setLoadingMsg('Aguardando o servidor acordar… isso pode levar até 30 segundos na primeira vez.');
+      }, 8_000);
       const response = await registerApi.post('/auth/login', data);
       const { access_token, user } = response.data;
       setAuth(access_token, user);
@@ -50,6 +56,8 @@ export default function LoginPage() {
       }
     } finally {
       setLoading(false);
+      setLoadingMsg('');
+      if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
     }
   };
 
@@ -194,6 +202,12 @@ export default function LoginPage() {
           </button>
 
           <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+
+          {loadingMsg && (
+            <p style={{ fontSize: '13px', color: '#F97316', textAlign: 'center', margin: '0' }}>
+              ⏳ {loadingMsg}
+            </p>
+          )}
         </form>
 
         <div style={{ marginTop: '24px', textAlign: 'center' }}>
