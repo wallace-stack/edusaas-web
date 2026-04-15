@@ -102,7 +102,14 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
       header: true,
       skipEmptyLines: true,
       encoding: 'UTF-8',
+      delimiter: '',        // autodetect: tenta , ; \t
       complete: (res) => {
+        // Se só tem 1 coluna, provavelmente o delimitador está errado
+        const headers = res.meta.fields ?? [];
+        if (headers.length <= 1) {
+          setParseError('Arquivo não reconhecido. Dica: ao salvar no Excel, use "CSV UTF-8 (delimitado por vírgulas)" — não "CSV (separado por ponto e vírgula)".');
+          return;
+        }
         const rows = (res.data as any[])
           .filter((row: any) => {
             const firstVal = Object.values(row)[0] as string ?? '';
@@ -210,6 +217,14 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
                 <strong>Use apenas o template de importação.</strong> O arquivo exportado (com 16 colunas) não é compatível com a importação. Baixe o template acima para preencher.
               </p>
             </div>
+          </div>
+
+          {/* Dica Excel */}
+          <div className="flex items-start gap-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3">
+            <span className="text-gray-400 text-base shrink-0">💡</span>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              <strong>Usuários do Excel:</strong> ao salvar, escolha <em>&quot;CSV UTF-8 (delimitado por vírgulas)&quot;</em>. Evite &quot;CSV (separado por ponto e vírgula)&quot; — o sistema não reconhece esse formato.
+            </p>
           </div>
 
           {/* Drop zone */}
