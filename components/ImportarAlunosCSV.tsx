@@ -103,98 +103,90 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
     setResult(null);
     setAlunos([]);
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      let text = (e.target?.result as string) ?? '';
-
-      // Remove BOM se presente
-      text = text.replace(/^\uFEFF/, '');
-
-      // Detecta delimitador pela primeira linha com dados
-      const firstLine = text.split(/\r?\n/).find(l => l.trim() && !l.startsWith('#')) ?? '';
-      const semicolons = (firstLine.match(/;/g) ?? []).length;
-      const commas     = (firstLine.match(/,/g) ?? []).length;
-      const delimiter  = semicolons > commas ? ';' : ',';
-
-      console.log('Delimiter:', delimiter, '| First line:', firstLine.slice(0, 80));
-
-      // Divide em linhas, remove CR, ignora vazias e comentários
-      const lines = text
-        .split(/\r?\n/)
-        .map(l => l.trim())
-        .filter(l => l && !l.startsWith('#'));
-
-      console.log('Total lines (sem cabeçalho e comentários):', lines.length);
-
-      // Função para dividir uma linha CSV respeitando aspas
-      const splitLine = (line: string): string[] => {
-        const result: string[] = [];
-        let current = '';
-        let inQuotes = false;
-        for (let i = 0; i < line.length; i++) {
-          const ch = line[i];
-          if (ch === '"') {
-            if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
-            else inQuotes = !inQuotes;
-          } else if (ch === delimiter && !inQuotes) {
-            result.push(current.trim());
-            current = '';
-          } else {
-            current += ch;
-          }
+    // Divide linha CSV respeitando campos entre aspas
+    const splitLine = (line: string, delimiter: string): string[] => {
+      const result: string[] = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+          else inQuotes = !inQuotes;
+        } else if (ch === delimiter && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += ch;
         }
-        result.push(current.trim());
-        return result;
-      };
-
-      // Separa cabeçalho dos dados
-      const headerLine = lines[0];
-      const dataLines  = lines.slice(1);
-
-      console.log('Header:', headerLine);
-      console.log('Data lines:', dataLines.length, dataLines);
-
-      if (dataLines.length === 0) {
-        setParseError('Arquivo vazio ou sem dados além do cabeçalho.');
-        return;
       }
-
-      const rows: AlunoRow[] = [];
-      for (let i = 0; i < dataLines.length; i++) {
-        const cols = splitLine(dataLines[i]);
-        const name  = cols[0] ?? '';
-        const email = (cols[1] ?? '').toLowerCase();
-        if (!name && !email) continue;
-
-        rows.push({
-          name,
-          email,
-          className:     cols[2] ?? '',
-          phone:         cols[3] || undefined,
-          document:      cols[4] || undefined,
-          birthDate:     parseDateBR(cols[5]) || undefined,
-          guardianName:  cols[6] || undefined,
-          guardianPhone: cols[7] || undefined,
-          zipCode:       cols[8] || undefined,
-          address:       cols[9] || undefined,
-          addressNumber: cols[10] || undefined,
-          city:          cols[11] || undefined,
-          state:         cols[12] || undefined,
-        });
-      }
-
-      console.log('Rows parsed:', rows.length, rows[0]);
-
-      if (rows.length === 0) {
-        setParseError('Nenhum aluno encontrado. Verifique se preencheu os dados abaixo do cabeçalho.');
-        return;
-      }
-
-      setAlunos(rows);
+      result.push(current.trim());
+      return result;
     };
 
-    reader.onerror = () => setParseError('Erro ao ler o arquivo.');
-    reader.readAsText(file, 'UTF-8');
+    const tryEncoding = (encoding: string, fallback?: string) => {
+      const r = new FileReader();
+      r.onload = (e) => {
+        const raw = e.target?.result as ArrayBuffer;
+        let text = new TextDecoder(encoding).decode(raw);
+        text = text.replace(/^\uFEFF/, '');
+
+        const firstLine = text.split(/\r?\n/).find(l => l.trim() && !l.startsWith('#')) ?? '';
+        const semicolons = (firstLine.match(/;/g) ?? []).length;
+        const commas     = (firstLine.match(/,/g) ?? []).length;
+        const delimiter  = semicolons > commas ? ';' : ',';
+
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#'));
+        const headerLine = lines[0] ?? '';
+        const dataLines  = lines.slice(1);
+
+        console.log(`[${encoding}] Delimiter:`, delimiter, '| Header:', headerLine.slice(0, 60));
+        console.log(`[${encoding}] Data lines:`, dataLines.length, dataLines[0]?.slice(0, 80));
+
+        if (dataLines.length === 0) {
+          if (fallback) { tryEncoding(fallback); return; }
+          setParseError('Arquivo vazio ou sem dados além do cabeçalho.');
+          return;
+        }
+
+        const rows: AlunoRow[] = [];
+        for (let i = 0; i < dataLines.length; i++) {
+          const cols = splitLine(dataLines[i], delimiter);
+          const name  = cols[0] ?? '';
+          const email = (cols[1] ?? '').toLowerCase();
+          if (!name && !email) continue;
+          rows.push({
+            name,
+            email,
+            className:     cols[2] ?? '',
+            phone:         cols[3] || undefined,
+            document:      cols[4] || undefined,
+            birthDate:     parseDateBR(cols[5]) || undefined,
+            guardianName:  cols[6] || undefined,
+            guardianPhone: cols[7] || undefined,
+            zipCode:       cols[8] || undefined,
+            address:       cols[9] || undefined,
+            addressNumber: cols[10] || undefined,
+            city:          cols[11] || undefined,
+            state:         cols[12] || undefined,
+          });
+        }
+
+        console.log('Rows parsed:', rows.length, rows[0]);
+
+        if (rows.length === 0) {
+          if (fallback) { tryEncoding(fallback); return; }
+          setParseError('Nenhum aluno encontrado. Verifique se preencheu os dados abaixo do cabeçalho.');
+          return;
+        }
+
+        setAlunos(rows);
+      };
+      r.onerror = () => setParseError('Erro ao ler o arquivo.');
+      r.readAsArrayBuffer(file);
+    };
+
+    tryEncoding('utf-8', 'windows-1252');
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
