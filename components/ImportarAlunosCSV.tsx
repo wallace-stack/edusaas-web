@@ -16,6 +16,11 @@ interface AlunoRow {
   birthDate?: string;
   guardianName?: string;
   guardianPhone?: string;
+  address?: string;
+  addressNumber?: string;
+  city?: string;
+  state?: string;
+  zipCode?: string;
 }
 
 interface ImportError {
@@ -38,7 +43,7 @@ interface Props {
 
 function downloadTemplate(classes?: Array<{ id: number; name: string; year?: number }>) {
   const BOM = '\uFEFF';
-  const cabecalho  = 'nome,email,turma,telefone,cpf,data_nascimento,responsavel,telefone_responsavel';
+  const cabecalho  = 'nome,email,turma,telefone,cpf,data_nascimento,responsavel,telefone_responsavel,cep,endereco,numero,cidade,estado';
 
   let linhasExemplo: string[];
   if (classes && classes.length > 0) {
@@ -46,15 +51,15 @@ function downloadTemplate(classes?: Array<{ id: number; name: string; year?: num
     const turma2 = classes[1]?.name ?? turma1;
     const turma3 = classes[2]?.name ?? turma1;
     linhasExemplo = [
-      `João Silva,joao.silva@escola.com,${turma1},(11)99999-0001,111.222.333-01,15/03/2012,Maria Silva,(11)98888-0001`,
-      `Ana Costa,ana.costa@escola.com,${turma2},(11)99999-0002,,22/07/2011,,`,
-      `Carlos Souza,carlos.souza@escola.com,${turma3},,,,,`,
+      `João Silva,joao.silva@escola.com,${turma1},(11)99999-0001,111.222.333-01,15/03/2012,Maria Silva,(11)98888-0001,21310-000,Rua das Flores,42,Rio de Janeiro,RJ`,
+      `Ana Costa,ana.costa@escola.com,${turma2},(11)99999-0002,,22/07/2011,,,,,,,`,
+      `Carlos Souza,carlos.souza@escola.com,${turma3},,,,,,,,,,,`,
     ];
   } else {
     linhasExemplo = [
-      'João Silva,joao.silva@escola.com,1º Ano A,(11)99999-0001,111.222.333-01,15/03/2012,Maria Silva,(11)98888-0001',
-      'Ana Costa,ana.costa@escola.com,1º Ano A,(11)99999-0002,,22/07/2011,,',
-      'Carlos Souza,carlos.souza@escola.com,2º Ano B,,,,,',
+      'João Silva,joao.silva@escola.com,1º Ano A,(11)99999-0001,111.222.333-01,15/03/2012,Maria Silva,(11)98888-0001,21310-000,Rua das Flores,42,Rio de Janeiro,RJ',
+      'Ana Costa,ana.costa@escola.com,1º Ano A,(11)99999-0002,,22/07/2011,,,,,,,',
+      'Carlos Souza,carlos.souza@escola.com,2º Ano B,,,,,,,,,,,',
     ];
   }
 
@@ -164,6 +169,11 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
           birthDate:     parseDateBR(cols[5]) || undefined,
           guardianName:  cols[6] || undefined,
           guardianPhone: cols[7] || undefined,
+          zipCode:       cols[8] || undefined,
+          address:       cols[9] || undefined,
+          addressNumber: cols[10] || undefined,
+          city:          cols[11] || undefined,
+          state:         cols[12] || undefined,
         });
       }
 
