@@ -126,11 +126,6 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
 
       console.log('Total lines (sem cabeçalho e comentários):', lines.length);
 
-      if (lines.length < 2) {
-        setParseError('Arquivo vazio ou sem dados além do cabeçalho.');
-        return;
-      }
-
       // Função para dividir uma linha CSV respeitando aspas
       const splitLine = (line: string): string[] => {
         const result: string[] = [];
@@ -152,10 +147,21 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
         return result;
       };
 
-      // Pula cabeçalho (lines[0]), processa dados
+      // Separa cabeçalho dos dados
+      const headerLine = lines[0];
+      const dataLines  = lines.slice(1);
+
+      console.log('Header:', headerLine);
+      console.log('Data lines:', dataLines.length, dataLines);
+
+      if (dataLines.length === 0) {
+        setParseError('Arquivo vazio ou sem dados além do cabeçalho.');
+        return;
+      }
+
       const rows: AlunoRow[] = [];
-      for (let i = 1; i < lines.length; i++) {
-        const cols = splitLine(lines[i]);
+      for (let i = 0; i < dataLines.length; i++) {
+        const cols = splitLine(dataLines[i]);
         const name  = cols[0] ?? '';
         const email = (cols[1] ?? '').toLowerCase();
         if (!name && !email) continue;
