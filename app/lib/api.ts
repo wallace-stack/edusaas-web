@@ -81,6 +81,15 @@ api.interceptors.response.use(
       }
     }
 
+    // Trial expirado
+    if (error.response.status === 403 &&
+        error.response?.data?.code === 'TRIAL_EXPIRED') {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/planos?expired=true';
+      }
+      return Promise.reject(error);
+    }
+
     if (error.response.status === 402) {
       if (typeof window !== 'undefined') {
         window.location.href = '/planos';
