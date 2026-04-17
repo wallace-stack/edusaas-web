@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Check, X, Zap, Sparkles, Star, ArrowRight, Shield, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -97,6 +98,9 @@ const plans = [
 ];
 
 export default function PlanosPage() {
+  const searchParams = useSearchParams();
+  const trialExpired = searchParams.get('expired') === 'true';
+
   return (
     <div style={{ background: '#0A0A0F', minHeight: '100vh', color: '#F1F5F9', display: 'flex', flexDirection: 'column' }}>
       <style>{`
@@ -120,6 +124,22 @@ export default function PlanosPage() {
           </Link>
         </div>
       </header>
+
+      {trialExpired && (
+        <div className="max-w-6xl mx-auto w-full px-6 pt-8">
+          <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-start gap-3">
+            <span className="text-red-500 text-xl shrink-0">⏰</span>
+            <div>
+              <p className="font-semibold text-red-700 dark:text-red-300">
+                Seu período de teste encerrou
+              </p>
+              <p className="text-sm text-red-600 dark:text-red-400 mt-0.5">
+                Escolha um plano abaixo para continuar usando o EduSaaS e manter todos os seus dados.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <section className="text-center px-6 pt-16 pb-10">
         <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-6 text-xs font-semibold text-white"
