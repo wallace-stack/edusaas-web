@@ -1,16 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Check, X, Zap, Sparkles, Star, ArrowRight, Shield, ChevronDown } from 'lucide-react';
+import { Check, Zap, Sparkles, Star, ArrowRight, Shield, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 const faqItems = [
   { q: 'Posso cancelar a qualquer momento?', a: 'Sim, sem multa ou fidelidade. O cancelamento pode ser feito diretamente no painel, a qualquer hora.' },
   { q: 'O trial exige cartão de crédito?', a: 'Não. 14 dias grátis sem cartão. Você só é cobrado se decidir assinar um plano pago.' },
-  { q: 'O que acontece após o trial?', a: 'Você escolhe um plano pago ou continua no Free com até 150 alunos. Nenhum dado é perdido.' },
-  { q: 'Consigo migrar dados de outro sistema?', a: 'Sim. Nossa equipe apoia a migração de dados gratuitamente nos planos Pro e Premium.' },
+  { q: 'O que acontece após o trial?', a: 'Você escolhe um plano pago para continuar. Nenhum dado é perdido.' },
+  { q: 'Consigo migrar dados de outro sistema?', a: 'Sim. Nossa equipe apoia a migração de dados gratuitamente nos planos Escola e Rede.' },
 ];
 
 function FaqRow({ q, a }: { q: string; a: string }) {
@@ -36,70 +36,87 @@ function FaqRow({ q, a }: { q: string; a: string }) {
 
 const plans = [
   {
-    name: 'Free',
-    price: 'Grátis',
-    sub: 'Para sempre',
-    desc: 'Para escolas pequenas começarem',
+    name: 'Starter',
+    monthly: 97,
+    annual: 78,
+    saving: 233,
+    prefix: '',
+    desc: 'Para escolas que estão começando',
     featured: false,
     features: [
-      { text: 'Até 150 alunos', included: true },
-      { text: 'Lançamento de notas', included: true },
-      { text: 'Controle de frequência', included: true },
-      { text: 'Feed de avisos', included: true },
-      { text: '1 imagem por post', included: true },
-      { text: 'Gestão financeira', included: false },
-      { text: 'Relatórios PDF', included: false },
-      { text: 'Suporte prioritário', included: false },
+      'Até 150 alunos',
+      'Lançamento de notas e frequência',
+      'Dashboard diretor e coordenador',
+      'Wizard de onboarding',
+      'Suporte por e-mail',
+      'Trial 14 dias grátis',
     ],
     cta: 'Começar grátis',
     href: '/cadastro',
   },
   {
     name: 'Pro',
-    price: '79',
-    cent: ',90',
-    sub: '/mês',
+    monthly: 197,
+    annual: 158,
+    saving: 473,
+    prefix: '',
     desc: 'Para escolas em crescimento',
     featured: true,
     features: [
-      { text: 'Até 350 alunos', included: true },
-      { text: 'Lançamento de notas', included: true },
-      { text: 'Controle de frequência', included: true },
-      { text: 'Feed de avisos', included: true },
-      { text: '2 imagens por post', included: true },
-      { text: 'Gestão financeira', included: true },
-      { text: 'Relatórios PDF', included: true },
-      { text: 'Suporte prioritário', included: false },
+      'Até 500 alunos',
+      'Tudo do Starter',
+      'Módulo financeiro com gráficos',
+      'Relatórios avançados Chart.js',
+      'Drawer de alunos com dados pessoais',
+      'Suporte prioritário por WhatsApp',
     ],
     cta: 'Assinar Pro',
     href: '#',
   },
   {
-    name: 'Premium',
-    price: '149',
-    cent: ',90',
-    sub: '/mês',
-    desc: 'Para escolas que querem tudo',
+    name: 'Escola',
+    monthly: 397,
+    annual: 318,
+    saving: 953,
+    prefix: '',
+    desc: 'Para escolas consolidadas',
     featured: false,
-    badge: 'Trial 14 dias grátis',
     features: [
-      { text: 'Alunos ilimitados', included: true },
-      { text: 'Lançamento de notas', included: true },
-      { text: 'Controle de frequência', included: true },
-      { text: 'Feed de avisos', included: true },
-      { text: '5 imagens por post', included: true },
-      { text: 'Gestão financeira', included: true },
-      { text: 'Relatórios PDF', included: true },
-      { text: 'Suporte prioritário', included: true },
+      'Até 1.000 alunos',
+      'Tudo do Pro',
+      'Importação de alunos via CSV',
+      'Relatórios para secretaria de educação',
+      'Múltiplos coordenadores',
+      'Suporte via chat em horário comercial',
     ],
-    cta: 'Testar 14 dias grátis',
-    href: '/cadastro',
+    cta: 'Assinar Escola',
+    href: '#',
+  },
+  {
+    name: 'Rede',
+    monthly: 797,
+    annual: 638,
+    saving: 1913,
+    prefix: 'A partir de ',
+    desc: 'Para redes com múltiplas unidades',
+    featured: false,
+    features: [
+      'Múltiplas unidades',
+      'Painel centralizado (em breve)',
+      'Tudo do plano Escola',
+      'Treinamento da equipe incluído',
+      'SLA 99% garantido',
+      'Gerente de conta dedicado',
+    ],
+    cta: 'Falar com especialista',
+    href: '#',
   },
 ];
 
-export default function PlanosPage() {
+function PlanosContent() {
   const searchParams = useSearchParams();
   const trialExpired = searchParams.get('expired') === 'true';
+  const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
 
   return (
     <div style={{ background: '#0A0A0F', minHeight: '100vh', color: '#F1F5F9', display: 'flex', flexDirection: 'column' }}>
@@ -109,7 +126,25 @@ export default function PlanosPage() {
         .grad-border { background: linear-gradient(135deg,#3B82F6,#8B5CF6); padding: 2px; border-radius: 20px; box-shadow: 0 0 32px rgba(59,130,246,0.2); }
       `}</style>
 
-      <header style={{ background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50 }}>
+      {trialExpired && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-red-600 text-white px-4 py-3 flex items-center justify-center gap-3">
+          <span className="text-lg">⏰</span>
+          <p className="text-sm font-medium">
+            Seu período de teste encerrou. Escolha um plano abaixo para continuar.
+          </p>
+        </div>
+      )}
+
+      <header
+        style={{
+          background: 'rgba(10,10,15,0.85)',
+          backdropFilter: 'blur(16px)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          position: 'sticky',
+          top: trialExpired ? '44px' : 0,
+          zIndex: 40,
+        }}
+      >
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
@@ -125,95 +160,113 @@ export default function PlanosPage() {
         </div>
       </header>
 
-      {trialExpired && (
-        <div className="max-w-6xl mx-auto w-full px-6 pt-8">
-          <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-2xl p-4 flex items-start gap-3">
-            <span className="text-red-500 text-xl shrink-0">⏰</span>
-            <div>
-              <p className="font-semibold text-red-700 dark:text-red-300">
-                Seu período de teste encerrou
-              </p>
-              <p className="text-sm text-red-600 dark:text-red-400 mt-0.5">
-                Escolha um plano abaixo para continuar usando o EduSaaS e manter todos os seus dados.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <section className="text-center px-6 pt-16 pb-10">
+      <section className={`text-center px-6 pb-8 ${trialExpired ? 'pt-20' : 'pt-16'}`}>
         <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-6 text-xs font-semibold text-white"
           style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
           <Sparkles size={11} /> Planos e preços
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold mb-3">O plano certo para sua escola</h1>
-        <p className="text-base sm:text-lg max-w-lg mx-auto" style={{ color: '#94A3B8' }}>
-          Comece com trial Premium de 14 dias. Sem cartão de crédito.
+        <p className="text-base sm:text-lg max-w-lg mx-auto mb-8" style={{ color: '#94A3B8' }}>
+          14 dias grátis no Starter. Sem cartão de crédito.
         </p>
+
+        {/* Toggle mensal / anual */}
+        <div className="inline-flex items-center rounded-xl p-1 gap-1" style={{ background: '#111118', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <button
+            onClick={() => setBilling('monthly')}
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
+            style={billing === 'monthly'
+              ? { background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)', color: '#fff' }
+              : { color: '#64748B' }}
+          >
+            Mensal
+          </button>
+          <button
+            onClick={() => setBilling('annual')}
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2"
+            style={billing === 'annual'
+              ? { background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)', color: '#fff' }
+              : { color: '#64748B' }}
+          >
+            Anual
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+              style={billing === 'annual'
+                ? { background: 'rgba(255,255,255,0.2)', color: '#fff' }
+                : { background: 'rgba(34,197,94,0.15)', color: '#22c55e' }}>
+              20% OFF
+            </span>
+          </button>
+        </div>
       </section>
 
       <main className="flex-1 max-w-6xl mx-auto w-full px-6 pb-16">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 items-stretch">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
           {plans.map(plan => {
+            const price = billing === 'annual' ? plan.annual : plan.monthly;
+
             const inner = (
-              <div className={`rounded-[18px] p-6 sm:p-8 flex flex-col h-full ${plan.featured ? '' : 'rounded-2xl border'}`}
-                style={plan.featured ? { background: '#111118' } : { background: '#111118', borderColor: 'rgba(255,255,255,0.08)' }}>
-
-                {plan.badge && (
-                  <div className="mb-4">
-                    <span className="text-[10px] font-bold px-3 py-1 rounded-full text-white"
-                      style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-                      {plan.badge}
-                    </span>
-                  </div>
-                )}
-
-                <span className="text-xs font-semibold uppercase tracking-widest mb-3"
+              <div
+                className={`rounded-[18px] p-6 flex flex-col h-full ${plan.featured ? '' : 'border'}`}
+                style={plan.featured
+                  ? { background: '#111118' }
+                  : { background: '#111118', borderColor: 'rgba(255,255,255,0.08)' }}
+              >
+                <span
+                  className="text-xs font-semibold uppercase tracking-widest mb-3"
                   style={plan.featured
                     ? { background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }
-                    : { color: '#64748B' }
-                  }>
+                    : { color: '#64748B' }}
+                >
                   {plan.name}
                 </span>
 
                 <div className="flex items-end gap-0.5 mb-1">
-                  {plan.price === 'Grátis' ? (
-                    <span className="text-3xl sm:text-4xl font-extrabold">Grátis</span>
-                  ) : (
-                    <>
-                      <span className="text-lg font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
-                      <span className="text-3xl sm:text-4xl font-extrabold">{plan.price}</span>
-                      <span className="text-sm font-medium mb-1" style={{ color: '#64748B' }}>{plan.cent}</span>
-                      <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>{plan.sub}</span>
-                    </>
-                  )}
+                  <span className="text-sm font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
+                  <span className="text-3xl font-extrabold">
+                    {plan.prefix}{price}
+                  </span>
+                  <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
                 </div>
-                <p className="text-sm mb-6" style={{ color: '#64748B' }}>{plan.desc}</p>
+
+                {billing === 'annual' && (
+                  <p className="text-xs mb-1" style={{ color: '#22c55e' }}>
+                    Economize R$ {plan.saving}/ano
+                  </p>
+                )}
+
+                <p className="text-sm mb-5" style={{ color: '#64748B' }}>{plan.desc}</p>
 
                 <ul className="space-y-2.5 flex-1 mb-6">
                   {plan.features.map(f => (
-                    <li key={f.text} className="flex items-center gap-3 text-sm"
-                      style={{ color: f.included ? (plan.featured ? '#F1F5F9' : '#94A3B8') : '#334155' }}>
-                      {f.included ? (
-                        <Check size={14} style={{ color: plan.featured ? '#3B82F6' : '#64748B' }} strokeWidth={3} className="flex-shrink-0" />
-                      ) : (
-                        <X size={14} style={{ color: '#334155' }} strokeWidth={2} className="flex-shrink-0" />
-                      )}
-                      <span className={f.included ? '' : 'line-through'}>{f.text}</span>
+                    <li key={f} className="flex items-start gap-3 text-sm" style={{ color: plan.featured ? '#F1F5F9' : '#94A3B8' }}>
+                      <Check size={14} style={{ color: plan.featured ? '#3B82F6' : '#64748B', flexShrink: 0, marginTop: 2 }} strokeWidth={3} />
+                      {f}
                     </li>
                   ))}
                 </ul>
 
                 {plan.featured ? (
-                  <button onClick={() => toast.info('Integração com pagamento em breve!')}
+                  <button
+                    onClick={() => toast.info('Integração com pagamento em breve!')}
                     className="w-full py-3 rounded-xl font-bold text-sm text-white glow-btn flex items-center justify-center gap-1.5"
-                    style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
+                    style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}
+                  >
+                    {plan.cta} <ArrowRight size={13} />
+                  </button>
+                ) : plan.name === 'Rede' ? (
+                  <button
+                    onClick={() => toast.info('Entre em contato pelo WhatsApp ou e-mail!')}
+                    className="w-full py-3 rounded-xl border font-semibold text-sm transition-all flex items-center justify-center gap-1.5 hover:bg-white/5"
+                    style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#F1F5F9' }}
+                  >
                     {plan.cta} <ArrowRight size={13} />
                   </button>
                 ) : (
-                  <Link href={plan.href}
+                  <Link
+                    href={plan.href}
                     className="w-full text-center py-3 rounded-xl border font-semibold text-sm transition-all flex items-center justify-center gap-1.5 hover:bg-white/5"
-                    style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#F1F5F9' }}>
+                    style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#F1F5F9' }}
+                  >
                     {plan.cta} <ArrowRight size={13} />
                   </Link>
                 )}
@@ -247,7 +300,7 @@ export default function PlanosPage() {
         {/* FAQ */}
         <div className="mt-16 max-w-2xl mx-auto">
           <h3 className="text-xl font-bold text-center mb-8">Perguntas frequentes</h3>
-          <div className="flex flex-col">
+          <div className="flex flex-col gap-2">
             {faqItems.map(f => <FaqRow key={f.q} q={f.q} a={f.a} />)}
           </div>
         </div>
@@ -276,5 +329,13 @@ export default function PlanosPage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function PlanosPage() {
+  return (
+    <Suspense fallback={null}>
+      <PlanosContent />
+    </Suspense>
   );
 }
