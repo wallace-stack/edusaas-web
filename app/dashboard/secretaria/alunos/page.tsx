@@ -62,6 +62,8 @@ export default function SecretariaAlunosPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [transferClassId, setTransferClassId] = useState('');
   const [transferring, setTransferring] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
+  const [confirmDeactivate, setConfirmDeactivate] = useState(false);
   const [loadError, setLoadError] = useState('');
   const loadingRef = useRef(false);
   const [form, setForm] = useState({
@@ -123,6 +125,22 @@ export default function SecretariaAlunosPage() {
       toast.error(err.response?.data?.message || 'Erro ao matricular');
     } finally {
       setTransferring(false);
+    }
+  };
+
+  const handleDeactivate = async () => {
+    if (!selectedStudent) return;
+    try {
+      setDeactivating(true);
+      await api.delete(`/secretary/users/${selectedStudent.id}`);
+      toast.success(`${selectedStudent.name} foi removido com sucesso.`);
+      setSelectedStudent(null);
+      setConfirmDeactivate(false);
+      loadData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erro ao remover aluno');
+    } finally {
+      setDeactivating(false);
     }
   };
 
@@ -528,7 +546,7 @@ export default function SecretariaAlunosPage() {
           <div className="bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[85vh] overflow-y-auto">
             <div className="sticky top-0 bg-white dark:bg-gray-900 px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
               <h2 className="text-base font-bold text-[#1E3A5F] dark:text-white">Dados do Aluno</h2>
-              <button onClick={() => setSelectedStudent(null)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
+              <button onClick={() => { setSelectedStudent(null); setConfirmDeactivate(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
                 <X size={18} />
               </button>
             </div>
@@ -595,6 +613,42 @@ export default function SecretariaAlunosPage() {
                 >
                   {transferring ? 'Salvando...' : selectedStudent?.class ? 'Confirmar transferência' : 'Matricular nesta turma'}
                 </button>
+              </div>
+
+              {/* Remover aluno */}
+              <div className="pt-2">
+                {!confirmDeactivate ? (
+                  <button
+                    onClick={() => setConfirmDeactivate(true)}
+                    className="w-full py-2.5 rounded-xl border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+                  >
+                    Remover aluno
+                  </button>
+                ) : (
+                  <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl p-3 space-y-2">
+                    <p className="text-xs text-red-700 dark:text-red-300 font-medium text-center">
+                      Confirmar remoção de {selectedStudent.name}?
+                    </p>
+                    <p className="text-xs text-red-500 dark:text-red-400 text-center">
+                      O aluno perderá acesso ao sistema.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setConfirmDeactivate(false)}
+                        className="flex-1 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        onClick={handleDeactivate}
+                        disabled={deactivating}
+                        className="flex-1 py-2 rounded-xl bg-red-500 text-white text-xs font-medium hover:bg-red-600 disabled:opacity-50 transition-colors"
+                      >
+                        {deactivating ? 'Removendo...' : 'Confirmar remoção'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
