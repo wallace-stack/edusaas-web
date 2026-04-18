@@ -238,7 +238,16 @@ function PlanosContent() {
             const price = billing === 'annual' ? plan.annual : plan.monthly;
 
             return (
-              <div key={plan.name} className={`rounded-2xl overflow-hidden border ${plan.borderCls} flex flex-col`}>
+              <div key={plan.name} className={`relative flex flex-col ${plan.name !== 'Rede' ? 'pt-3' : ''}`}>
+
+                {/* Badge "14 dias grátis" flutuando acima do card (todos exceto Rede) */}
+                {plan.name !== 'Rede' && (
+                  <div className="absolute -top-0 left-1/2 -translate-x-1/2 z-10 bg-green-500 text-white text-[10px] font-semibold px-3 py-1 rounded-full whitespace-nowrap shadow-sm">
+                    14 dias grátis
+                  </div>
+                )}
+
+                <div className={`rounded-2xl overflow-hidden border ${plan.borderCls} flex flex-col flex-1`}>
 
                 {/* Barra gradiente no topo do Pro */}
                 {plan.proBar && (
@@ -254,11 +263,6 @@ function PlanosContent() {
                     {plan.isPro && (
                       <span className="text-[9px] bg-indigo-500 text-white px-2 py-0.5 rounded-full">
                         ⭐ Mais popular
-                      </span>
-                    )}
-                    {plan.name === 'Starter' && (
-                      <span className="text-[9px] bg-green-500 text-white px-2 py-0.5 rounded-full">
-                        14 dias grátis
                       </span>
                     )}
                   </div>
@@ -324,6 +328,7 @@ function PlanosContent() {
                       {plan.cta} <ArrowRight size={12} />
                     </Link>
                   )}
+                </div>
                 </div>
               </div>
             );
