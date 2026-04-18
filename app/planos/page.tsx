@@ -53,6 +53,12 @@ const plans = [
     ],
     cta: 'Começar grátis',
     href: '/cadastro',
+    borderColor: '#1E3A5F',
+    accentBg: '#1E3A5F',
+    accentHover: '#162d4a',
+    accentCheck: '#3B82F6',
+    cardBg: '#111118',
+    isGradientBtn: false,
   },
   {
     name: 'Pro',
@@ -72,6 +78,12 @@ const plans = [
     ],
     cta: 'Assinar Pro',
     href: '#',
+    borderColor: '#6366F1',
+    accentBg: 'linear-gradient(135deg,#4F46E5,#7C3AED)',
+    accentHover: '',
+    accentCheck: '#818CF8',
+    cardBg: 'rgba(49,46,129,0.18)',
+    isGradientBtn: true,
   },
   {
     name: 'Escola',
@@ -91,6 +103,12 @@ const plans = [
     ],
     cta: 'Assinar Escola',
     href: '#',
+    borderColor: '#059669',
+    accentBg: '#059669',
+    accentHover: '#047857',
+    accentCheck: '#34D399',
+    cardBg: '#111118',
+    isGradientBtn: false,
   },
   {
     name: 'Rede',
@@ -110,6 +128,12 @@ const plans = [
     ],
     cta: 'Falar com especialista',
     href: '#',
+    borderColor: '#F59E0B',
+    accentBg: 'linear-gradient(135deg,#F59E0B,#EA580C)',
+    accentHover: '',
+    accentCheck: '#FCD34D',
+    cardBg: '#111118',
+    isGradientBtn: true,
   },
 ];
 
@@ -121,9 +145,6 @@ function PlanosContent() {
   return (
     <div style={{ background: '#0A0A0F', minHeight: '100vh', color: '#F1F5F9', display: 'flex', flexDirection: 'column' }}>
       <style>{`
-        .glow-btn { box-shadow: 0 0 20px rgba(59,130,246,0.35); transition: box-shadow 0.2s, transform 0.2s; }
-        .glow-btn:hover { box-shadow: 0 0 32px rgba(59,130,246,0.5); transform: translateY(-1px); }
-        .grad-border { background: linear-gradient(135deg,#3B82F6,#8B5CF6); padding: 2px; border-radius: 20px; box-shadow: 0 0 32px rgba(59,130,246,0.2); }
       `}</style>
 
       {trialExpired && (
@@ -206,16 +227,21 @@ function PlanosContent() {
 
             const inner = (
               <div
-                className={`rounded-[18px] p-6 flex flex-col h-full ${plan.featured ? '' : 'border'}`}
-                style={plan.featured
-                  ? { background: '#111118' }
-                  : { background: '#111118', borderColor: 'rgba(255,255,255,0.08)' }}
+                className="rounded-[18px] p-6 flex flex-col h-full border"
+                style={{
+                  background: plan.cardBg,
+                  borderColor: plan.featured ? 'transparent' : plan.borderColor + '66',
+                }}
               >
+                {/* Accent strip no topo */}
+                <div
+                  className="w-8 h-1 rounded-full mb-4"
+                  style={{ background: plan.accentBg }}
+                />
+
                 <span
                   className="text-xs font-semibold uppercase tracking-widest mb-3"
-                  style={plan.featured
-                    ? { background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }
-                    : { color: '#64748B' }}
+                  style={{ color: plan.accentCheck }}
                 >
                   {plan.name}
                 </span>
@@ -238,34 +264,34 @@ function PlanosContent() {
 
                 <ul className="space-y-2.5 flex-1 mb-6">
                   {plan.features.map(f => (
-                    <li key={f} className="flex items-start gap-3 text-sm" style={{ color: plan.featured ? '#F1F5F9' : '#94A3B8' }}>
-                      <Check size={14} style={{ color: plan.featured ? '#3B82F6' : '#64748B', flexShrink: 0, marginTop: 2 }} strokeWidth={3} />
+                    <li key={f} className="flex items-start gap-3 text-sm" style={{ color: '#94A3B8' }}>
+                      <Check size={14} style={{ color: plan.accentCheck, flexShrink: 0, marginTop: 2 }} strokeWidth={3} />
                       {f}
                     </li>
                   ))}
                 </ul>
 
-                {plan.featured ? (
+                {plan.name === 'Rede' ? (
                   <button
-                    onClick={() => toast.info('Integração com pagamento em breve!')}
-                    className="w-full py-3 rounded-xl font-bold text-sm text-white glow-btn flex items-center justify-center gap-1.5"
-                    style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}
+                    onClick={() => toast.info('Entre em contato pelo WhatsApp ou e-mail!')}
+                    className="w-full py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-1.5 transition-opacity hover:opacity-90"
+                    style={{ background: plan.accentBg }}
                   >
                     {plan.cta} <ArrowRight size={13} />
                   </button>
-                ) : plan.name === 'Rede' ? (
+                ) : plan.href === '#' ? (
                   <button
-                    onClick={() => toast.info('Entre em contato pelo WhatsApp ou e-mail!')}
-                    className="w-full py-3 rounded-xl border font-semibold text-sm transition-all flex items-center justify-center gap-1.5 hover:bg-white/5"
-                    style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#F1F5F9' }}
+                    onClick={() => toast.info('Integração com pagamento em breve!')}
+                    className="w-full py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-1.5 transition-opacity hover:opacity-90"
+                    style={{ background: plan.accentBg }}
                   >
                     {plan.cta} <ArrowRight size={13} />
                   </button>
                 ) : (
                   <Link
                     href={plan.href}
-                    className="w-full text-center py-3 rounded-xl border font-semibold text-sm transition-all flex items-center justify-center gap-1.5 hover:bg-white/5"
-                    style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#F1F5F9' }}
+                    className="w-full text-center py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-1.5 transition-opacity hover:opacity-90"
+                    style={{ background: plan.accentBg }}
                   >
                     {plan.cta} <ArrowRight size={13} />
                   </Link>
@@ -275,10 +301,10 @@ function PlanosContent() {
 
             if (plan.featured) {
               return (
-                <div key={plan.name} className="grad-border flex flex-col relative">
+                <div key={plan.name} className="flex flex-col relative" style={{ padding: 2, borderRadius: 20, background: plan.accentBg, boxShadow: '0 0 32px rgba(99,102,241,0.25)' }}>
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
                     <span className="text-xs font-bold px-4 py-1.5 rounded-full text-white flex items-center gap-1.5"
-                      style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
+                      style={{ background: plan.accentBg }}>
                       <Star size={11} fill="currentColor" /> Mais popular
                     </span>
                   </div>
