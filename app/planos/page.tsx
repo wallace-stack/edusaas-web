@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Check, Zap, Sparkles, Star, ArrowRight, Shield, ChevronDown } from 'lucide-react';
+import { Zap, Sparkles, ArrowRight, Shield, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 const faqItems = [
@@ -40,9 +40,8 @@ const plans = [
     monthly: 97,
     annual: 78,
     saving: 233,
-    prefix: '',
+    hasPrefix: false,
     desc: 'Para escolas que estão começando',
-    featured: false,
     features: [
       'Até 150 alunos',
       'Lançamento de notas e frequência',
@@ -53,21 +52,24 @@ const plans = [
     ],
     cta: 'Começar grátis',
     href: '/cadastro',
-    borderColor: '#1E3A5F',
-    accentBg: '#1E3A5F',
-    accentHover: '#162d4a',
-    accentCheck: '#3B82F6',
-    cardBg: '#111118',
-    isGradientBtn: false,
+    isPro: false,
+    proBar: false,
+    borderCls: 'border-[#1E3A5F]/30',
+    headerBg: 'bg-[#1E3A5F]',
+    labelCls: 'text-blue-300',
+    rsCls: 'text-blue-300',
+    subtitleCls: 'text-blue-200',
+    checkBg: 'bg-blue-900/30',
+    checkCls: 'text-blue-300',
+    btnCls: 'bg-[#1E3A5F] hover:bg-[#162d4a]',
   },
   {
     name: 'Pro',
     monthly: 197,
     annual: 158,
     saving: 473,
-    prefix: '',
+    hasPrefix: false,
     desc: 'Para escolas em crescimento',
-    featured: true,
     features: [
       'Até 500 alunos',
       'Tudo do Starter',
@@ -78,21 +80,24 @@ const plans = [
     ],
     cta: 'Assinar Pro',
     href: '#',
-    borderColor: '#6366F1',
-    accentBg: 'linear-gradient(135deg,#4F46E5,#7C3AED)',
-    accentHover: '',
-    accentCheck: '#818CF8',
-    cardBg: 'rgba(49,46,129,0.18)',
-    isGradientBtn: true,
+    isPro: true,
+    proBar: true,
+    borderCls: 'border-indigo-500 ring-2 ring-indigo-500/30',
+    headerBg: 'bg-[#1e1b4b]',
+    labelCls: 'text-indigo-300',
+    rsCls: 'text-indigo-300',
+    subtitleCls: 'text-indigo-400',
+    checkBg: 'bg-indigo-500/10',
+    checkCls: 'text-indigo-500',
+    btnCls: 'bg-indigo-600 hover:bg-indigo-700',
   },
   {
     name: 'Escola',
     monthly: 397,
     annual: 318,
     saving: 953,
-    prefix: '',
+    hasPrefix: false,
     desc: 'Para escolas consolidadas',
-    featured: false,
     features: [
       'Até 1.000 alunos',
       'Tudo do Pro',
@@ -103,21 +108,24 @@ const plans = [
     ],
     cta: 'Assinar Escola',
     href: '#',
-    borderColor: '#059669',
-    accentBg: '#059669',
-    accentHover: '#047857',
-    accentCheck: '#34D399',
-    cardBg: '#111118',
-    isGradientBtn: false,
+    isPro: false,
+    proBar: false,
+    borderCls: 'border-emerald-700/30',
+    headerBg: 'bg-emerald-800',
+    labelCls: 'text-emerald-300',
+    rsCls: 'text-emerald-300',
+    subtitleCls: 'text-emerald-200',
+    checkBg: 'bg-emerald-500/10',
+    checkCls: 'text-emerald-600 dark:text-emerald-400',
+    btnCls: 'bg-emerald-700 hover:bg-emerald-800',
   },
   {
     name: 'Rede',
     monthly: 797,
     annual: 638,
     saving: 1913,
-    prefix: 'A partir de ',
+    hasPrefix: true,
     desc: 'Para redes com múltiplas unidades',
-    featured: false,
     features: [
       'Múltiplas unidades',
       'Painel centralizado (em breve)',
@@ -128,12 +136,16 @@ const plans = [
     ],
     cta: 'Falar com especialista',
     href: '#',
-    borderColor: '#F59E0B',
-    accentBg: 'linear-gradient(135deg,#F59E0B,#EA580C)',
-    accentHover: '',
-    accentCheck: '#FCD34D',
-    cardBg: '#111118',
-    isGradientBtn: true,
+    isPro: false,
+    proBar: false,
+    borderCls: 'border-amber-600/30',
+    headerBg: 'bg-gradient-to-br from-amber-800 to-amber-700',
+    labelCls: 'text-amber-300',
+    rsCls: 'text-amber-300',
+    subtitleCls: 'text-amber-200',
+    checkBg: 'bg-amber-500/10',
+    checkCls: 'text-amber-600 dark:text-amber-400',
+    btnCls: 'bg-gradient-to-r from-amber-700 to-amber-600 hover:from-amber-800 hover:to-amber-700',
   },
 ];
 
@@ -225,94 +237,96 @@ function PlanosContent() {
           {plans.map(plan => {
             const price = billing === 'annual' ? plan.annual : plan.monthly;
 
-            const inner = (
-              <div
-                className="rounded-[18px] p-6 flex flex-col h-full border"
-                style={{
-                  background: plan.cardBg,
-                  borderColor: plan.featured ? 'transparent' : plan.borderColor + '66',
-                }}
-              >
-                {/* Accent strip no topo */}
-                <div
-                  className="w-8 h-1 rounded-full mb-4"
-                  style={{ background: plan.accentBg }}
-                />
+            return (
+              <div key={plan.name} className={`rounded-2xl overflow-hidden border ${plan.borderCls} flex flex-col`}>
 
-                <span
-                  className="text-xs font-semibold uppercase tracking-widest mb-3"
-                  style={{ color: plan.accentCheck }}
-                >
-                  {plan.name}
-                </span>
+                {/* Barra gradiente no topo do Pro */}
+                {plan.proBar && (
+                  <div className="h-0.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500" />
+                )}
 
-                <div className="flex items-end gap-0.5 mb-1">
-                  <span className="text-sm font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
-                  <span className="text-3xl font-extrabold">
-                    {plan.prefix}{price}
-                  </span>
-                  <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
+                {/* Header colorido */}
+                <div className={`${plan.headerBg} p-5`}>
+                  <div className="flex justify-between items-start">
+                    <span className={`text-[10px] uppercase tracking-widest font-medium ${plan.labelCls}`}>
+                      {plan.name}
+                    </span>
+                    {plan.isPro && (
+                      <span className="text-[9px] bg-indigo-500 text-white px-2 py-0.5 rounded-full">
+                        ⭐ Mais popular
+                      </span>
+                    )}
+                    {plan.name === 'Starter' && (
+                      <span className="text-[9px] bg-green-500 text-white px-2 py-0.5 rounded-full">
+                        14 dias grátis
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Preço */}
+                  <div className="mt-2">
+                    {plan.hasPrefix && (
+                      <p className={`text-[10px] ${plan.rsCls} mb-0.5`}>A partir de</p>
+                    )}
+                    <div className="flex items-baseline gap-0.5">
+                      <span className={`text-xs ${plan.rsCls} self-end mb-1`}>R$</span>
+                      <span className="text-4xl font-medium text-white leading-none">{price}</span>
+                      <span className={`text-xs ${plan.rsCls} self-end mb-1`}>/mês</span>
+                    </div>
+                  </div>
+
+                  <p className={`text-[11px] ${plan.subtitleCls} mt-1`}>{plan.desc}</p>
                 </div>
 
-                {billing === 'annual' && (
-                  <p className="text-xs mb-1" style={{ color: '#22c55e' }}>
-                    Economize R$ {plan.saving}/ano
-                  </p>
-                )}
+                {/* Corpo */}
+                <div className="p-5 bg-white dark:bg-gray-900 flex flex-col flex-1">
+                  <ul className="space-y-2 flex-1">
+                    {plan.features.map(f => (
+                      <li key={f} className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
+                        <span className={`w-4 h-4 rounded-full ${plan.checkBg} flex items-center justify-center text-[9px] ${plan.checkCls} flex-shrink-0`}>
+                          ✓
+                        </span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
 
-                <p className="text-sm mb-5" style={{ color: '#64748B' }}>{plan.desc}</p>
-
-                <ul className="space-y-2.5 flex-1 mb-6">
-                  {plan.features.map(f => (
-                    <li key={f} className="flex items-start gap-3 text-sm" style={{ color: '#94A3B8' }}>
-                      <Check size={14} style={{ color: plan.accentCheck, flexShrink: 0, marginTop: 2 }} strokeWidth={3} />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-
-                {plan.name === 'Rede' ? (
-                  <button
-                    onClick={() => toast.info('Entre em contato pelo WhatsApp ou e-mail!')}
-                    className="w-full py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-1.5 transition-opacity hover:opacity-90"
-                    style={{ background: plan.accentBg }}
-                  >
-                    {plan.cta} <ArrowRight size={13} />
-                  </button>
-                ) : plan.href === '#' ? (
-                  <button
-                    onClick={() => toast.info('Integração com pagamento em breve!')}
-                    className="w-full py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-1.5 transition-opacity hover:opacity-90"
-                    style={{ background: plan.accentBg }}
-                  >
-                    {plan.cta} <ArrowRight size={13} />
-                  </button>
-                ) : (
-                  <Link
-                    href={plan.href}
-                    className="w-full text-center py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-1.5 transition-opacity hover:opacity-90"
-                    style={{ background: plan.accentBg }}
-                  >
-                    {plan.cta} <ArrowRight size={13} />
-                  </Link>
-                )}
-              </div>
-            );
-
-            if (plan.featured) {
-              return (
-                <div key={plan.name} className="flex flex-col relative" style={{ padding: 2, borderRadius: 20, background: plan.accentBg, boxShadow: '0 0 32px rgba(99,102,241,0.25)' }}>
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10">
-                    <span className="text-xs font-bold px-4 py-1.5 rounded-full text-white flex items-center gap-1.5"
-                      style={{ background: plan.accentBg }}>
-                      <Star size={11} fill="currentColor" /> Mais popular
+                  {/* Rodapé com preço anual */}
+                  <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                    <span className="text-[10px] text-gray-400">
+                      Anual: <strong className="text-gray-600 dark:text-gray-300">R$ {plan.annual}/mês</strong>
+                    </span>
+                    <span className="text-[10px] text-green-600 bg-green-50 dark:bg-green-950 px-1.5 py-0.5 rounded">
+                      -20%
                     </span>
                   </div>
-                  {inner}
+
+                  {/* Botão */}
+                  {plan.name === 'Rede' ? (
+                    <button
+                      onClick={() => toast.info('Entre em contato pelo WhatsApp ou e-mail!')}
+                      className={`mt-3 w-full py-2.5 rounded-xl ${plan.btnCls} text-white text-xs font-medium transition-colors flex items-center justify-center gap-1.5`}
+                    >
+                      {plan.cta} <ArrowRight size={12} />
+                    </button>
+                  ) : plan.href === '#' ? (
+                    <button
+                      onClick={() => toast.info('Integração com pagamento em breve!')}
+                      className={`mt-3 w-full py-2.5 rounded-xl ${plan.btnCls} text-white text-xs font-medium transition-colors flex items-center justify-center gap-1.5`}
+                    >
+                      {plan.cta} <ArrowRight size={12} />
+                    </button>
+                  ) : (
+                    <Link
+                      href={plan.href}
+                      className={`mt-3 w-full text-center py-2.5 rounded-xl ${plan.btnCls} text-white text-xs font-medium transition-colors flex items-center justify-center gap-1.5`}
+                    >
+                      {plan.cta} <ArrowRight size={12} />
+                    </Link>
+                  )}
                 </div>
-              );
-            }
-            return <div key={plan.name}>{inner}</div>;
+              </div>
+            );
           })}
         </div>
 
