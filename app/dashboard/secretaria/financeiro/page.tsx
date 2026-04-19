@@ -255,7 +255,7 @@ export default function SecretariaFinanceiroPage() {
       });
       toast.success(`Pagamento de ${selected.studentName} registrado!`);
       closeModal();
-      fetchData();
+      loadData();
     } catch (e: any) {
       toast.error(e?.response?.data?.message ?? 'Erro ao registrar pagamento.');
     } finally {
