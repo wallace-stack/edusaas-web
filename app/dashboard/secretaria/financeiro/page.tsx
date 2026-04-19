@@ -182,19 +182,18 @@ export default function SecretariaFinanceiroPage() {
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
   const loadData = async () => {
-    console.log('[Financeiro] iniciando loadData', { month, year });
+    console.log('[Financeiro] loadData iniciado', { month, year });
     setLoading(true);
     try {
       const [summaryRes, tuitionsRes] = await Promise.all([
         api.get(`/secretary/financial/summary?month=${month}&year=${year}`),
         api.get(`/secretary/financial/tuitions?month=${month}&year=${year}&status=all`),
       ]);
-      console.log('Summary:', summaryRes.data);
-      console.log('Tuitions:', tuitionsRes.data?.length);
+      console.log('[Financeiro] dados recebidos', { summary: summaryRes.data, count: tuitionsRes.data?.length });
       setSummary(summaryRes.data);
-      setTuitions(tuitionsRes.data);
+      setTuitions(tuitionsRes.data ?? []);
     } catch (err: any) {
-      console.error('Erro financeiro:', err.response?.status, err.response?.data);
+      console.error('[Financeiro] erro:', err.response?.status, err.response?.data?.message);
       toast.error('Erro ao carregar financeiro');
     } finally {
       setLoading(false);
@@ -202,15 +201,19 @@ export default function SecretariaFinanceiroPage() {
   };
 
   useEffect(() => {
-    // Aguarda hidratação do cliente antes de verificar o usuário
     const timer = setTimeout(() => {
       const currentUser = getUser();
+      console.log('[Financeiro] useEffect disparou', { month, year, currentUser: !!currentUser });
+
       if (!currentUser) {
+        console.log('[Financeiro] usuário null — redirecionando para login');
         router.push('/login');
         return;
       }
+
+      console.log('[Financeiro] chamando loadData');
       loadData();
-    }, 100);
+    }, 200);
     return () => clearTimeout(timer);
   }, [month, year]);
 
