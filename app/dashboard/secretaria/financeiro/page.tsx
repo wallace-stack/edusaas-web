@@ -182,9 +182,9 @@ export default function SecretariaFinanceiroPage() {
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
   const loadData = async () => {
+    console.log('[Financeiro] iniciando loadData', { month, year });
     setLoading(true);
     try {
-      console.log('Carregando financeiro...', { month, year });
       const [summaryRes, tuitionsRes] = await Promise.all([
         api.get(`/secretary/financial/summary?month=${month}&year=${year}`),
         api.get(`/secretary/financial/tuitions?month=${month}&year=${year}&status=all`),
@@ -202,12 +202,16 @@ export default function SecretariaFinanceiroPage() {
   };
 
   useEffect(() => {
-    const currentUser = getUser();
-    if (!currentUser) {
-      router.push('/login');
-      return;
-    }
-    loadData();
+    // Aguarda hidratação do cliente antes de verificar o usuário
+    const timer = setTimeout(() => {
+      const currentUser = getUser();
+      if (!currentUser) {
+        router.push('/login');
+        return;
+      }
+      loadData();
+    }, 100);
+    return () => clearTimeout(timer);
   }, [month, year]);
 
   // ── Filtered list ──────────────────────────────────────────────────────────
