@@ -1,3 +1,4 @@
+// v3 — força rebuild Vercel — fix hidratação SSR
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -178,6 +179,7 @@ export default function SecretariaFinanceiroPage() {
   const [paidDate, setPaidDate] = useState(now.toISOString().split('T')[0]);
   const [saving, setSaving] = useState(false);
   const [notifying, setNotifying] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
@@ -201,21 +203,26 @@ export default function SecretariaFinanceiroPage() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const currentUser = getUser();
-      console.log('[Financeiro] useEffect disparou', { month, year, currentUser: !!currentUser });
+    setMounted(true);
+  }, []);
 
-      if (!currentUser) {
-        console.log('[Financeiro] usuário null — redirecionando para login');
-        router.push('/login');
-        return;
-      }
+  useEffect(() => {
+    if (!mounted) return;
 
-      console.log('[Financeiro] chamando loadData');
-      loadData();
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [month, year]);
+    console.log('[Financeiro v3] mounted=true, verificando user...');
+
+    const currentUser = getUser();
+    console.log('[Financeiro v3] getUser result:', !!currentUser);
+
+    if (!currentUser) {
+      console.log('[Financeiro v3] sem user, redirecionando');
+      router.push('/login');
+      return;
+    }
+
+    console.log('[Financeiro v3] chamando loadData', { month, year });
+    loadData();
+  }, [mounted, month, year]);
 
   // ── Filtered list ──────────────────────────────────────────────────────────
 
