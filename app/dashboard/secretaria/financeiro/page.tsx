@@ -159,7 +159,6 @@ function Donut({ slices, colors, labels }: {
 
 export default function SecretariaFinanceiroPage() {
   const router = useRouter();
-  const user = getUser();
 
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
@@ -182,25 +181,33 @@ export default function SecretariaFinanceiroPage() {
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
 
-  async function fetchData() {
+  const loadData = async () => {
     setLoading(true);
     try {
-      const [s, t] = await Promise.all([
+      console.log('Carregando financeiro...', { month, year });
+      const [summaryRes, tuitionsRes] = await Promise.all([
         api.get(`/secretary/financial/summary?month=${month}&year=${year}`),
-        api.get(`/secretary/financial/tuitions?month=${month}&year=${year}`),
+        api.get(`/secretary/financial/tuitions?month=${month}&year=${year}&status=all`),
       ]);
-      setSummary(s.data);
-      setTuitions(t.data);
-    } catch (e) {
-      console.error(e);
+      console.log('Summary:', summaryRes.data);
+      console.log('Tuitions:', tuitionsRes.data?.length);
+      setSummary(summaryRes.data);
+      setTuitions(tuitionsRes.data);
+    } catch (err: any) {
+      console.error('Erro financeiro:', err.response?.status, err.response?.data);
+      toast.error('Erro ao carregar financeiro');
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    if (!user) { router.push('/login'); return; }
-    fetchData();
+    const currentUser = getUser();
+    if (!currentUser) {
+      router.push('/login');
+      return;
+    }
+    loadData();
   }, [month, year]);
 
   // ── Filtered list ──────────────────────────────────────────────────────────
