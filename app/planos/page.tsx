@@ -152,6 +152,7 @@ const plans = [
 function PlanosContent() {
   const searchParams = useSearchParams();
   const trialExpired = searchParams.get('expired') === 'true';
+  const planCancelled = searchParams.get('cancelled') === 'true';
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly');
 
   return (
@@ -168,13 +169,22 @@ function PlanosContent() {
         </div>
       )}
 
+      {planCancelled && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-gray-800 text-white px-4 py-3 flex items-center justify-center gap-3">
+          <span className="text-lg">😔</span>
+          <p className="text-sm font-medium">
+            Seu plano foi cancelado. Escolha um plano abaixo para reativar o acesso.
+          </p>
+        </div>
+      )}
+
       <header
         style={{
           background: 'rgba(10,10,15,0.85)',
           backdropFilter: 'blur(16px)',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
           position: 'sticky',
-          top: trialExpired ? '44px' : 0,
+          top: (trialExpired || planCancelled) ? '44px' : 0,
           zIndex: 40,
         }}
       >
@@ -193,7 +203,7 @@ function PlanosContent() {
         </div>
       </header>
 
-      <section className={`text-center px-6 pb-8 ${trialExpired ? 'pt-20' : 'pt-16'}`}>
+      <section className={`text-center px-6 pb-8 ${(trialExpired || planCancelled) ? 'pt-20' : 'pt-16'}`}>
         <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-6 text-xs font-semibold text-white"
           style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
           <Sparkles size={11} /> Planos e preços
