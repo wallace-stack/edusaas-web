@@ -90,6 +90,15 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // Plano cancelado
+    if (error.response.status === 403 &&
+        error.response?.data?.code === 'PLAN_CANCELLED') {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/planos?cancelled=true';
+      }
+      return Promise.reject(error);
+    }
+
     if (error.response.status === 402) {
       if (typeof window !== 'undefined') {
         window.location.href = '/planos';

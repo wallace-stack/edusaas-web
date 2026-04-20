@@ -13,6 +13,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import OnboardingWizard from '@/components/OnboardingWizard';
+import CancelarPlano from '@/components/CancelarPlano';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -30,6 +31,7 @@ export default function DiretorDashboard() {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showWizard, setShowWizard] = useState(false);
+  const [showCancel, setShowCancel] = useState(false);
 
   const getSaudacao = () => {
     const h = new Date().getHours();
@@ -72,6 +74,7 @@ export default function DiretorDashboard() {
           api.get('/metrics/director').then(r => setData(r.data)).catch(() => {});
         }} />
       )}
+      {showCancel && <CancelarPlano onClose={() => setShowCancel(false)} />}
       <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -302,6 +305,16 @@ export default function DiretorDashboard() {
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{item.hint}</p>
             </button>
           ))}
+        </div>
+
+        {/* Rodapé discreto com link de cancelamento */}
+        <div className="text-center py-6">
+          <button
+            onClick={() => setShowCancel(true)}
+            className="text-xs text-gray-400 hover:text-red-400 transition-colors underline"
+          >
+            Cancelar plano
+          </button>
         </div>
       </main>
     </div>
