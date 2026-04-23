@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Inter } from 'next/font/google';
 import { useState, useEffect, useRef } from 'react';
 import {
-  Menu, X, Zap, Check, ChevronDown, ChevronUp,
+  Menu, X, Zap, Check, ChevronDown,
   BarChart3, Users, DollarSign, ClipboardList, CalendarCheck, ShieldCheck,
   Sparkles, School, UserPlus, Rocket, Quote, Star, ArrowRight,
 } from 'lucide-react';
@@ -35,13 +35,38 @@ const testimonials = [
 ];
 
 const faqs = [
-  { q: 'Preciso de cartão de crédito para o trial?',      a: 'Não. O trial de 14 dias é completamente gratuito e não exige nenhum dado de pagamento. Você só é cobrado se decidir assinar um plano.' },
-  { q: 'Quantos alunos posso cadastrar?',                 a: 'No Starter até 150 alunos, no Pro até 500, no Escola até 1.000. O plano Rede não tem limite — entre em contato para um orçamento.' },
-  { q: 'Como funciona o período de trial?',               a: 'Ao criar sua conta, você tem 14 dias de acesso completo sem cartão de crédito. No final do trial, escolha o plano que melhor atende sua escola.' },
-  { q: 'Posso cancelar quando quiser?',                   a: 'Sim. O cancelamento pode ser feito a qualquer momento diretamente pelo painel, sem multas ou burocracia.' },
-  { q: 'Qual a diferença entre mensal e anual?',          a: 'No plano anual você paga 20% menos. O valor é cobrado à vista uma vez por ano via boleto, Pix ou cartão de crédito.' },
-  { q: 'Tem suporte?',                                    a: 'Sim. Suporte por e-mail no Starter, WhatsApp prioritário no Pro e no Escola, e gerente de conta dedicado no Rede.' },
-  { q: 'Como funciona o pagamento?',                      a: 'Os pagamentos são processados via Asaas. Aceitamos boleto, Pix e cartão de crédito em todos os planos.' },
+  {
+    q: 'Preciso de cartão de crédito para o trial?',
+    a: 'Não. O trial de 14 dias é completamente gratuito e não exige nenhum dado de pagamento. Você só é cobrado se decidir assinar um plano ao final do período.',
+  },
+  {
+    q: 'Os dados dos meus alunos ficam seguros?',
+    a: 'Sim. Todos os dados são armazenados com criptografia e cada usuário acessa apenas o que é permitido para o seu perfil. Nunca compartilhamos informações com terceiros.',
+  },
+  {
+    q: 'Posso cancelar quando quiser?',
+    a: 'Sim. O cancelamento pode ser feito a qualquer momento diretamente pelo painel do diretor, sem multas, sem burocracia e sem precisar ligar para ninguém.',
+  },
+  {
+    q: 'Como funciona o suporte?',
+    a: 'No Starter o suporte é por e-mail. No Pro e no Escola, suporte prioritário por WhatsApp. No plano Rede, você tem um gerente de conta dedicado com SLA garantido.',
+  },
+  {
+    q: 'Quantos alunos posso cadastrar?',
+    a: 'No Starter até 150 alunos, no Pro até 500, no Escola até 1.000. O plano Rede atende redes e franquias sem limite fixo — entre em contato para um orçamento.',
+  },
+  {
+    q: 'Qual a diferença entre o plano mensal e anual?',
+    a: 'No plano anual você economiza 20%. O valor é cobrado uma vez por ano via Pix, boleto ou cartão de crédito. Você pode voltar para o mensal na renovação.',
+  },
+  {
+    q: 'Como faço para migrar minha escola para a plataforma?',
+    a: 'É simples. Você cadastra a escola, convida sua equipe e importa os alunos por um arquivo CSV. Nossa equipe de suporte te acompanha nessa etapa sem custo adicional.',
+  },
+  {
+    q: 'A plataforma funciona no celular?',
+    a: 'Sim. A plataforma é totalmente responsiva e funciona em qualquer dispositivo — computador, tablet ou celular — sem precisar instalar nada.',
+  },
 ];
 
 const PLANS = [
