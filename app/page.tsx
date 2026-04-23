@@ -19,7 +19,7 @@ const features = [
   { Icon: DollarSign,   title: 'Controle financeiro',        desc: 'Mensalidades, inadimplência e fluxo de caixa em um painel completo. Nunca perca um pagamento.' },
   { Icon: ClipboardList,title: 'Lançamento de notas',        desc: 'Professores lançam notas por turma, disciplina e bimestre de forma simples, rápida e rastreável.' },
   { Icon: CalendarCheck,title: 'Controle de frequência',     desc: 'Chamadas com status presente, ausente ou justificado. Histórico completo por aluno e turma.' },
-  { Icon: ShieldCheck,  title: 'Segurança e confiabilidade', desc: 'Autenticação JWT, proteção de rotas por perfil, validação de dados e infraestrutura robusta.' },
+  { Icon: ShieldCheck,  title: 'Segurança e privacidade', desc: 'Seus dados e os dados dos alunos protegidos com criptografia de ponta. Acesso controlado por perfil — cada usuário vê apenas o que precisa.' },
 ];
 
 const steps = [
@@ -351,19 +351,48 @@ export default function LandingPage() {
             <span className="flex items-center gap-1"><Check size={12} /> Cancelamento fácil</span>
           </p>
 
+          <div className="flex flex-wrap justify-center gap-6 mt-8 text-white/60 text-xs">
+            <span className="flex items-center gap-1.5">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd"/></svg>
+              Dados 100% seguros
+            </span>
+            <span className="flex items-center gap-1.5">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
+              14 dias grátis sem cartão
+            </span>
+            <span className="flex items-center gap-1.5">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+              Suporte em português
+            </span>
+            <span className="flex items-center gap-1.5">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clipRule="evenodd"/></svg>
+              Cancele quando quiser
+            </span>
+          </div>
+
           <div className="mt-16"><MockDashboard /></div>
         </div>
       </section>
 
-      {/* ── FAIXA TECNOLOGIA ── */}
+      {/* ── FAIXA BENEFÍCIOS ── */}
       <section style={{ borderTop: '1px solid rgba(255,255,255,0.05)', borderBottom: '1px solid rgba(255,255,255,0.05)', background: '#0D0D14' }}>
         <div className="max-w-5xl mx-auto px-6 py-8 text-center">
-          <div className="flex items-center justify-center gap-6 flex-wrap">
-            <span className="text-xs font-medium px-3 py-1 rounded-full border" style={{ color: 'rgba(255,255,255,0.35)', borderColor: 'rgba(255,255,255,0.08)' }}>Next.js</span>
-            <span className="text-xs font-medium px-3 py-1 rounded-full border" style={{ color: 'rgba(255,255,255,0.35)', borderColor: 'rgba(255,255,255,0.08)' }}>NestJS</span>
-            <span className="text-xs font-medium px-3 py-1 rounded-full border" style={{ color: 'rgba(255,255,255,0.35)', borderColor: 'rgba(255,255,255,0.08)' }}>MySQL</span>
-            <span className="text-xs font-medium px-3 py-1 rounded-full border" style={{ color: 'rgba(255,255,255,0.35)', borderColor: 'rgba(255,255,255,0.08)' }}>JWT Auth</span>
-            <span className="text-xs font-medium px-3 py-1 rounded-full border" style={{ color: 'rgba(255,255,255,0.35)', borderColor: 'rgba(255,255,255,0.08)' }}>Vercel</span>
+          <div className="flex flex-wrap justify-center gap-3 mt-6">
+            {[
+              { icon: '🔒', text: 'Dados criptografados' },
+              { icon: '📱', text: 'Acesso de qualquer dispositivo' },
+              { icon: '🇧🇷', text: 'Suporte em português' },
+              { icon: '☁️', text: 'Sem instalação' },
+              { icon: '⚡', text: 'Configurado em minutos' },
+            ].map((badge) => (
+              <span
+                key={badge.text}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/80 text-xs font-medium backdrop-blur-sm"
+              >
+                <span>{badge.icon}</span>
+                {badge.text}
+              </span>
+            ))}
           </div>
         </div>
       </section>
