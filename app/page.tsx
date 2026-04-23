@@ -55,8 +55,8 @@ const PLANS = [
     features: [
       'Até 150 alunos',
       'Lançamento de notas e frequência',
-      'Dashboard diretor e coordenador',
-      'Wizard de onboarding',
+      'Painel completo para diretor e coordenador',
+      'Configuração guiada passo a passo',
       'Suporte por e-mail',
       'Trial 14 dias grátis',
     ],
@@ -76,9 +76,9 @@ const PLANS = [
     features: [
       'Até 500 alunos',
       'Tudo do Starter',
-      'Módulo financeiro com gráficos',
-      'Relatórios avançados Chart.js',
-      'Drawer de alunos com dados pessoais',
+      'Controle financeiro com relatórios visuais',
+      'Relatórios avançados de desempenho',
+      'Ficha completa de cada aluno',
       'Suporte prioritário por WhatsApp',
     ],
     cta: 'Começar grátis →',
@@ -97,7 +97,7 @@ const PLANS = [
     features: [
       'Até 1.000 alunos',
       'Tudo do Pro',
-      'Importação de alunos via CSV',
+      'Importação em massa de alunos',
       'Relatórios para secretaria de educação',
       'Múltiplos coordenadores',
       'Suporte via chat em horário comercial',
@@ -379,17 +379,32 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-6 py-8 text-center">
           <div className="flex flex-wrap justify-center gap-3 mt-6">
             {[
-              { icon: '🔒', text: 'Dados criptografados' },
-              { icon: '📱', text: 'Acesso de qualquer dispositivo' },
-              { icon: '🇧🇷', text: 'Suporte em português' },
-              { icon: '☁️', text: 'Sem instalação' },
-              { icon: '⚡', text: 'Configurado em minutos' },
+              {
+                icon: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>,
+                text: 'Dados criptografados',
+              },
+              {
+                icon: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>,
+                text: 'Acesso de qualquer dispositivo',
+              },
+              {
+                icon: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>,
+                text: 'Suporte em português',
+              },
+              {
+                icon: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+                text: 'Sem instalação',
+              },
+              {
+                icon: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+                text: 'Configurado em minutos',
+              },
             ].map((badge) => (
               <span
                 key={badge.text}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/80 text-xs font-medium backdrop-blur-sm"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/80 text-xs font-medium"
               >
-                <span>{badge.icon}</span>
+                <span className="opacity-70">{badge.icon}</span>
                 {badge.text}
               </span>
             ))}
