@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
+import Cookies from 'js-cookie';
 import {
   ArrowLeft, DollarSign, AlertTriangle, Clock, Check,
   Bell, Search, X,
@@ -277,20 +278,38 @@ export default function SecretariaFinanceiroPage() {
 
   const handleExportFiscal = async () => {
     try {
-      const params = new URLSearchParams({ month: String(month), year: String(year) });
-      const response = await api.get(`/secretary/financial/export-fiscal?${params}`, {
-        responseType: 'blob',
+      const token = Cookies.get('token');
+      const params = new URLSearchParams({
+        month: String(month),
+        year: String(year),
       });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/secretary/financial/export-fiscal?${params}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error(`Erro ${response.status}`);
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `relatorio-fiscal-${year}-${String(month).padStart(2, '0')}.csv`);
+      link.setAttribute(
+        'download',
+        `relatorio-fiscal-${year}-${String(month).padStart(2, '0')}.csv`
+      );
       document.body.appendChild(link);
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
       toast.success('Relatório fiscal exportado!');
-    } catch {
+    } catch (err: any) {
+      console.error('[ExportFiscal] erro:', err);
       toast.error('Erro ao exportar relatório');
     }
   };
