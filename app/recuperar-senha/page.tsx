@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import api from '../lib/api';
+import { registerApi } from '../lib/api';
 
 const schema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -25,7 +25,7 @@ export default function ForgotPasswordPage() {
     try {
       setLoading(true);
       setError('');
-      await api.post('/auth/forgot-password', data);
+      await registerApi.post('/auth/forgot-password', data);
       setSent(true);
     } catch {
       setError('Erro ao processar solicitação. Tente novamente.');
