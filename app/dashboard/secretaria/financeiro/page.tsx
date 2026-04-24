@@ -275,6 +275,26 @@ export default function SecretariaFinanceiroPage() {
     }
   }
 
+  const handleExportFiscal = async () => {
+    try {
+      const params = new URLSearchParams({ month: String(month), year: String(year) });
+      const response = await api.get(`/secretary/financial/export-fiscal?${params}`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `relatorio-fiscal-${year}-${String(month).padStart(2, '0')}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('Relatório fiscal exportado!');
+    } catch {
+      toast.error('Erro ao exportar relatório');
+    }
+  };
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   if (loading) return (
@@ -322,6 +342,17 @@ export default function SecretariaFinanceiroPage() {
             >
               {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
             </select>
+            <button
+              onClick={handleExportFiscal}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+            >
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Exportar fiscal
+            </button>
             <button
               onClick={handleNotifyOverdue}
               disabled={notifying}
