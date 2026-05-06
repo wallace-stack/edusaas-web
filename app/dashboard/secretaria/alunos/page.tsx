@@ -14,6 +14,7 @@ interface Student {
   name: string;
   email: string;
   phone?: string;
+  cpf?: string;
   document?: string;
   address?: string;
   addressNumber?: string;
@@ -65,6 +66,12 @@ export default function SecretariaAlunosPage() {
   const [deactivating, setDeactivating] = useState(false);
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
   const [loadError, setLoadError] = useState('');
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '', phone: '', cpf: '', address: '',
+    guardianName: '', guardianPhone: '', guardianRelation: '',
+  });
+  const [editSaving, setEditSaving] = useState(false);
   const loadingRef = useRef(false);
   const [form, setForm] = useState({
     name: '', email: '', phone: '', birthDate: '', classId: '',
@@ -108,6 +115,32 @@ export default function SecretariaAlunosPage() {
   const handleSelectStudent = (s: Student) => {
     setSelectedStudent(s);
     setTransferClassId('');
+    setEditing(false);
+    setEditForm({
+      name: s.name || '',
+      phone: s.phone || '',
+      cpf: s.cpf || '',
+      address: s.address || '',
+      guardianName: s.guardianName || '',
+      guardianPhone: s.guardianPhone || '',
+      guardianRelation: s.guardianRelation || '',
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!selectedStudent) return;
+    setEditSaving(true);
+    try {
+      await api.patch(`/secretary/students/${selectedStudent.id}`, editForm);
+      toast.success('Dados atualizados com sucesso!');
+      setEditing(false);
+      setSelectedStudent({ ...selectedStudent, ...editForm });
+      loadData();
+    } catch {
+      toast.error('Erro ao salvar dados.');
+    } finally {
+      setEditSaving(false);
+    }
   };
 
   const handleTransfer = async () => {
@@ -546,48 +579,133 @@ export default function SecretariaAlunosPage() {
           <div className="bg-white dark:bg-gray-900 rounded-t-2xl sm:rounded-2xl w-full sm:max-w-md max-h-[85vh] overflow-y-auto">
             <div className="sticky top-0 bg-white dark:bg-gray-900 px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
               <h2 className="text-base font-bold text-[#1E3A5F] dark:text-white">Dados do Aluno</h2>
-              <button onClick={() => { setSelectedStudent(null); setConfirmDeactivate(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
-                <X size={18} />
-              </button>
+              <div className="flex items-center gap-2">
+                {editing ? (
+                  <>
+                    <button onClick={() => setEditing(false)} className="text-xs text-gray-500 hover:text-gray-700 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700">
+                      Cancelar
+                    </button>
+                    <button onClick={handleSaveEdit} disabled={editSaving} className="text-xs bg-[#1E3A5F] text-white px-3 py-1.5 rounded-lg disabled:opacity-50">
+                      {editSaving ? 'Salvando...' : 'Salvar'}
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={() => setEditing(true)} className="text-xs text-[#1E3A5F] dark:text-blue-400 hover:underline flex items-center gap-1 mr-1">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Editar
+                  </button>
+                )}
+                <button onClick={() => { setSelectedStudent(null); setConfirmDeactivate(false); setEditing(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
+                  <X size={18} />
+                </button>
+              </div>
             </div>
             <div className="p-4 space-y-3">
               <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                <div className="w-10 h-10 bg-[#1E3A5F] rounded-full flex items-center justify-center">
-                  <span className="text-white font-bold">{selectedStudent.name.charAt(0).toUpperCase()}</span>
+                <div className="w-10 h-10 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold">{(editing ? editForm.name : selectedStudent.name).charAt(0).toUpperCase()}</span>
                 </div>
-                <div>
-                  <p className="font-semibold text-gray-800 dark:text-gray-100">{selectedStudent.name}</p>
+                <div className="flex-1 min-w-0">
+                  {editing ? (
+                    <input
+                      value={editForm.name}
+                      onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                      className="w-full px-2 py-1 rounded-lg border border-gray-200 dark:border-gray-700 text-sm font-semibold bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                    />
+                  ) : (
+                    <p className="font-semibold text-gray-800 dark:text-gray-100">{selectedStudent.name}</p>
+                  )}
                   <p className="text-xs text-gray-400">{selectedStudent.email}</p>
                 </div>
               </div>
-              {selectedStudent.phone && (
-                <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                  <p className="text-xs text-gray-400 mb-0.5">Telefone</p>
-                  <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.phone}</p>
-                </div>
-              )}
-              {selectedStudent?.address && (
-                <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                  <p className="text-xs text-gray-400 mb-0.5">Endereço</p>
+
+              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                <p className="text-xs text-gray-400 mb-1">Telefone</p>
+                {editing ? (
+                  <input
+                    value={editForm.phone}
+                    onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
+                    placeholder="(00) 00000-0000"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                  />
+                ) : (
+                  <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.phone || '—'}</p>
+                )}
+              </div>
+
+              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                <p className="text-xs text-gray-400 mb-1">CPF</p>
+                {editing ? (
+                  <input
+                    value={editForm.cpf}
+                    onChange={e => setEditForm({ ...editForm, cpf: e.target.value })}
+                    placeholder="000.000.000-00"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                  />
+                ) : (
+                  <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.cpf || '—'}</p>
+                )}
+              </div>
+
+              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                <p className="text-xs text-gray-400 mb-1">Endereço</p>
+                {editing ? (
+                  <input
+                    value={editForm.address}
+                    onChange={e => setEditForm({ ...editForm, address: e.target.value })}
+                    placeholder="Rua, número, bairro"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                  />
+                ) : (
                   <p className="text-sm text-gray-700 dark:text-gray-200">
-                    {selectedStudent.address}
-                    {selectedStudent.addressNumber && `, ${selectedStudent.addressNumber}`}
-                    {selectedStudent.complement && ` - ${selectedStudent.complement}`}
-                    {selectedStudent.city && `, ${selectedStudent.city}`}
-                    {selectedStudent.state && ` - ${selectedStudent.state}`}
-                    {selectedStudent.zipCode && ` · CEP ${selectedStudent.zipCode}`}
+                    {selectedStudent.address ? (
+                      <>
+                        {selectedStudent.address}
+                        {selectedStudent.addressNumber && `, ${selectedStudent.addressNumber}`}
+                        {selectedStudent.complement && ` - ${selectedStudent.complement}`}
+                        {selectedStudent.city && `, ${selectedStudent.city}`}
+                        {selectedStudent.state && ` - ${selectedStudent.state}`}
+                        {selectedStudent.zipCode && ` · CEP ${selectedStudent.zipCode}`}
+                      </>
+                    ) : '—'}
                   </p>
-                </div>
-              )}
-              {selectedStudent?.guardianName && (
-                <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                  <p className="text-xs text-gray-400 mb-0.5">Responsável</p>
-                  <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.guardianName}</p>
-                  {selectedStudent.guardianPhone && (
-                    <p className="text-xs text-gray-400">{selectedStudent.guardianPhone} · {selectedStudent.guardianRelation}</p>
-                  )}
-                </div>
-              )}
+                )}
+              </div>
+
+              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                <p className="text-xs text-gray-400 mb-1">Responsável</p>
+                {editing ? (
+                  <div className="space-y-2">
+                    <input
+                      value={editForm.guardianName}
+                      onChange={e => setEditForm({ ...editForm, guardianName: e.target.value })}
+                      placeholder="Nome do responsável"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                    />
+                    <input
+                      value={editForm.guardianPhone}
+                      onChange={e => setEditForm({ ...editForm, guardianPhone: e.target.value })}
+                      placeholder="Telefone do responsável"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                    />
+                    <input
+                      value={editForm.guardianRelation}
+                      onChange={e => setEditForm({ ...editForm, guardianRelation: e.target.value })}
+                      placeholder="Parentesco (ex: Mãe, Pai)"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                    />
+                  </div>
+                ) : (
+                  selectedStudent.guardianName ? (
+                    <>
+                      <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.guardianName}</p>
+                      {selectedStudent.guardianPhone && (
+                        <p className="text-xs text-gray-400">{selectedStudent.guardianPhone} · {selectedStudent.guardianRelation}</p>
+                      )}
+                    </>
+                  ) : <p className="text-sm text-gray-700 dark:text-gray-200">—</p>
+                )}
+              </div>
               <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
                 <p className="text-xs text-gray-400 mb-0.5">Turma atual</p>
                 <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.class?.name ?? 'Não matriculado'}</p>
