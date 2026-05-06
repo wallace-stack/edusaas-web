@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../lib/auth';
@@ -98,10 +99,10 @@ export default function FeedPage() {
             onClick={() => router.back()}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <div className="flex items-center gap-2">
-  <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
-  <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Walla</span><span className="text-[#F5A623]">adm</span></span>
-</div>
+                      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
+            <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Walla</span><span className="text-[#F5A623]">adm</span></span>
+          </Link>
           </button>
 
           <h1 className="font-semibold text-gray-600 dark:text-gray-300 text-sm">Feed de Notícias</h1>

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -81,7 +82,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <img src="/logo.png" alt="Walladm" style={{ height: "96px", width: "auto", margin: "0 auto 12px" }} />
+          <Link href="/"><img src="/logo.png" alt="Walladm" style={{ height: "96px", width: "auto", margin: "0 auto 12px" }} className="hover:opacity-80 transition-opacity cursor-pointer" /></Link>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Entre com sua conta</p>
         </div>
 
