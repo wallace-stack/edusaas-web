@@ -150,7 +150,7 @@ const PLANS = [
       'Gerente de conta dedicado',
     ],
     cta: 'Falar com especialista →',
-    ctaHref: 'https://wa.me/5511999999999?text=Olá%2C+tenho+interesse+no+plano+Rede+do+EduSaaS',
+    ctaHref: 'https://wa.me/5511999999999?text=Olá%2C+tenho+interesse+no+plano+Rede+do+Walladm',
     highlight: false,
     checkColor: '#F97316',
     ctaStyle: { background: 'linear-gradient(135deg,#F97316,#EF4444)', color: '#fff' } as React.CSSProperties,
@@ -183,7 +183,7 @@ function MockDashboard() {
         <span className="w-3 h-3 rounded-full bg-red-500/70" />
         <span className="w-3 h-3 rounded-full bg-yellow-500/70" />
         <span className="w-3 h-3 rounded-full bg-green-500/70" />
-        <span className="ml-3 text-xs text-white/30 font-mono">dashboard · EduSaaS</span>
+        <span className="ml-3 text-xs text-white/30 font-mono">dashboard · Walladm</span>
       </div>
       <div className="p-5">
         <div className="grid grid-cols-3 gap-3 mb-4">
@@ -293,7 +293,7 @@ export default function LandingPage() {
               <Zap size={15} className="text-white" />
             </div>
             <span className="font-bold text-base" style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              EduSaaS
+              Walladm
             </span>
           </Link>
 
@@ -494,7 +494,7 @@ export default function LandingPage() {
         <div ref={testiRef} style={fadeStyle} className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">O que dizem os diretores</h2>
-            <p style={{ color: '#94A3B8' }}>Instituições que transformaram sua gestão com o EduSaaS.</p>
+            <p style={{ color: '#94A3B8' }}>Instituições que transformaram sua gestão com o Walladm.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {testimonials.map((t) => (
@@ -710,7 +710,7 @@ export default function LandingPage() {
                 <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
                   <Zap size={13} className="text-white" />
                 </div>
-                <span className="font-bold" style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>EduSaaS</span>
+                <span className="font-bold" style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Walladm</span>
               </Link>
               <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#475569' }}>
                 Plataforma SaaS para gestão educacional. Simples, completo e seguro.
@@ -738,7 +738,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-            <p className="text-xs" style={{ color: '#334155' }}>© 2026 EduSaaS. Todos os direitos reservados.</p>
+            <p className="text-xs" style={{ color: '#334155' }}>© 2026 Walladm. Todos os direitos reservados.</p>
             <p className="text-xs mt-2 sm:mt-0" style={{ color: '#334155' }}>Feito com carinho para você</p>
           </div>
         </div>

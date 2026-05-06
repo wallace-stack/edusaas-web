@@ -91,7 +91,7 @@ export default function LoginPage() {
           }}>
             <Zap size={24} color="white" />
           </div>
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>EduSaaS</h1>
+          <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>Walladm</h1>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Entre com sua conta</p>
         </div>
 

@@ -147,7 +147,7 @@ export default function OnboardingWizard({ onClose }: Props) {
               <span className="text-white text-lg font-bold">E</span>
             </div>
             <div>
-              <p className="text-white/70 text-xs uppercase tracking-widest">EduSaaS</p>
+              <p className="text-white/70 text-xs uppercase tracking-widest">Walladm</p>
               <h2 className="text-white font-bold text-lg leading-tight">Bem-vindo! Vamos começar 🎉</h2>
             </div>
           </div>

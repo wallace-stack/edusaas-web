@@ -42,7 +42,7 @@ export default function SuportePage() {
       <div className="bg-gray-900 rounded-2xl border border-gray-800 w-full max-w-md p-6 space-y-4">
         <div className="text-center">
           <h1 className="text-white font-bold text-lg">Painel de Suporte</h1>
-          <p className="text-gray-400 text-xs mt-1">Acesso restrito — EduSaaS</p>
+          <p className="text-gray-400 text-xs mt-1">Acesso restrito — Walladm</p>
         </div>
         <input type="password" placeholder="Chave master" value={key}
           onChange={e => setKey(e.target.value)}

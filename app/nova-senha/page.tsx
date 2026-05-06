@@ -170,7 +170,7 @@ export default function NovaSenhaPage() {
           <div className="w-14 h-14 bg-[#1E3A5F] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <span className="text-white text-2xl font-bold">E</span>
           </div>
-          <h1 className="text-2xl font-bold text-[#1E3A5F]">EduSaaS</h1>
+          <h1 className="text-2xl font-bold text-[#1E3A5F]">Walladm</h1>
         </div>
         <Suspense fallback={<p className="text-center text-gray-400 text-sm">Carregando...</p>}>
           <NovaSenhaForm />

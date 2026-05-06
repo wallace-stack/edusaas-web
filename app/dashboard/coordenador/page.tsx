@@ -82,7 +82,7 @@ export default function CoordenadorDashboard() {
             <div className="w-8 h-8 bg-[#1E3A5F] rounded-lg flex items-center justify-center">
               <span className="text-white text-sm font-bold">E</span>
             </div>
-            <span className="font-bold text-[#1E3A5F] dark:text-white">EduSaaS</span>
+            <span className="font-bold text-[#1E3A5F] dark:text-white">Walladm</span>
             <span className="text-gray-300 dark:text-gray-600 hidden sm:inline">|</span>
             <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">Coordenação</span>
           </div>
