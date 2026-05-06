@@ -289,7 +289,7 @@ export default function LandingPage() {
       <header style={{ background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50 }}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
+            <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" style={{mixBlendMode: 'multiply'}} />
             <span className="font-bold text-white text-xl tracking-tight">Walladm</span>
           </Link>
 
