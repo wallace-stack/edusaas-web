@@ -98,7 +98,10 @@ export default function FeedPage() {
             onClick={() => router.back()}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <img src="/logo.png" alt="Walladm" className="h-10 w-auto" />
+            <div className="flex items-center gap-2">
+  <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
+  <span className="font-bold text-[#1E3A5F] dark:text-white text-lg tracking-tight">Walladm</span>
+</div>
           </button>
 
           <h1 className="font-semibold text-gray-600 dark:text-gray-300 text-sm">Feed de Notícias</h1>

@@ -81,7 +81,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <img src="/logo.png" alt="Walladm" style={{ height: "64px", width: "auto", margin: "0 auto 12px" }} />
+          <img src="/logo.png" alt="Walladm" style={{ height: "96px", width: "auto", margin: "0 auto 12px" }} />
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Entre com sua conta</p>
         </div>
 
