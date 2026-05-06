@@ -98,10 +98,7 @@ export default function FeedPage() {
             onClick={() => router.back()}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
-            <div className="w-8 h-8 bg-[#1E3A5F] rounded-lg flex items-center justify-center">
-              <span className="text-white text-xs font-bold">E</span>
-            </div>
-            <span className="font-bold text-[#1E3A5F] dark:text-white">Walladm</span>
+            <img src="/logo.png" alt="Walladm" className="h-10 w-auto" />
           </button>
 
           <h1 className="font-semibold text-gray-600 dark:text-gray-300 text-sm">Feed de Notícias</h1>

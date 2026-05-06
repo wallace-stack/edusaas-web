@@ -289,7 +289,7 @@ export default function LandingPage() {
       <header style={{ background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50 }}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="Walladm" className="h-10 w-auto" />
+            <img src="/logo.png" alt="Walladm" className="h-12 w-auto" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-7">
@@ -702,7 +702,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 mb-10">
             <div className="sm:col-span-2">
               <Link href="/" className="flex items-center gap-2 mb-3">
-                <img src="/logo.png" alt="Walladm" className="h-8 w-auto" />
+                <img src="/logo.png" alt="Walladm" className="h-10 w-auto" />
               </Link>
               <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#475569' }}>
                 Plataforma SaaS para gestão educacional. Simples, completo e seguro.
