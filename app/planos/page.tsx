@@ -190,7 +190,7 @@ function PlanosContent() {
       >
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="Walladm" className="h-10 w-auto" />
+            <img src="/logo.png" alt="Walladm" className="h-12 w-auto" />
           </Link>
           <Link href="/login" className="text-sm flex items-center gap-1" style={{ color: '#94A3B8' }}>
             Já tenho conta <ArrowRight size={13} />

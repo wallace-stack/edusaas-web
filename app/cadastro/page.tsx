@@ -154,7 +154,7 @@ export default function CadastroPage() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <img src="/logo.png" alt="Walladm" style={{ height: '48px', width: 'auto', margin: '0 auto 12px' }} />
+          <img src="/logo.png" alt="Walladm" style={{ height: "64px", width: "auto", margin: "0 auto 12px" }} />
           <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>Cadastrar Escola</h1>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>14 dias grátis — sem cartão de crédito</p>
         </div>

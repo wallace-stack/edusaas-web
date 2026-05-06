@@ -79,10 +79,7 @@ export default function CoordenadorDashboard() {
       <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#1E3A5F] rounded-lg flex items-center justify-center">
-              <span className="text-white text-sm font-bold">E</span>
-            </div>
-            <span className="font-bold text-[#1E3A5F] dark:text-white">Walladm</span>
+            <img src="/logo.png" alt="Walladm" className="h-10 w-auto" />
             <span className="text-gray-300 dark:text-gray-600 hidden sm:inline">|</span>
             <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">Coordenação</span>
           </div>
