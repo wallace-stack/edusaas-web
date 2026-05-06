@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2, Zap } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, AlertCircle, Loader2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import api, { registerApi } from '../lib/api';
 import { setAuth, getDashboardRoute } from '../lib/auth';
@@ -81,17 +81,7 @@ export default function LoginPage() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '52px', height: '52px',
-            background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)',
-            borderRadius: '14px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 12px',
-            boxShadow: '0 8px 24px rgba(59,130,246,0.3)',
-          }}>
-            <Zap size={24} color="white" />
-          </div>
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>Walladm</h1>
+          <img src="/logo.png" alt="Walladm" style={{ height: '48px', width: 'auto', margin: '0 auto 12px' }} />
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Entre com sua conta</p>
         </div>
 

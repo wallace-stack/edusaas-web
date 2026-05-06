@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Inter } from 'next/font/google';
 import { useState, useEffect, useRef } from 'react';
 import {
-  Menu, X, Zap, Check, ChevronDown,
+  Menu, X, Check, ChevronDown,
   BarChart3, Users, DollarSign, ClipboardList, CalendarCheck, ShieldCheck,
   Sparkles, School, UserPlus, Rocket, Quote, Star, ArrowRight,
 } from 'lucide-react';
@@ -289,12 +289,7 @@ export default function LandingPage() {
       <header style={{ background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50 }}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-              <Zap size={15} className="text-white" />
-            </div>
-            <span className="font-bold text-base" style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Walladm
-            </span>
+            <img src="/logo.png" alt="Walladm" className="h-10 w-auto" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-7">
@@ -707,10 +702,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 mb-10">
             <div className="sm:col-span-2">
               <Link href="/" className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-                  <Zap size={13} className="text-white" />
-                </div>
-                <span className="font-bold" style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Walladm</span>
+                <img src="/logo.png" alt="Walladm" className="h-8 w-auto" />
               </Link>
               <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#475569' }}>
                 Plataforma SaaS para gestão educacional. Simples, completo e seguro.
