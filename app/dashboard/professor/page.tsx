@@ -73,7 +73,7 @@ export default function ProfessorDashboard() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
   <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
-  <span className="font-bold text-[#1E3A5F] dark:text-white text-lg tracking-tight">Walladm</span>
+  <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Walla</span><span className="text-[#F5A623]">adm</span></span>
 </div>
             <span className="text-gray-300 dark:text-gray-600 hidden sm:inline">|</span>
             <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">Painel do Professor</span>

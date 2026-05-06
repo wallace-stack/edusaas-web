@@ -290,7 +290,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
-            <span className="font-bold text-white text-xl tracking-tight">Walladm</span>
+            <span className="font-bold text-xl tracking-tight"><span className="text-white">Walla</span><span className="text-[#F5A623]">adm</span></span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-7">
