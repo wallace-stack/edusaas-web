@@ -288,8 +288,9 @@ export default function LandingPage() {
       {/* ── NAVBAR ── */}
       <header style={{ background: 'rgba(10,10,15,0.85)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50 }}>
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="Walladm" className="h-12 w-auto" />
+          <Link href="/" className="flex items-center gap-2">
+            <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
+            <span className="font-bold text-white text-xl tracking-tight">Walladm</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-7">
