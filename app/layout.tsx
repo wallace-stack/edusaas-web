@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "EduSaaS — Gestão Escolar Inteligente",
+  title: "Walladm — Gestão Escolar Inteligente",
   description: "Plataforma SaaS educacional completa para diretores, coordenadores, professores e alunos.",
 };
 

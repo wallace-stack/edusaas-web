@@ -194,7 +194,7 @@ function PlanosContent() {
               <Zap size={15} className="text-white" />
             </div>
             <span className="font-bold text-base" style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              EduSaaS
+              Walladm
             </span>
           </Link>
           <Link href="/login" className="text-sm flex items-center gap-1" style={{ color: '#94A3B8' }}>
@@ -373,14 +373,14 @@ function PlanosContent() {
               <Zap size={13} className="text-white" />
             </div>
             <span className="font-bold text-sm" style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              EduSaaS
+              Walladm
             </span>
           </Link>
           <div className="flex items-center gap-6">
             <Link href="/login" className="text-sm hover:text-gray-300 transition-colors" style={{ color: '#475569' }}>Entrar</Link>
             <Link href="/cadastro" className="text-sm hover:text-gray-300 transition-colors" style={{ color: '#475569' }}>Cadastrar</Link>
           </div>
-          <p className="text-xs" style={{ color: '#334155' }}>© 2026 EduSaaS</p>
+          <p className="text-xs" style={{ color: '#334155' }}>© 2026 Walladm</p>
         </div>
       </footer>
     </div>
