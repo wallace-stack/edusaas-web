@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, clearAuth } from '../../lib/auth';
@@ -78,10 +79,10 @@ export default function DiretorDashboard() {
       <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-  <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
-  <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Walla</span><span className="text-[#F5A623]">adm</span></span>
-</div>
+                      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
+            <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Walla</span><span className="text-[#F5A623]">adm</span></span>
+          </Link>
             <span className="text-gray-300 dark:text-gray-600 hidden sm:inline">|</span>
             <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">Painel do Diretor</span>
           </div>
