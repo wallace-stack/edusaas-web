@@ -16,8 +16,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Walladm — Gestão Escolar Inteligente",
-  description: "Plataforma SaaS educacional completa para diretores, coordenadores, professores e alunos.",
+  title: 'Walladm — Gestão Escolar Inteligente',
+  description: 'Plataforma completa de gestão escolar para diretores, coordenadores, professores e alunos.',
+  icons: {
+    icon: '/logo-icon.png',
+    apple: '/logo-icon.png',
+  },
 };
 
 export default function RootLayout({

@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
-  Eye, EyeOff, Mail, Lock, AlertCircle, Loader2, Zap,
+  Eye, EyeOff, Mail, Lock, AlertCircle, Loader2,
   Building2, FileText, Phone, User,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -154,16 +154,7 @@ export default function CadastroPage() {
 
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '52px', height: '52px',
-            background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)',
-            borderRadius: '14px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 auto 12px',
-            boxShadow: '0 8px 24px rgba(59,130,246,0.3)',
-          }}>
-            <Zap size={24} color="white" />
-          </div>
+          <img src="/logo.png" alt="Walladm" style={{ height: '48px', width: 'auto', margin: '0 auto 12px' }} />
           <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>Cadastrar Escola</h1>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>14 dias grátis — sem cartão de crédito</p>
         </div>

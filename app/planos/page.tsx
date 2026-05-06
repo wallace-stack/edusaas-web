@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Zap, Sparkles, ArrowRight, Shield, ChevronDown } from 'lucide-react';
+import { Sparkles, ArrowRight, Shield, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
 const faqItems = [
@@ -190,12 +190,7 @@ function PlanosContent() {
       >
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-              <Zap size={15} className="text-white" />
-            </div>
-            <span className="font-bold text-base" style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Walladm
-            </span>
+            <img src="/logo.png" alt="Walladm" className="h-10 w-auto" />
           </Link>
           <Link href="/login" className="text-sm flex items-center gap-1" style={{ color: '#94A3B8' }}>
             Já tenho conta <ArrowRight size={13} />
@@ -369,12 +364,7 @@ function PlanosContent() {
       <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
-              <Zap size={13} className="text-white" />
-            </div>
-            <span className="font-bold text-sm" style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              Walladm
-            </span>
+            <img src="/logo.png" alt="Walladm" className="h-8 w-auto" />
           </Link>
           <div className="flex items-center gap-6">
             <Link href="/login" className="text-sm hover:text-gray-300 transition-colors" style={{ color: '#475569' }}>Entrar</Link>
