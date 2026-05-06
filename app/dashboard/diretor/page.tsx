@@ -79,7 +79,7 @@ export default function DiretorDashboard() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-  <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" style={{mixBlendMode: 'multiply'}} />
+  <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
   <span className="font-bold text-[#1E3A5F] dark:text-white text-lg tracking-tight">Walladm</span>
 </div>
             <span className="text-gray-300 dark:text-gray-600 hidden sm:inline">|</span>
