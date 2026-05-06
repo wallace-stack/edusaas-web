@@ -99,7 +99,7 @@ export default function FeedPage() {
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           >
             <div className="flex items-center gap-2">
-  <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
+  <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" style={{mixBlendMode: 'multiply'}} />
   <span className="font-bold text-[#1E3A5F] dark:text-white text-lg tracking-tight">Walladm</span>
 </div>
           </button>

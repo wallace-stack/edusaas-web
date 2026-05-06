@@ -103,7 +103,7 @@ export default function AlunoDashboard() {
             </button>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-2">
-  <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
+  <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" style={{mixBlendMode: 'multiply'}} />
   <span className="font-bold text-[#1E3A5F] dark:text-white text-lg tracking-tight">Walladm</span>
 </div>
               <span className="text-gray-300 dark:text-gray-600 hidden sm:block">|</span>
