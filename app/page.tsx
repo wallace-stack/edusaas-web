@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { Inter } from 'next/font/google';
 import { useState, useEffect, useRef } from 'react';
@@ -71,11 +72,14 @@ const faqs = [
 
 const PLANS = [
   {
+    id: 'starter',
     name: 'Starter',
     price: { monthly: 97, annual: 78 },
-    description: 'Para escolas pequenas que querem começar',
+    subtitle: 'Para escolas pequenas que querem começar',
     badge: '14 dias grátis',
+    badgeGradient: 'linear-gradient(135deg, #2563EB, #3B82F6)',
     highlight: false,
+    checkColor: '#3B82F6',
     features: [
       'Até 150 alunos',
       'Lançamento de notas e frequência',
@@ -87,13 +91,17 @@ const PLANS = [
     ],
     cta: 'Começar grátis',
     href: '/cadastro',
+    ctaStyle: { background: '#1E3A5F', color: 'white' } as React.CSSProperties,
   },
   {
+    id: 'pro',
     name: 'Pro',
     price: { monthly: 197, annual: 158 },
-    description: 'Para escolas que querem crescer com controle',
+    subtitle: 'Para escolas que querem crescer com controle',
     badge: 'Mais popular',
+    badgeGradient: 'linear-gradient(135deg, #7C3AED, #A855F7)',
     highlight: true,
+    checkColor: '#A855F7',
     features: [
       'Até 500 alunos',
       'Tudo do Starter',
@@ -106,13 +114,17 @@ const PLANS = [
     ],
     cta: 'Começar grátis',
     href: '/cadastro',
+    ctaStyle: { background: 'linear-gradient(135deg, #7C3AED, #A855F7)', color: 'white' } as React.CSSProperties,
   },
   {
+    id: 'escola',
     name: 'Escola',
     price: { monthly: 397, annual: 318 },
-    description: 'Para escolas que precisam de gestão completa',
+    subtitle: 'Para escolas que precisam de gestão completa',
     badge: '14 dias grátis',
+    badgeGradient: 'linear-gradient(135deg, #059669, #10B981)',
     highlight: false,
+    checkColor: '#10B981',
     features: [
       'Até 1.000 alunos',
       'Tudo do Pro',
@@ -124,13 +136,17 @@ const PLANS = [
     ],
     cta: 'Começar grátis',
     href: '/cadastro',
+    ctaStyle: { background: '#111118', color: 'white', border: '1px solid rgba(255,255,255,0.12)' } as React.CSSProperties,
   },
   {
+    id: 'rede',
     name: 'Rede',
-    price: { monthly: 797, annual: 638 },
-    description: 'Para redes e franquias com múltiplas unidades',
+    price: { monthly: 0, annual: 0 },
+    subtitle: 'Para redes e franquias com múltiplas unidades',
     badge: null,
+    badgeGradient: 'linear-gradient(135deg, #D97706, #F59E0B)',
     highlight: false,
+    checkColor: '#F59E0B',
     features: [
       'Múltiplas unidades',
       'Painel centralizado (em breve)',
@@ -142,6 +158,7 @@ const PLANS = [
     ],
     cta: 'Falar com especialista',
     href: 'https://wa.me/5511999999999?text=Olá,+tenho+interesse+no+plano+Rede+do+Walladm',
+    ctaStyle: { background: '#111118', color: 'white', border: '1px solid rgba(255,255,255,0.12)' } as React.CSSProperties,
   },
 ];
 
@@ -539,9 +556,9 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
             {PLANS.map((plan) => {
               const p = plan as typeof plan & { pricePrefix?: string };
-              const price     = p.monthlyPrice ? (isAnnual ? Math.round(p.monthlyPrice * 0.8) : p.monthlyPrice) : null;
-              const annualSavings = p.monthlyPrice ? Math.round(p.monthlyPrice * 0.2 * 12) : 0;
-              const isWA      = p.ctaHref.startsWith('https://wa');
+              const price         = p.price.monthly ? (isAnnual ? p.price.annual : p.price.monthly) : null;
+              const annualSavings = p.price.monthly ? Math.round(p.price.monthly * 0.2 * 12) : 0;
+              const isWA          = p.href.startsWith('https://wa');
 
               return p.highlight ? (
                 /* ── Pro (destaque com borda gradiente) ── */
@@ -581,13 +598,13 @@ export default function LandingPage() {
                       ))}
                     </ul>
                     {isWA ? (
-                      <a href={p.ctaHref} target="_blank" rel="noopener noreferrer"
+                      <a href={p.href} target="_blank" rel="noopener noreferrer"
                         className="w-full text-center py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5"
                         style={p.ctaStyle}>
                         {p.cta}
                       </a>
                     ) : (
-                      <Link href={p.ctaHref}
+                      <Link href={p.href}
                         className="w-full text-center py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5"
                         style={p.ctaStyle}>
                         {p.cta}
@@ -635,13 +652,13 @@ export default function LandingPage() {
                     ))}
                   </ul>
                   {isWA ? (
-                    <a href={p.ctaHref} target="_blank" rel="noopener noreferrer"
+                    <a href={p.href} target="_blank" rel="noopener noreferrer"
                       className="w-full text-center py-3 rounded-xl font-bold text-sm border flex items-center justify-center gap-1.5 transition-colors"
                       style={p.ctaStyle}>
                       {p.cta}
                     </a>
                   ) : (
-                    <Link href={p.ctaHref}
+                    <Link href={p.href}
                       className="w-full text-center py-3 rounded-xl font-bold text-sm border flex items-center justify-center gap-1.5 transition-colors"
                       style={p.ctaStyle}>
                       {p.cta}
