@@ -82,7 +82,7 @@ export default function SecretariaDashboard() {
             <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Wall</span><span className="text-[#F5A623]">adm</span></span>
           </Link>
             <span className="text-gray-300 dark:text-gray-600">|</span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">Painel da Secretaria</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Painel Administrativo</span>
           </div>
           <div className="flex items-center gap-4">
             <button onClick={() => router.push('/dashboard/secretaria/notificacoes')} className="relative p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">

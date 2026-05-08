@@ -291,7 +291,7 @@ export default function DiretorDashboard() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {[
             { label: 'Feed',        icon: Newspaper,  href: '/dashboard/feed',                    color: 'bg-sky-50 dark:bg-sky-950 text-sky-600',         hint: 'Mural da escola' },
-            { label: 'Secretaria',  icon: UserCog,    href: '/dashboard/secretaria/alunos',        color: 'bg-teal-50 dark:bg-teal-950 text-teal-600',      hint: 'Gestão administrativa' },
+            { label: 'Administrativo', icon: UserCog, href: '/dashboard/secretaria/alunos',        color: 'bg-teal-50 dark:bg-teal-950 text-teal-600',      hint: 'Gestão administrativa' },
             { label: 'Usuários',    icon: Users,      href: '/dashboard/diretor/usuarios',         color: 'bg-blue-50 dark:bg-blue-950 text-blue-600',      hint: 'Equipe e acessos' },
             { label: 'Turmas',      icon: BookOpen,   href: '/dashboard/diretor/turmas',           color: 'bg-purple-50 dark:bg-purple-950 text-purple-600',hint: 'Turmas e disciplinas' },
             { label: 'Financeiro',  icon: DollarSign, href: '/dashboard/diretor/financeiro',       color: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600', hint: 'Receitas e inadimplência' },

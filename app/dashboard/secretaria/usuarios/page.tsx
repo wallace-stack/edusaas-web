@@ -19,7 +19,7 @@ interface StaffUser {
 const roleLabel: Record<string, string> = {
   teacher: 'Professor',
   coordinator: 'Coordenador',
-  secretary: 'Secretaria',
+  secretary: 'Administrativo',
 };
 
 const roleColor: Record<string, string> = {
