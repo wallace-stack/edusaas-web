@@ -19,7 +19,10 @@ export const metadata: Metadata = {
   title: 'Walladm — Gestão Escolar Inteligente',
   description: 'Plataforma completa de gestão escolar para diretores, coordenadores, professores e alunos.',
   icons: {
-    icon: '/logo-icon.png',
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/logo-icon.png', sizes: 'any', type: 'image/png' },
+    ],
     apple: '/logo-icon.png',
   },
 };
