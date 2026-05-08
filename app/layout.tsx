@@ -20,10 +20,10 @@ export const metadata: Metadata = {
   description: 'Plataforma completa de gestão escolar para diretores, coordenadores, professores e alunos.',
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' },
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
       { url: '/logo-icon.png', sizes: '192x192', type: 'image/png' },
     ],
-    apple: '/logo-icon.png',
+    apple: { url: '/apple-touch-icon.png', sizes: '180x180' },
     shortcut: '/favicon.ico',
   },
 };
