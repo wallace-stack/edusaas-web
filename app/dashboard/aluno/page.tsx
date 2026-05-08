@@ -105,7 +105,7 @@ export default function AlunoDashboard() {
             <div className="flex items-center gap-2">
                         <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
-            <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Walla</span><span className="text-[#F5A623]">adm</span></span>
+            <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Wall</span><span className="text-[#F5A623]">adm</span></span>
           </Link>
               <span className="text-gray-300 dark:text-gray-600 hidden sm:block">|</span>
               <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Portal do Aluno</span>
