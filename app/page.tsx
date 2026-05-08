@@ -157,7 +157,7 @@ const PLANS = [
       'Suporte por WhatsApp 24h',
     ],
     cta: 'Falar com especialista',
-    href: 'https://wa.me/5511999999999?text=Olá,+tenho+interesse+no+plano+Rede+do+Walladm',
+    href: 'https://wa.me/5521979911987?text=Olá,+tenho+interesse+no+plano+Rede+do+Walladm',
     ctaStyle: { background: '#111118', color: 'white', border: '1px solid rgba(255,255,255,0.12)' } as React.CSSProperties,
   },
 ];
