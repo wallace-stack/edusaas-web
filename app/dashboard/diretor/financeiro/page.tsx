@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUser } from '../../../lib/auth';
+import { getUser, getToken } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, DollarSign, TrendingUp, AlertTriangle, Users, Search } from 'lucide-react';
+import { ArrowLeft, DollarSign, TrendingUp, AlertTriangle, Users, Search, Download, FileText } from 'lucide-react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -43,6 +43,10 @@ export default function DiretorFinanceiroPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [exportingContab, setExportingContab] = useState(false);
+  const [exportingCompleto, setExportingCompleto] = useState(false);
 
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
@@ -51,6 +55,29 @@ export default function DiretorFinanceiroPage() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
+
+  const handleExport = async (tipo: 'contabilidade' | 'completo') => {
+    const setter = tipo === 'contabilidade' ? setExportingContab : setExportingCompleto;
+    setter(true);
+    try {
+      const token = getToken();
+      const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+      const url = `${base}/metrics/director/financial/export-${tipo}?month=${month}&year=${year}`;
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error('Falha ao exportar');
+      const blob = await res.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      const prefix = tipo === 'contabilidade' ? 'contabilidade' : 'relatorio-completo';
+      a.download = `${prefix}-${year}-${String(month).padStart(2, '0')}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch {
+      alert('Erro ao exportar. Tente novamente.');
+    } finally {
+      setter(false);
+    }
+  };
 
   if (loading) return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center">
@@ -222,6 +249,48 @@ export default function DiretorFinanceiroPage() {
                 <p className="text-lg font-bold text-red-500">{data.inadimplentes}</p>
                 <p className="text-xs text-gray-400">Inadimplentes</p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Exportar */}
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4 sm:p-5">
+          <h2 className="text-sm font-semibold text-[#1E3A5F] dark:text-white mb-3">Exportar relatórios</h2>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Filtro de período */}
+            <select
+              value={month}
+              onChange={e => setMonth(Number(e.target.value))}
+              className="text-xs px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+            >
+              {['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
+                .map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
+            </select>
+            <select
+              value={year}
+              onChange={e => setYear(Number(e.target.value))}
+              className="text-xs px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+            >
+              {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
+
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => handleExport('contabilidade')}
+                disabled={exportingContab}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1E3A5F] text-white text-xs font-medium hover:bg-[#16304f] disabled:opacity-60 transition-colors"
+              >
+                <Download size={13} />
+                {exportingContab ? 'Exportando...' : 'Exportar para contabilidade'}
+              </button>
+              <button
+                onClick={() => handleExport('completo')}
+                disabled={exportingCompleto}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#1E3A5F] text-[#1E3A5F] dark:border-indigo-400 dark:text-indigo-400 text-xs font-medium hover:bg-[#1E3A5F]/5 disabled:opacity-60 transition-colors"
+              >
+                <FileText size={13} />
+                {exportingCompleto ? 'Exportando...' : 'Exportar relatório completo'}
+              </button>
             </div>
           </div>
         </div>
