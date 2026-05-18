@@ -8,6 +8,13 @@ import { ArrowLeft, Plus, BookOpen, Users, X, ChevronRight, Phone, MapPin, User 
 import { toast } from 'sonner';
 import { maskCPF } from '../../../lib/utils';
 
+interface InfantilConfig {
+  useConceito:     boolean;
+  useParecer:      boolean;
+  useDiarioBordo:  boolean;
+  usePlanejamento: boolean;
+}
+
 interface SchoolClass {
   id: number;
   name: string;
@@ -15,6 +22,8 @@ interface SchoolClass {
   shift?: string;
   totalStudents?: number;
   teacher?: { name: string };
+  mode?: 'regular' | 'infantil';
+  infantilConfig?: InfantilConfig | null;
 }
 
 interface Subject {
@@ -80,6 +89,12 @@ export default function SecretariaTurmasPage() {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [subjectForm, setSubjectForm] = useState({ name: '', teacherId: '' });
   const [savingSubject, setSavingSubject] = useState(false);
+  const [manageTab, setManageTab] = useState<'disciplinas' | 'modo'>('disciplinas');
+  const [modeForm, setModeForm] = useState<{ mode: 'regular' | 'infantil'; cfg: InfantilConfig }>({
+    mode: 'regular',
+    cfg: { useConceito: true, useParecer: true, useDiarioBordo: false, usePlanejamento: false },
+  });
+  const [savingMode, setSavingMode] = useState(false);
 
   // Drawer de alunos
   const [studentsClass, setStudentsClass] = useState<SchoolClass | null>(null);
@@ -116,6 +131,11 @@ export default function SecretariaTurmasPage() {
 
   const openManageModal = async (c: SchoolClass) => {
     setManageClass(c);
+    setManageTab('disciplinas');
+    setModeForm({
+      mode: c.mode ?? 'regular',
+      cfg: c.infantilConfig ?? { useConceito: true, useParecer: true, useDiarioBordo: false, usePlanejamento: false },
+    });
     try {
       const [subRes, teachRes] = await Promise.all([
         api.get(`/classes/${c.id}/subjects`),
@@ -124,6 +144,24 @@ export default function SecretariaTurmasPage() {
       setSubjects(subRes.data);
       setTeachers(teachRes.data);
     } catch (err) { console.error(err); }
+  };
+
+  const handleSaveMode = async () => {
+    if (!manageClass) return;
+    setSavingMode(true);
+    try {
+      const updated = await api.patch(`/classes/${manageClass.id}/mode`, {
+        mode: modeForm.mode,
+        infantilConfig: modeForm.mode === 'infantil' ? modeForm.cfg : undefined,
+      });
+      setManageClass(updated.data);
+      setClasses(prev => prev.map(c => c.id === manageClass.id ? { ...c, ...updated.data } : c));
+      toast.success('Modo da turma atualizado!');
+    } catch {
+      toast.error('Erro ao atualizar modo');
+    } finally {
+      setSavingMode(false);
+    }
   };
 
   const openStudentsDrawer = async (c: SchoolClass) => {
@@ -238,6 +276,11 @@ export default function SecretariaTurmasPage() {
                     Prof. {c.teacher.name}
                   </p>
                 )}
+                {c.mode === 'infantil' && (
+                  <span className="inline-block mb-3 text-[10px] px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-300 font-medium">
+                    🎨 Educação Infantil
+                  </span>
+                )}
                 <div className="flex gap-2">
                   <button
                     onClick={() => openStudentsDrawer(c)}
@@ -249,7 +292,7 @@ export default function SecretariaTurmasPage() {
                     onClick={() => openManageModal(c)}
                     className="flex-1 text-xs text-[#1E3A5F] dark:text-blue-400 border border-[#1E3A5F] dark:border-blue-400 py-2 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
                   >
-                    Disciplinas
+                    Gerenciar
                   </button>
                 </div>
               </div>
@@ -283,13 +326,13 @@ export default function SecretariaTurmasPage() {
         </div>
       )}
 
-      {/* Modal: Gerenciar disciplinas */}
+      {/* Modal: Gerenciar turma */}
       {manageClass && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white">Disciplinas</h2>
+                <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white">Gerenciar turma</h2>
                 <p className="text-xs text-gray-400 dark:text-gray-500">{manageClass.name} · {manageClass.year}</p>
               </div>
               <button onClick={() => setManageClass(null)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
@@ -297,59 +340,136 @@ export default function SecretariaTurmasPage() {
               </button>
             </div>
 
-            <div className="space-y-2 mb-5">
-              {subjects.length === 0 ? (
-                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Nenhuma disciplina ainda</p>
-              ) : (
-                subjects.map(s => (
-                  <div key={s.id} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3">
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{s.name}</p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500">
-                        {s.teacher ? `Prof. ${s.teacher.name}` : 'Sem professor'}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleRemoveSubject(s.id)}
-                      className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950"
-                    >
-                      Remover
-                    </button>
-                  </div>
-                ))
-              )}
+            {/* Abas */}
+            <div className="flex gap-1 mb-5 bg-gray-100 dark:bg-gray-800 rounded-xl p-1">
+              {(['disciplinas', 'modo'] as const).map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setManageTab(tab)}
+                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${
+                    manageTab === tab ? 'bg-white dark:bg-gray-700 text-[#1E3A5F] dark:text-white shadow-sm' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                  }`}
+                >
+                  {tab === 'disciplinas' ? 'Disciplinas' : 'Modo da turma'}
+                </button>
+              ))}
             </div>
 
-            <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3">Adicionar disciplina</p>
-              <form onSubmit={handleAddSubject} className="space-y-3">
-                <input
-                  value={subjectForm.name}
-                  onChange={e => setSubjectForm({ ...subjectForm, name: e.target.value })}
-                  placeholder="Nome da disciplina (ex: Matemática)"
-                  required
-                  className={inputCls}
-                />
-                <select
-                  value={subjectForm.teacherId}
-                  onChange={e => setSubjectForm({ ...subjectForm, teacherId: e.target.value })}
-                  required
-                  className={inputCls}
-                >
-                  <option value="">Selecione o professor *</option>
-                  {teachers.map(t => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
+            {/* Aba Disciplinas */}
+            {manageTab === 'disciplinas' && (
+              <>
+                <div className="space-y-2 mb-5">
+                  {subjects.length === 0 ? (
+                    <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Nenhuma disciplina ainda</p>
+                  ) : (
+                    subjects.map(s => (
+                      <div key={s.id} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{s.name}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">
+                            {s.teacher ? `Prof. ${s.teacher.name}` : 'Sem professor'}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleRemoveSubject(s.id)}
+                          className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950"
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+                <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
+                  <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3">Adicionar disciplina</p>
+                  <form onSubmit={handleAddSubject} className="space-y-3">
+                    <input
+                      value={subjectForm.name}
+                      onChange={e => setSubjectForm({ ...subjectForm, name: e.target.value })}
+                      placeholder="Nome da disciplina (ex: Matemática)"
+                      required
+                      className={inputCls}
+                    />
+                    <select
+                      value={subjectForm.teacherId}
+                      onChange={e => setSubjectForm({ ...subjectForm, teacherId: e.target.value })}
+                      required
+                      className={inputCls}
+                    >
+                      <option value="">Selecione o professor *</option>
+                      {teachers.map(t => (
+                        <option key={t.id} value={t.id}>{t.name}</option>
+                      ))}
+                    </select>
+                    <button
+                      type="submit"
+                      disabled={savingSubject}
+                      className="w-full py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50"
+                    >
+                      {savingSubject ? 'Adicionando...' : 'Adicionar disciplina'}
+                    </button>
+                  </form>
+                </div>
+              </>
+            )}
+
+            {/* Aba Modo da turma */}
+            {manageTab === 'modo' && (
+              <div className="space-y-5">
+                {/* Toggle Regular / Infantil */}
+                <div className="flex gap-2">
+                  {(['regular', 'infantil'] as const).map(m => (
+                    <button
+                      key={m}
+                      onClick={() => setModeForm(f => ({ ...f, mode: m }))}
+                      className={`flex-1 py-3 rounded-xl text-sm font-medium border-2 transition-all ${
+                        modeForm.mode === m
+                          ? m === 'infantil'
+                            ? 'border-purple-500 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
+                            : 'border-[#1E3A5F] bg-blue-50 dark:bg-blue-950 text-[#1E3A5F] dark:text-blue-300'
+                          : 'border-gray-200 dark:border-gray-700 text-gray-400 hover:border-gray-300'
+                      }`}
+                    >
+                      {m === 'regular' ? '📚 Regular' : '🎨 Educação Infantil'}
+                    </button>
                   ))}
-                </select>
+                </div>
+
+                {/* Opções do modo infantil */}
+                {modeForm.mode === 'infantil' && (
+                  <div className="bg-purple-50 dark:bg-purple-950/40 rounded-2xl p-4 space-y-3">
+                    <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 uppercase tracking-wider mb-1">Recursos ativos</p>
+                    {([
+                      { key: 'useConceito',     label: 'Avaliação por conceito', desc: 'Desenvolvido / Em desenvolvimento / Não desenvolvido' },
+                      { key: 'useParecer',      label: 'Parecer descritivo',     desc: 'Texto livre por aluno por bimestre' },
+                      { key: 'useDiarioBordo',  label: 'Diário de bordo',        desc: 'Registro diário do que aconteceu na turma' },
+                      { key: 'usePlanejamento', label: 'Planejamento diário',    desc: 'Objetivos, atividades e recursos do dia' },
+                    ] as const).map(({ key, label, desc }) => (
+                      <label key={key} className="flex items-start gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={modeForm.cfg[key]}
+                          onChange={e => setModeForm(f => ({ ...f, cfg: { ...f.cfg, [key]: e.target.checked } }))}
+                          className="mt-0.5 w-4 h-4 accent-purple-600 flex-shrink-0"
+                        />
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{label}</p>
+                          <p className="text-xs text-gray-400 dark:text-gray-500">{desc}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
                 <button
-                  type="submit"
-                  disabled={savingSubject}
+                  onClick={handleSaveMode}
+                  disabled={savingMode}
                   className="w-full py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50"
                 >
-                  {savingSubject ? 'Adicionando...' : 'Adicionar disciplina'}
+                  {savingMode ? 'Salvando...' : 'Salvar configuração'}
                 </button>
-              </form>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       )}

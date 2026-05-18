@@ -4,7 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, BookOpen, Users, ClipboardList, CheckSquare } from 'lucide-react';
+import { ArrowLeft, BookOpen, Users, ClipboardList, CheckSquare, BookMarked, CalendarDays } from 'lucide-react';
+
+interface InfantilConfig {
+  useConceito:     boolean;
+  useParecer:      boolean;
+  useDiarioBordo:  boolean;
+  usePlanejamento: boolean;
+}
 
 interface SchoolClass {
   id: number;
@@ -13,6 +20,8 @@ interface SchoolClass {
   shift?: string;
   totalStudents?: number;
   subjects?: { id: number; name: string }[];
+  mode?: 'regular' | 'infantil';
+  infantilConfig?: InfantilConfig | null;
 }
 
 export default function ProfessorTurmasPage() {
@@ -112,13 +121,22 @@ export default function ProfessorTurmasPage() {
                     </div>
                   </div>
                 )}
-                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-50 dark:border-gray-800">
+                {c.mode === 'infantil' && (
+                  <span className="inline-block mb-2 text-[10px] px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-300 font-medium">
+                    🎨 Educação Infantil
+                  </span>
+                )}
+                <div className={`grid gap-2 pt-3 border-t border-gray-50 dark:border-gray-800 ${c.mode === 'infantil' ? 'grid-cols-2' : 'grid-cols-2'}`}>
                   <button
                     onClick={() => router.push(`/dashboard/professor/notas?turmaId=${c.id}`)}
-                    className="flex items-center justify-center gap-1.5 min-h-[40px] py-2.5 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 text-sm font-medium hover:bg-blue-100 dark:hover:bg-blue-900 active:scale-[0.97] transition-all"
+                    className={`flex items-center justify-center gap-1.5 min-h-[40px] py-2.5 rounded-xl text-sm font-medium active:scale-[0.97] transition-all ${
+                      c.mode === 'infantil'
+                        ? 'bg-purple-50 dark:bg-purple-950 text-purple-600 hover:bg-purple-100 dark:hover:bg-purple-900'
+                        : 'bg-blue-50 dark:bg-blue-950 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900'
+                    }`}
                   >
                     <ClipboardList size={15} />
-                    Notas
+                    {c.mode === 'infantil' ? 'Avaliação' : 'Notas'}
                   </button>
                   <button
                     onClick={() => router.push(`/dashboard/professor/chamada?turmaId=${c.id}`)}
@@ -127,6 +145,24 @@ export default function ProfessorTurmasPage() {
                     <CheckSquare size={15} />
                     Chamada
                   </button>
+                  {c.mode === 'infantil' && c.infantilConfig?.useDiarioBordo && (
+                    <button
+                      onClick={() => router.push(`/dashboard/professor/diario?turmaId=${c.id}`)}
+                      className="flex items-center justify-center gap-1.5 min-h-[40px] py-2.5 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 text-sm font-medium hover:bg-amber-100 dark:hover:bg-amber-900 active:scale-[0.97] transition-all"
+                    >
+                      <BookMarked size={15} />
+                      Diário
+                    </button>
+                  )}
+                  {c.mode === 'infantil' && c.infantilConfig?.usePlanejamento && (
+                    <button
+                      onClick={() => router.push(`/dashboard/professor/planejamento?turmaId=${c.id}`)}
+                      className="flex items-center justify-center gap-1.5 min-h-[40px] py-2.5 rounded-xl bg-teal-50 dark:bg-teal-950 text-teal-600 text-sm font-medium hover:bg-teal-100 dark:hover:bg-teal-900 active:scale-[0.97] transition-all"
+                    >
+                      <CalendarDays size={15} />
+                      Planejamento
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
