@@ -18,6 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Walladm — Gestão Escolar Inteligente',
   description: 'Plataforma completa de gestão escolar para diretores, coordenadores, professores e alunos.',
+  manifest: '/manifest.json',
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
@@ -26,6 +27,12 @@ export const metadata: Metadata = {
     apple: { url: '/apple-touch-icon.png', sizes: '180x180' },
     shortcut: '/favicon.ico',
   },
+};
+
+export const viewport = {
+  themeColor: '#0A0A0A',
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({

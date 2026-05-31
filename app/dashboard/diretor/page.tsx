@@ -11,6 +11,7 @@ import {
   ClipboardList, UserCog, CheckSquare, CreditCard
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { PwaInstallButton } from '@/components/PwaInstallButton';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
 import OnboardingWizard from '@/components/OnboardingWizard';
@@ -97,6 +98,7 @@ export default function DiretorDashboard() {
               </div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">{user?.name}</span>
             </button>
+            <PwaInstallButton />
             <ThemeToggle />
             <button onClick={() => { clearAuth(); router.push('/login'); }} className="text-gray-400 hover:text-red-500 transition-colors">
               <LogOut size={16} />
