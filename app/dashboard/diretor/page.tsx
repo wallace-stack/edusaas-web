@@ -120,18 +120,19 @@ export default function DiretorDashboard() {
         {/* Pessoas */}
         <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
           {[
-            { value: data?.people.totalStudents || 0, label: 'Alunos', icon: GraduationCap, color: 'bg-blue-50 dark:bg-blue-950 text-blue-600' },
-            { value: data?.people.totalTeachers || 0, label: 'Professores', icon: BookOpen, color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
-            { value: data?.people.totalCoordinators || 0, label: 'Coordenadores', icon: Users, color: 'bg-orange-50 dark:bg-orange-950 text-orange-600' },
+            { value: data?.people.totalStudents || 0, label: 'Alunos', icon: GraduationCap, color: 'bg-blue-50 dark:bg-blue-950 text-blue-600', href: '/dashboard/diretor/alunos' },
+            { value: data?.people.totalTeachers || 0, label: 'Professores', icon: BookOpen, color: 'bg-purple-50 dark:bg-purple-950 text-purple-600', href: '/dashboard/diretor/usuarios' },
+            { value: data?.people.totalCoordinators || 0, label: 'Coordenadores', icon: Users, color: 'bg-orange-50 dark:bg-orange-950 text-orange-600', href: '/dashboard/diretor/usuarios' },
           ].map(c => (
-            <div key={c.label} className="bg-white dark:bg-gray-900 rounded-2xl p-3 sm:p-6 border border-gray-100 dark:border-gray-800 hover:opacity-80 transition-opacity duration-200">
+            <button key={c.label} onClick={() => router.push(c.href)}
+              className="bg-white dark:bg-gray-900 rounded-2xl p-3 sm:p-6 border border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-left cursor-pointer">
               <div className={`w-8 h-8 sm:w-10 sm:h-10 ${c.color} rounded-xl flex items-center justify-center mb-2 sm:mb-3`}>
                 <c.icon size={16} className="sm:hidden" />
                 <c.icon size={18} className="hidden sm:block" />
               </div>
               <p className="text-2xl sm:text-3xl font-bold text-[#1E3A5F] dark:text-white">{c.value}</p>
               <p className="text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 mt-1 leading-tight">{c.label}</p>
-            </div>
+            </button>
           ))}
         </div>
 
