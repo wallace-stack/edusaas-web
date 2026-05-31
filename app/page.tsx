@@ -388,7 +388,7 @@ export default function LandingPage() {
             </span>
             <span className="flex items-center gap-1.5">
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
-              Suporte em português
+              Suporte humanizado
             </span>
             <span className="flex items-center gap-1.5">
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clipRule="evenodd"/></svg>
@@ -415,7 +415,7 @@ export default function LandingPage() {
               },
               {
                 icon: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>,
-                text: 'Suporte em português',
+                text: 'Suporte humanizado',
               },
               {
                 icon: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
@@ -697,7 +697,7 @@ export default function LandingPage() {
               style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
               Criar minha conta gratuitamente <ArrowRight size={18} />
             </Link>
-            <p className="text-xs mt-4" style={{ color: '#475569' }}>Sem cartão de crédito · Suporte em português</p>
+            <p className="text-xs mt-4" style={{ color: '#475569' }}>Sem cartão de crédito · Suporte humanizado</p>
           </div>
         </div>
       </section>
