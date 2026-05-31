@@ -6,6 +6,7 @@ import { Download } from 'lucide-react';
 export function PwaInstallButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [installed, setInstalled] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
     if (window.matchMedia('(display-mode: standalone)').matches) {
@@ -37,16 +38,42 @@ export function PwaInstallButton() {
   return (
     <button
       onClick={handleInstall}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      title="Instalar app"
       style={{
-        display: 'flex', alignItems: 'center', gap: '8px',
-        padding: '8px 16px', borderRadius: '10px',
-        background: 'linear-gradient(135deg, #7C3AED, #8B5CF6)',
-        color: '#fff', fontSize: '13px', fontWeight: 700,
-        border: 'none', cursor: 'pointer',
+        position: 'fixed',
+        bottom: '24px',
+        right: '24px',
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        gap: hovered ? '8px' : '0px',
+        overflow: 'hidden',
+        maxWidth: hovered ? '160px' : '40px',
+        padding: '10px',
+        borderRadius: '999px',
+        background: 'rgba(30, 58, 95, 0.85)',
+        backdropFilter: 'blur(8px)',
+        color: '#fff',
+        fontSize: '13px',
+        fontWeight: 600,
+        border: '1px solid rgba(255,255,255,0.12)',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
+        transition: 'max-width 0.3s ease, gap 0.3s ease, opacity 0.3s ease',
+        opacity: hovered ? 1 : 0.65,
       }}
     >
-      <Download size={14} strokeWidth={2} />
-      Instalar app
+      <Download size={16} strokeWidth={2} style={{ flexShrink: 0 }} />
+      <span style={{
+        opacity: hovered ? 1 : 0,
+        transition: 'opacity 0.2s ease',
+        overflow: 'hidden',
+      }}>
+        Instalar app
+      </span>
     </button>
   );
 }

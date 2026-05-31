@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "./providers/theme-provider";
 import { Toaster } from 'sonner';
 import SlowApiBanner from '@/components/SlowApiBanner';
+import { PwaInstallButton } from '@/components/PwaInstallButton';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -47,6 +48,7 @@ export default function RootLayout({
           {children}
           <Toaster richColors position="top-right" theme="dark" />
           <SlowApiBanner />
+          <PwaInstallButton />
         </ThemeProvider>
       </body>
     </html>
