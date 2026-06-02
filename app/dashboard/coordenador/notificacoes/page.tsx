@@ -4,13 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, Bell, X } from 'lucide-react';
+import { ArrowLeft, Plus, Bell, X, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Notification {
   id: number;
   title: string;
   message: string;
+  type?: string;
   target: string;
   classId?: number;
   createdAt: string;
@@ -131,18 +132,31 @@ export default function CoordenadorNotificacoesPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {notifications.map(n => (
-              <div key={n.id} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5">
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <h3 className="font-semibold text-[#1E3A5F] dark:text-white text-sm">{n.title}</h3>
-                  <span className="text-[10px] px-2 py-0.5 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-full whitespace-nowrap flex-shrink-0">
-                    {targetLabel[n.target] ?? n.target}
-                  </span>
+            {notifications.map(n => {
+              const isSystemMsg = n.type === 'system_message';
+              return (
+                <div key={n.id} className={`rounded-2xl border p-5 ${isSystemMsg ? 'bg-pink-50/60 dark:bg-pink-950/30 border-pink-100 dark:border-pink-900' : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800'}`}>
+                  {isSystemMsg && (
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <div className="w-6 h-6 rounded-lg bg-pink-100 dark:bg-pink-900 flex items-center justify-center">
+                        <Heart size={12} className="text-pink-500" />
+                      </div>
+                      <span className="text-[10px] font-medium text-pink-500 uppercase tracking-wide">Mensagem do sistema</span>
+                    </div>
+                  )}
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <h3 className="font-semibold text-[#1E3A5F] dark:text-white text-sm">{n.title}</h3>
+                    {!isSystemMsg && (
+                      <span className="text-[10px] px-2 py-0.5 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-full whitespace-nowrap flex-shrink-0">
+                        {targetLabel[n.target] ?? n.target}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 leading-relaxed">{n.message}</p>
+                  <p className="text-[11px] text-gray-400 dark:text-gray-500">{formatDate(n.createdAt)}</p>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 leading-relaxed">{n.message}</p>
-                <p className="text-[11px] text-gray-400 dark:text-gray-500">{formatDate(n.createdAt)}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>

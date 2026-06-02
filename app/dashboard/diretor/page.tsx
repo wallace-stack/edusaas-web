@@ -8,7 +8,7 @@ import api from '../../lib/api';
 import {
   Users, GraduationCap, BookOpen, DollarSign,
   TrendingUp, AlertTriangle, LogOut, Bell, Newspaper,
-  ClipboardList, UserCog, CheckSquare, CreditCard, NotebookPen
+  ClipboardList, UserCog, CheckSquare, CreditCard, NotebookPen, Heart
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
@@ -299,6 +299,7 @@ export default function DiretorDashboard() {
             { label: 'Avisos',      icon: Bell,       href: '/dashboard/diretor/notificacoes',     color: 'bg-orange-50 dark:bg-orange-950 text-orange-600',hint: 'Avisos institucionais' },
             { label: 'Pagamento',      icon: CreditCard,   href: '/dashboard/diretor/pagamento',        color: 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600',  hint: 'PIX e dados de cobrança' },
             { label: 'Planejamentos',  icon: NotebookPen,  href: '/dashboard/diretor/planejamentos',    color: 'bg-violet-50 dark:bg-violet-950 text-violet-600',   hint: 'Cadernos dos professores' },
+            { label: 'Msgs Carinhosas', icon: Heart,       href: '/dashboard/diretor/mensagens-sistema', color: 'bg-pink-50 dark:bg-pink-950 text-pink-600',         hint: 'Mensagens automáticas 72h' },
           ].map(item => (
             <button key={item.label} onClick={() => router.push(item.href)}
               className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] hover:opacity-80 active:scale-[0.98] transition-all duration-200 text-left">

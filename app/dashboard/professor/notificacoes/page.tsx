@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Bell, Plus, X, BookOpen, AlertTriangle, XCircle, Megaphone } from 'lucide-react';
+import { ArrowLeft, Bell, Plus, X, BookOpen, AlertTriangle, XCircle, Megaphone, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SchoolClass { id: number; name: string; }
@@ -19,10 +19,11 @@ interface Notification {
 }
 
 const typeConfig: Record<string, { label: string; color: string; icon: any }> = {
-  exam_scheduled: { label: 'Prova Agendada', color: 'bg-blue-50 dark:bg-blue-950 text-blue-700', icon: BookOpen },
-  exam_changed: { label: 'Prova Alterada', color: 'bg-orange-50 dark:bg-orange-950 text-orange-700', icon: AlertTriangle },
-  exam_cancelled: { label: 'Prova Cancelada', color: 'bg-red-50 dark:bg-red-950 text-red-700', icon: XCircle },
-  class_notice: { label: 'Aviso', color: 'bg-purple-50 dark:bg-purple-950 text-purple-700', icon: Megaphone },
+  exam_scheduled: { label: 'Prova Agendada',     color: 'bg-blue-50 dark:bg-blue-950 text-blue-700',   icon: BookOpen     },
+  exam_changed:   { label: 'Prova Alterada',     color: 'bg-orange-50 dark:bg-orange-950 text-orange-700', icon: AlertTriangle },
+  exam_cancelled: { label: 'Prova Cancelada',    color: 'bg-red-50 dark:bg-red-950 text-red-700',       icon: XCircle      },
+  class_notice:   { label: 'Aviso',              color: 'bg-purple-50 dark:bg-purple-950 text-purple-700', icon: Megaphone  },
+  system_message: { label: 'Mensagem do sistema', color: 'bg-pink-50 dark:bg-pink-950 text-pink-600',   icon: Heart        },
 };
 
 function timeAgo(dateStr: string): string {
