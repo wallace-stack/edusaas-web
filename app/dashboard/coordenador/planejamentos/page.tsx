@@ -7,7 +7,7 @@ import api from '../../../lib/api';
 import {
   ArrowLeft, BookOpen, Eye, CheckCircle, Clock, Send,
   Filter, X, FileText, ChevronLeft, Tag,
-  Users, Pencil, Gamepad2, Star, Loader2,
+  Users, Pencil, Gamepad2, Star, Loader2, Paperclip
 } from 'lucide-react';
 import { toast } from 'sonner';
 
