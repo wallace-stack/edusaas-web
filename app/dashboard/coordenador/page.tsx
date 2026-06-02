@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, clearAuth } from '../../lib/auth';
 import api from '../../lib/api';
-import { Users, AlertTriangle, LogOut, Bell, BookOpen, TrendingDown, Newspaper, UserCog } from 'lucide-react';
+import { Users, AlertTriangle, LogOut, Bell, BookOpen, TrendingDown, Newspaper, UserCog, NotebookPen } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
@@ -287,6 +287,7 @@ export default function CoordenadorDashboard() {
             { label: 'Alunos', icon: Users, href: '/dashboard/coordenador/alunos', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600', hint: 'Lista e frequência' },
             { label: 'Turmas', icon: BookOpen, href: '/dashboard/coordenador/turmas', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600', hint: 'Turmas e professores' },
             { label: 'Avisos', icon: Bell, href: '/dashboard/coordenador/notificacoes', color: 'bg-orange-50 dark:bg-orange-950 text-orange-600', hint: 'Notificações institucionais' },
+            { label: 'Planejamentos', icon: NotebookPen, href: '/dashboard/coordenador/planejamentos', color: 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600', hint: 'Cadernos dos professores' },
           ].map(item => (
             <button key={item.label} onClick={() => router.push(item.href)}
               className="relative bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 text-left">

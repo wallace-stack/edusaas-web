@@ -7,7 +7,7 @@ import { getUser, clearAuth } from '../../lib/auth';
 import api from '../../lib/api';
 import {
   Users, BookOpen, DollarSign, UserPlus,
-  AlertTriangle, LogOut, Bell, Newspaper
+  AlertTriangle, LogOut, Bell, Newspaper, NotebookPen
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 
@@ -198,7 +198,8 @@ export default function SecretariaDashboard() {
             { label: 'Alunos', icon: Users, href: '/dashboard/secretaria/alunos', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600' },
             { label: 'Turmas', icon: BookOpen, href: '/dashboard/secretaria/turmas', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
             { label: 'Financeiro', icon: DollarSign, href: '/dashboard/secretaria/financeiro', color: 'bg-emerald-50 dark:bg-emerald-950 text-emerald-600' },
-            { label: 'Usuários', icon: UserPlus, href: '/dashboard/secretaria/usuarios', color: 'bg-orange-50 dark:bg-orange-950 text-[#F97316]' },
+            { label: 'Usuários',      icon: UserPlus,   href: '/dashboard/secretaria/usuarios',      color: 'bg-orange-50 dark:bg-orange-950 text-[#F97316]' },
+            { label: 'Planejamentos', icon: NotebookPen, href: '/dashboard/secretaria/planejamentos', color: 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600' },
           ].map((item) => (
             <button
               key={item.label}

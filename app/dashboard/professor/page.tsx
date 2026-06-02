@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser, clearAuth } from '../../lib/auth';
 import api from '../../lib/api';
-import { BookOpen, Users, ClipboardList, LogOut, CheckSquare, Newspaper, Bell } from 'lucide-react';
+import { BookOpen, Users, ClipboardList, LogOut, CheckSquare, Newspaper, Bell, NotebookPen } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Filler, Tooltip, Legend } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
@@ -236,6 +236,7 @@ export default function ProfessorDashboard() {
             { label: 'Registrar Chamada', icon: CheckSquare,   href: '/dashboard/professor/chamada',          color: 'bg-green-50 dark:bg-green-950 text-green-600',  hint: 'Frequência diária' },
             { label: 'Minhas Turmas',     icon: BookOpen,      href: '/dashboard/professor/turmas',           color: 'bg-purple-50 dark:bg-purple-950 text-purple-600',hint: 'Turmas e disciplinas' },
             { label: 'Avisos da Turma',   icon: Bell,          href: '/dashboard/professor/notificacoes',     color: 'bg-orange-50 dark:bg-orange-950 text-orange-600',hint: 'Avisos institucionais' },
+            { label: 'Caderno',           icon: NotebookPen,   href: '/dashboard/professor/caderno',          color: 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600', hint: 'Planejamentos de aula' },
           ].map((item) => (
             <button
               key={item.label}
