@@ -99,6 +99,21 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
+    // 403 por falta de permissão granular — exibe toast amigável
+    if (error.response.status === 403) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(
+          new CustomEvent('api:forbidden', {
+            detail: {
+              message:
+                error.response?.data?.message ||
+                'Você não tem permissão para esta ação. Fale com a direção da escola.',
+            },
+          }),
+        );
+      }
+    }
+
     if (error.response.status === 402) {
       if (typeof window !== 'undefined') {
         window.location.href = '/planos';

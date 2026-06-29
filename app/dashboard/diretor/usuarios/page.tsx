@@ -158,7 +158,11 @@ export default function UsuariosPage() {
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-gray-800">
                 {filtered.map((u) => (
-                  <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  <tr
+                    key={u.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                    onClick={() => router.push(`/dashboard/diretor/usuarios/${u.id}`)}
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
@@ -182,7 +186,7 @@ export default function UsuariosPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <button
-                        onClick={() => handleDelete(u.id)}
+                        onClick={(e) => { e.stopPropagation(); handleDelete(u.id); }}
                         className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-colors"
                       >
                         <Trash2 size={16} />
