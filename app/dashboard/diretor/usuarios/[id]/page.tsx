@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { getUser } from '../../../../lib/auth';
 import api from '../../../../lib/api';
 import {
@@ -135,10 +135,12 @@ const ROLE_COLOR: Record<string, string> = {
 export default function UserDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const userId = Number(params.id);
   const currentUser = getUser();
 
-  const [tab, setTab] = useState<'dados' | 'permissoes'>('dados');
+  const initialTab = searchParams.get('tab') === 'permissoes' ? 'permissoes' : 'dados';
+  const [tab, setTab] = useState<'dados' | 'permissoes'>(initialTab);
   const [userData, setUserData] = useState<UserDetail | null>(null);
   const [permsData, setPermsData] = useState<PermissionsResponse | null>(null);
   const [grants, setGrants] = useState<Record<PermissionKey, boolean>>({} as any);
