@@ -37,8 +37,9 @@ TypeOrmModule.forRootAsync({
 })
 ```
 
-DATABASE_URL:
-`postgresql://postgres:zx0NYghGNEx8q3uW@db.xxrxxxhqoofwfifacndm.supabase.co:5432/postgres`
+DATABASE_URL (connection pooler Supavisor — sa-east-1, IPv4 nativo):
+Formato: `postgresql://postgres.xxrxxxhqoofwfifacndm:<SENHA>@aws-1-sa-east-1.pooler.supabase.com:5432/postgres`
+> Senha real: ver Render → edusaas-api → Environment → `DATABASE_URL` (não versionar a senha em texto puro aqui).
 
 ---
 
@@ -111,6 +112,18 @@ database/seeds/— demo.seed.ts (idempotente, batches de 50)
 
 ---
 
+## ⚠️ Segurança — nunca versionar segredos (incidente 2026-07-07)
+
+Já aconteceu neste repo: a senha real do banco ficou em texto puro no `claude.md`, e o `.claude/settings.local.json` foi parar no Git porque o `.gitignore` tinha as linhas `.claude/` gravadas em **UTF-16** (bytes `00` intercalados — sintoma de terem sido acrescentadas via PowerShell `Add-Content`/`>>`, que grava em UTF-16 por padrão). O Git lê `.gitignore` como texto puro e simplesmente não reconheceu o padrão, então a pasta nunca foi ignorada de verdade. Mesmo bug no `edusaas-api` — corrigido nos dois no mesmo dia.
+
+Regras pra não repetir:
+- **Nunca** colar senha/token real em `claude.md` ou qualquer arquivo versionado — sempre placeholder + "ver Render/Vercel/Supabase → Environment"
+- `.claude/` **sempre** no `.gitignore`, e sempre confira com `git check-ignore -v .claude/settings.local.json` depois de editar — não confie só na leitura visual do arquivo
+- Se for editar `.gitignore` via PowerShell, **nunca** use `>>`/`Add-Content` sem `-Encoding utf8` (o padrão é UTF-16 e quebra silenciosamente o match de padrões)
+- Antes de tornar um repo público, ou antes de qualquer commit que mexa em `claude.md`/`.gitignore`/`.env*`, rodar `grep -inE "password|senha|postgresql://|secret|api_key" claude.md .claude/*.json` pra conferir que nada real ficou solto
+
+---
+
 ## Checklist antes de todo commit
 
 - [ ] Raw SQL usa `$1`/`$2` (não `?`)
@@ -119,3 +132,4 @@ database/seeds/— demo.seed.ts (idempotente, batches de 50)
 - [ ] Entities com `timestamp` (não `datetime`)
 - [ ] `extra: { family: 4 }` no TypeOrmModule
 - [ ] `npm run build` passa sem erros
+- [ ] Nenhum segredo real em texto puro em arquivos versionados (ver seção "Segurança" acima)
