@@ -68,6 +68,7 @@ export default function ProfessorNotificacoesPage() {
       ]);
       setNotifications(notifRes.data);
       setClasses(classRes.data);
+      api.patch('/notifications/read-all').catch(() => {});
     } catch (err) { console.error(err); }
     finally { setLoading(false); }
   };

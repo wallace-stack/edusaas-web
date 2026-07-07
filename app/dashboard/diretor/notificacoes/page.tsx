@@ -81,6 +81,7 @@ export default function DiretorNotificacoesPage() {
       ]);
       setNotifications(notifRes.data);
       setClasses(classesRes.data);
+      api.patch('/notifications/read-all').catch(() => {});
     } catch (err) {
       console.error(err);
     } finally {
