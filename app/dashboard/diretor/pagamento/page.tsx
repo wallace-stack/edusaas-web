@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/app/lib/api';
 import { toast } from 'sonner';
-import { ArrowLeft, Save, CreditCard, QrCode, Link } from 'lucide-react';
+import { ArrowLeft, Save, CreditCard, QrCode, Link, Percent } from 'lucide-react';
 
 const PIX_TYPES = [
   { value: 'cpf', label: 'CPF' },
@@ -23,6 +23,9 @@ export default function PagamentoPage() {
     pixKeyType: 'cpf',
     paymentInfo: '',
     paymentLink: '',
+    earlyPaymentDiscountPercent: '',
+    lateFeePercent: '',
+    lateInterestPercentPerMonth: '',
   });
 
   useEffect(() => {
@@ -35,6 +38,9 @@ export default function PagamentoPage() {
           pixKeyType: res.data.pixKeyType || 'cpf',
           paymentInfo: res.data.paymentInfo || '',
           paymentLink: res.data.paymentLink || '',
+          earlyPaymentDiscountPercent: res.data.earlyPaymentDiscountPercent ?? '',
+          lateFeePercent: res.data.lateFeePercent ?? '',
+          lateInterestPercentPerMonth: res.data.lateInterestPercentPerMonth ?? '',
         });
       } catch {
         toast.error('Erro ao carregar configurações');
@@ -48,10 +54,15 @@ export default function PagamentoPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.patch('/schools/payment-config', form);
+      await api.patch('/schools/payment-config', {
+        ...form,
+        earlyPaymentDiscountPercent: form.earlyPaymentDiscountPercent === '' ? null : Number(form.earlyPaymentDiscountPercent),
+        lateFeePercent: form.lateFeePercent === '' ? null : Number(form.lateFeePercent),
+        lateInterestPercentPerMonth: form.lateInterestPercentPerMonth === '' ? null : Number(form.lateInterestPercentPerMonth),
+      });
       toast.success('Configurações salvas! Os e-mails de cobrança já incluirão os dados de pagamento.');
-    } catch {
-      toast.error('Erro ao salvar configurações');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erro ao salvar configurações');
     } finally {
       setSaving(false);
     }
@@ -147,6 +158,50 @@ export default function PagamentoPage() {
                 rows={3}
                 className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] resize-none"
               />
+            </div>
+          </div>
+
+          {/* Desconto e juros/multa */}
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Percent size={18} className="text-[#1E3A5F]" />
+              <h2 className="font-semibold text-gray-900 dark:text-white">Desconto e juros por atraso</h2>
+              <span className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 px-2 py-0.5 rounded-full">opcional</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Desconto pontualidade (%)</label>
+                <input
+                  type="number" min="0" max="100" step="0.5"
+                  value={form.earlyPaymentDiscountPercent}
+                  onChange={e => setForm({ ...form, earlyPaymentDiscountPercent: e.target.value })}
+                  placeholder="Ex: 5"
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                />
+                <p className="text-xs text-gray-400 mt-1">Só se pago até o vencimento</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Multa por atraso (%)</label>
+                <input
+                  type="number" min="0" max="2" step="0.1"
+                  value={form.lateFeePercent}
+                  onChange={e => setForm({ ...form, lateFeePercent: e.target.value })}
+                  placeholder="Ex: 2"
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                />
+                <p className="text-xs text-gray-400 mt-1">Máx. 2% (limite legal)</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Juros de mora (% ao mês)</label>
+                <input
+                  type="number" min="0" max="20" step="0.1"
+                  value={form.lateInterestPercentPerMonth}
+                  onChange={e => setForm({ ...form, lateInterestPercentPerMonth: e.target.value })}
+                  placeholder="Ex: 1"
+                  className="w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+                />
+                <p className="text-xs text-gray-400 mt-1">Pro-rata pelos dias de atraso</p>
+              </div>
             </div>
           </div>
 
