@@ -23,9 +23,9 @@ interface SchoolClass {
 }
 
 const targetLabel: Record<string, string> = {
-  ALL_SCHOOL: 'Toda a escola',
-  ALL_ADMINS: 'Todos os admins',
-  CLASS: 'Turma específica',
+  all_school: 'Toda a escola',
+  all_admins: 'Todos os admins',
+  class: 'Turma específica',
 };
 
 export default function CoordenadorNotificacoesPage() {
@@ -39,7 +39,7 @@ export default function CoordenadorNotificacoesPage() {
   const [form, setForm] = useState({
     title: '',
     message: '',
-    target: 'ALL_SCHOOL',
+    target: 'all_school',
     classId: '',
   });
 
@@ -72,11 +72,11 @@ export default function CoordenadorNotificacoesPage() {
         title: form.title,
         message: form.message,
         target: form.target,
-        ...(form.target === 'CLASS' && form.classId ? { classId: Number(form.classId) } : {}),
+        ...(form.target === 'class' && form.classId ? { classId: Number(form.classId) } : {}),
       });
       toast.success('Aviso criado com sucesso!');
       setShowDialog(false);
-      setForm({ title: '', message: '', target: 'ALL_SCHOOL', classId: '' });
+      setForm({ title: '', message: '', target: 'all_school', classId: '' });
       loadData();
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Erro ao criar aviso');
@@ -201,12 +201,12 @@ export default function CoordenadorNotificacoesPage() {
                   onChange={e => setForm({ ...form, target: e.target.value, classId: '' })}
                   className={inputCls}
                 >
-                  <option value="ALL_SCHOOL">Toda a escola</option>
-                  <option value="ALL_ADMINS">Todos os admins</option>
-                  <option value="CLASS">Turma específica</option>
+                  <option value="all_school">Toda a escola</option>
+                  <option value="all_admins">Todos os admins</option>
+                  <option value="class">Turma específica</option>
                 </select>
               </div>
-              {form.target === 'CLASS' && (
+              {form.target === 'class' && (
                 <div>
                   <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Turma *</label>
                   <select
