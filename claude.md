@@ -1,5 +1,12 @@
 # EduSaaS — Contexto do Projeto
 
+## Manutenção deste arquivo
+- Ao FIM de cada bloco de trabalho concluído (feature entregue, bug corrigido, decisão
+  de arquitetura tomada), o Claude Code deve PERGUNTAR: "Isso muda o CLAUDE.md?
+  Sugiro atualizar as seções X e Y — quer que eu aplique?"
+- Nunca alterar o CLAUDE.md sem confirmação explícita do Wallace.
+- O Wallace decide; o Claude Code lembra.
+
 ## Stack
 - Backend: NestJS + TypeORM + PostgreSQL (Supabase) — `edusaas-api`
 - Frontend: Next.js 14 + Tailwind + Shadcn/ui — `edusaas-web`
