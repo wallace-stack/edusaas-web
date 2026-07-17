@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
+import { usePermissions } from '../../../lib/permissions-context';
+import { canModifyNotification } from '../../../lib/notification-permissions';
 import { ArrowLeft, Plus, Bell, X, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -14,6 +16,7 @@ interface Notification {
   type?: string;
   target: string;
   classId?: number;
+  createdById?: number;
   createdAt: string;
 }
 
@@ -31,11 +34,14 @@ const targetLabel: Record<string, string> = {
 export default function CoordenadorNotificacoesPage() {
   const router = useRouter();
   const user = getUser();
+  const { can, loading: permsLoading } = usePermissions();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [loading, setLoading] = useState(true);
   const [showDialog, setShowDialog] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editNotif, setEditNotif] = useState<Notification | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
   const [form, setForm] = useState({
     title: '',
     message: '',
@@ -85,6 +91,19 @@ export default function CoordenadorNotificacoesPage() {
     }
   };
 
+  const handleDelete = async (id: number) => {
+    if (!confirm('Excluir este aviso?')) return;
+    try {
+      setDeleting(id);
+      await api.delete(`/notifications/${id}`);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erro ao excluir');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleDateString('pt-BR', {
       day: '2-digit', month: '2-digit', year: 'numeric',
@@ -92,6 +111,7 @@ export default function CoordenadorNotificacoesPage() {
     });
 
   const inputCls = "w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]";
+  const canCreate = can('criar_aviso_global') || can('criar_aviso_turma');
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
@@ -103,13 +123,15 @@ export default function CoordenadorNotificacoesPage() {
             </button>
             <h1 className="font-bold text-[#1E3A5F] dark:text-white">Avisos e Notificações</h1>
           </div>
-          <button
-            onClick={() => setShowDialog(true)}
-            className="flex items-center gap-2 bg-[#1E3A5F] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#162d4a] transition-colors"
-          >
-            <Plus size={16} />
-            Novo aviso
-          </button>
+          {!permsLoading && canCreate && (
+            <button
+              onClick={() => setShowDialog(true)}
+              className="flex items-center gap-2 bg-[#1E3A5F] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#162d4a] transition-colors"
+            >
+              <Plus size={16} />
+              Novo aviso
+            </button>
+          )}
         </div>
       </header>
 
@@ -124,12 +146,14 @@ export default function CoordenadorNotificacoesPage() {
               <Bell size={28} className="text-[#F97316]" />
             </div>
             <p className="text-gray-500 dark:text-gray-400 text-sm">Nenhum aviso criado ainda.</p>
-            <button
-              onClick={() => setShowDialog(true)}
-              className="mt-4 text-sm text-[#1E3A5F] dark:text-blue-400 font-medium hover:underline"
-            >
-              Criar o primeiro aviso →
-            </button>
+            {!permsLoading && canCreate && (
+              <button
+                onClick={() => setShowDialog(true)}
+                className="mt-4 text-sm text-[#1E3A5F] dark:text-blue-400 font-medium hover:underline"
+              >
+                Criar o primeiro aviso →
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-3">
@@ -154,7 +178,26 @@ export default function CoordenadorNotificacoesPage() {
                     )}
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 leading-relaxed">{n.message}</p>
-                  <p className="text-[11px] text-gray-400 dark:text-gray-500">{formatDate(n.createdAt)}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[11px] text-gray-400 dark:text-gray-500">{formatDate(n.createdAt)}</p>
+                    {!permsLoading && canModifyNotification(n, user, can) && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setEditNotif(n)}
+                          className="text-xs text-gray-400 hover:text-[#1E3A5F] dark:hover:text-white px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleDelete(n.id)}
+                          disabled={deleting === n.id}
+                          className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 transition-colors disabled:opacity-50"
+                        >
+                          {deleting === n.id ? '...' : 'Excluir'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
@@ -236,6 +279,59 @@ export default function CoordenadorNotificacoesPage() {
                   className="flex-1 py-2.5 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50"
                 >
                   {saving ? 'Enviando...' : 'Publicar aviso'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Dialog — editar aviso */}
+      {editNotif && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white">Editar aviso</h2>
+              <button onClick={() => setEditNotif(null)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                <X size={16} className="text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+            <form onSubmit={async e => {
+              e.preventDefault();
+              try {
+                await api.patch(`/notifications/${editNotif.id}`, {
+                  title: editNotif.title,
+                  message: editNotif.message,
+                });
+                setEditNotif(null);
+                loadData();
+              } catch (err: any) {
+                toast.error(err.response?.data?.message || 'Erro ao editar');
+              }
+            }} className="space-y-3">
+              <input
+                value={editNotif.title}
+                onChange={e => setEditNotif({ ...editNotif, title: e.target.value })}
+                placeholder="Título"
+                required
+                className={inputCls}
+              />
+              <textarea
+                value={editNotif.message}
+                onChange={e => setEditNotif({ ...editNotif, message: e.target.value })}
+                placeholder="Mensagem"
+                required
+                rows={4}
+                className={`${inputCls} resize-none`}
+              />
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setEditNotif(null)}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  Cancelar
+                </button>
+                <button type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a]">
+                  Salvar alterações
                 </button>
               </div>
             </form>
