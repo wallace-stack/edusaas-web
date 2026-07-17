@@ -62,12 +62,7 @@ Formato: `postgresql://postgres.xxrxxxhqoofwfifacndm:<SENHA>@aws-1-sa-east-1.poo
 
 ## Credenciais Demo — Colégio Horizonte
 
-| Papel | Email | Senha |
-|-------|-------|-------|
-| Diretora | erikacarolinajunqueiradasilva@gmail.com | Horizonte@2026 |
-| Coordenadora | patricia.sousa@horizonte.com | Horizonte@2026 |
-| Secretaria | marcos.oliveira@horizonte.com | Horizonte@2026 |
-| Aluno | sophia.ferreira@aluno.horizonte.com | Aluno@2026 |
+Usuários de teste: ver `CLAUDE.md` do `edusaas-api` (fonte única — não duplicar aqui, foi o que causou a divergência de 2026-07-17).
 
 ---
 
