@@ -1,0 +1,344 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { getUser } from '../../../lib/auth';
+import api from '../../../lib/api';
+import { usePermissions } from '../../../lib/permissions-context';
+import { canModifyNotification } from '../../../lib/notification-permissions';
+import { ArrowLeft, Plus, Bell, X, Heart } from 'lucide-react';
+import { toast } from 'sonner';
+
+interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  type?: string;
+  target: string;
+  classId?: number;
+  createdById?: number;
+  createdAt: string;
+}
+
+interface SchoolClass {
+  id: number;
+  name: string;
+}
+
+const targetLabel: Record<string, string> = {
+  all_school: 'Toda a escola',
+  all_admins: 'Todos os admins',
+  class: 'Turma específica',
+};
+
+const inputCls = "w-full px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]";
+
+export default function SecretariaNotificacoesPage() {
+  const router = useRouter();
+  const user = getUser();
+  const { can, loading: permsLoading } = usePermissions();
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [classes, setClasses] = useState<SchoolClass[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showDialog, setShowDialog] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [editNotif, setEditNotif] = useState<Notification | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
+  const [form, setForm] = useState({
+    title: '',
+    message: '',
+    target: 'all_school',
+    classId: '',
+  });
+
+  useEffect(() => {
+    if (!user) { router.push('/login'); return; }
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      const [notifRes, classesRes] = await Promise.all([
+        api.get('/notifications'),
+        api.get('/classes'),
+      ]);
+      setNotifications(notifRes.data);
+      setClasses(classesRes.data);
+      api.patch('/notifications/read-all').catch(() => {});
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await api.post('/notifications', {
+        title: form.title,
+        message: form.message,
+        target: form.target,
+        ...(form.target === 'class' && form.classId ? { classId: Number(form.classId) } : {}),
+      });
+      toast.success('Aviso criado com sucesso!');
+      setShowDialog(false);
+      setForm({ title: '', message: '', target: 'all_school', classId: '' });
+      loadData();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erro ao criar aviso');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Excluir este aviso?')) return;
+    try {
+      setDeleting(id);
+      await api.delete(`/notifications/${id}`);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erro ao excluir');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString('pt-BR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    });
+
+  const canCreate = can('criar_aviso_global') || can('criar_aviso_turma');
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
+      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+              <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
+            </button>
+            <h1 className="font-bold text-[#1E3A5F] dark:text-white">Avisos e Notificações</h1>
+          </div>
+          {!permsLoading && canCreate && (
+            <button
+              onClick={() => setShowDialog(true)}
+              className="flex items-center gap-2 bg-[#1E3A5F] text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#162d4a] transition-colors"
+            >
+              <Plus size={16} />
+              Novo aviso
+            </button>
+          )}
+        </div>
+      </header>
+
+      <main className="max-w-3xl mx-auto px-6 py-8">
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <div className="w-8 h-8 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : notifications.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 bg-orange-50 dark:bg-orange-950 rounded-2xl flex items-center justify-center mb-4">
+              <Bell size={28} className="text-[#F97316]" />
+            </div>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Nenhum aviso criado ainda.</p>
+            {!permsLoading && canCreate && (
+              <button
+                onClick={() => setShowDialog(true)}
+                className="mt-4 text-sm text-[#1E3A5F] dark:text-blue-400 font-medium hover:underline"
+              >
+                Criar o primeiro aviso →
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {notifications.map(n => {
+              const isSystemMsg = n.type === 'system_message';
+              return (
+                <div key={n.id} className={`rounded-2xl border p-5 ${isSystemMsg ? 'bg-pink-50/60 dark:bg-pink-950/30 border-pink-100 dark:border-pink-900' : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800'}`}>
+                  {isSystemMsg && (
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <div className="w-6 h-6 rounded-lg bg-pink-100 dark:bg-pink-900 flex items-center justify-center">
+                        <Heart size={12} className="text-pink-500" />
+                      </div>
+                      <span className="text-[10px] font-medium text-pink-500 uppercase tracking-wide">Mensagem do sistema</span>
+                    </div>
+                  )}
+                  <div className="flex items-start justify-between gap-3 mb-2">
+                    <h3 className="font-semibold text-[#1E3A5F] dark:text-white text-sm">{n.title}</h3>
+                    {!isSystemMsg && (
+                      <span className="text-[10px] px-2 py-0.5 bg-blue-50 dark:bg-blue-950 text-blue-600 rounded-full whitespace-nowrap flex-shrink-0">
+                        {targetLabel[n.target] ?? n.target}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 leading-relaxed">{n.message}</p>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[11px] text-gray-400 dark:text-gray-500">{formatDate(n.createdAt)}</p>
+                    {!permsLoading && canModifyNotification(n, user, can) && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setEditNotif(n)}
+                          className="text-xs text-gray-400 hover:text-[#1E3A5F] dark:hover:text-white px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleDelete(n.id)}
+                          disabled={deleting === n.id}
+                          className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 transition-colors disabled:opacity-50"
+                        >
+                          {deleting === n.id ? '...' : 'Excluir'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </main>
+
+      {/* Dialog — novo aviso */}
+      {showDialog && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white">Novo aviso</h2>
+              <button onClick={() => setShowDialog(false)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                <X size={16} className="text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+            <form onSubmit={handleCreate} className="space-y-3">
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Título *</label>
+                <input
+                  value={form.title}
+                  onChange={e => setForm({ ...form, title: e.target.value })}
+                  placeholder="Ex: Reunião de pais"
+                  required
+                  className={inputCls}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Mensagem *</label>
+                <textarea
+                  value={form.message}
+                  onChange={e => setForm({ ...form, message: e.target.value })}
+                  placeholder="Descreva o aviso..."
+                  required
+                  rows={4}
+                  className={`${inputCls} resize-none`}
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Destinatário *</label>
+                <select
+                  value={form.target}
+                  onChange={e => setForm({ ...form, target: e.target.value, classId: '' })}
+                  className={inputCls}
+                >
+                  <option value="all_school">Toda a escola</option>
+                  <option value="all_admins">Todos os admins</option>
+                  <option value="class">Turma específica</option>
+                </select>
+              </div>
+              {form.target === 'class' && (
+                <div>
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Turma *</label>
+                  <select
+                    value={form.classId}
+                    onChange={e => setForm({ ...form, classId: e.target.value })}
+                    required
+                    className={inputCls}
+                  >
+                    <option value="">Selecione uma turma</option>
+                    {classes.map(c => (
+                      <option key={c.id} value={c.id}>{c.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDialog(false)}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="flex-1 py-2.5 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50"
+                >
+                  {saving ? 'Enviando...' : 'Publicar aviso'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Dialog — editar aviso */}
+      {editNotif && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-md p-6 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white">Editar aviso</h2>
+              <button onClick={() => setEditNotif(null)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
+                <X size={16} className="text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+            <form onSubmit={async e => {
+              e.preventDefault();
+              try {
+                await api.patch(`/notifications/${editNotif.id}`, {
+                  title: editNotif.title,
+                  message: editNotif.message,
+                });
+                setEditNotif(null);
+                loadData();
+              } catch (err: any) {
+                toast.error(err.response?.data?.message || 'Erro ao editar');
+              }
+            }} className="space-y-3">
+              <input
+                value={editNotif.title}
+                onChange={e => setEditNotif({ ...editNotif, title: e.target.value })}
+                placeholder="Título"
+                required
+                className={inputCls}
+              />
+              <textarea
+                value={editNotif.message}
+                onChange={e => setEditNotif({ ...editNotif, message: e.target.value })}
+                placeholder="Mensagem"
+                required
+                rows={4}
+                className={`${inputCls} resize-none`}
+              />
+              <div className="flex gap-3 pt-2">
+                <button type="button" onClick={() => setEditNotif(null)}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                  Cancelar
+                </button>
+                <button type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a]">
+                  Salvar alterações
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
