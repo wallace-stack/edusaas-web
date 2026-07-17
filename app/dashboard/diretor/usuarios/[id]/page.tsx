@@ -18,29 +18,16 @@ import {
 // Tipos
 // ──────────────────────────────────────────────────────────────────────────────
 
-type PermissionKey =
-  | 'criar_aviso_global'
-  | 'criar_aviso_turma'
-  | 'editar_notas'
-  | 'lancar_financeiro'
-  | 'ver_relatorios_financeiros'
-  | 'matricular_aluno'
-  | 'editar_aluno'
-  | 'criar_turma'
-  | 'nomear_turma'
-  | 'gerenciar_professores_turma'
-  | 'editar_materias_turma'
-  | 'ver_chamadas_outras_turmas'
-  | 'receber_caderno_planejamento'
-  | 'configurar_modulo_infantil'
-  | 'editar_usuario'
-  | 'excluir_usuario'
-  | 'moderar_avisos';
-
 interface Permission {
   id: number;
-  permissionKey: PermissionKey;
+  permissionKey: string;
   granted: boolean;
+}
+
+interface PermissionKeyMeta {
+  key: string;
+  label: string;
+  category: string;
 }
 
 interface UserDetail {
@@ -61,58 +48,17 @@ interface PermissionsResponse {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// Labels e categorias das permissões
+// Categorias — vem de GET /permissions/keys (fim do hardcode, ver groupByCategory)
 // ──────────────────────────────────────────────────────────────────────────────
 
-const PERMISSION_LABELS: Record<PermissionKey, string> = {
-  criar_aviso_global: 'Criar avisos para toda a escola',
-  criar_aviso_turma: 'Criar avisos para turmas',
-  editar_notas: 'Lançar e editar notas',
-  lancar_financeiro: 'Lançar cobranças e pagamentos',
-  ver_relatorios_financeiros: 'Ver relatórios financeiros',
-  matricular_aluno: 'Matricular alunos em turmas',
-  editar_aluno: 'Editar dados de alunos',
-  criar_turma: 'Criar novas turmas',
-  nomear_turma: 'Nomear / renomear turmas',
-  gerenciar_professores_turma: 'Atribuir professores a turmas',
-  editar_materias_turma: 'Editar matérias das turmas',
-  ver_chamadas_outras_turmas: 'Ver chamadas de outras turmas',
-  receber_caderno_planejamento: 'Receber cadernos de planejamento',
-  configurar_modulo_infantil: 'Configurar módulo infantil',
-  editar_usuario: 'Editar dados de usuários',
-  excluir_usuario: 'Excluir / desativar usuários',
-  moderar_avisos: 'Moderar avisos (editar/excluir de outras pessoas)',
-};
-
-const CATEGORIES: { label: string; keys: PermissionKey[] }[] = [
-  {
-    label: 'Comunicação',
-    keys: ['criar_aviso_global', 'criar_aviso_turma', 'moderar_avisos'],
-  },
-  {
-    label: 'Acadêmico',
-    keys: [
-      'editar_notas',
-      'criar_turma',
-      'nomear_turma',
-      'gerenciar_professores_turma',
-      'editar_materias_turma',
-      'ver_chamadas_outras_turmas',
-    ],
-  },
-  {
-    label: 'Financeiro',
-    keys: ['lancar_financeiro', 'ver_relatorios_financeiros'],
-  },
-  {
-    label: 'Administrativo',
-    keys: ['matricular_aluno', 'editar_aluno', 'editar_usuario', 'excluir_usuario'],
-  },
-  {
-    label: 'Planejamento',
-    keys: ['receber_caderno_planejamento', 'configurar_modulo_infantil'],
-  },
-];
+function groupByCategory(keys: PermissionKeyMeta[]): { label: string; items: PermissionKeyMeta[] }[] {
+  const map = new Map<string, PermissionKeyMeta[]>();
+  for (const k of keys) {
+    if (!map.has(k.category)) map.set(k.category, []);
+    map.get(k.category)!.push(k);
+  }
+  return Array.from(map.entries()).map(([label, items]) => ({ label, items }));
+}
 
 const ROLE_LABEL: Record<string, string> = {
   director: 'Diretor',
@@ -145,7 +91,8 @@ export default function UserDetailPage() {
   const [tab, setTab] = useState<'dados' | 'permissoes'>(initialTab);
   const [userData, setUserData] = useState<UserDetail | null>(null);
   const [permsData, setPermsData] = useState<PermissionsResponse | null>(null);
-  const [grants, setGrants] = useState<Record<PermissionKey, boolean>>({} as any);
+  const [grants, setGrants] = useState<Record<string, boolean>>({});
+  const [permissionKeys, setPermissionKeys] = useState<PermissionKeyMeta[]>([]);
   const [loadingUser, setLoadingUser] = useState(true);
   const [loadingPerms, setLoadingPerms] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -161,18 +108,22 @@ export default function UserDetailPage() {
       .finally(() => setLoadingUser(false));
   }, [userId]);
 
-  // Carrega permissões ao trocar para aba de permissões
+  // Carrega permissões + chaves disponíveis ao trocar para aba de permissões
   const loadPermissions = useCallback(async () => {
     if (permsData) return; // já carregado
     setLoadingPerms(true);
     try {
-      const r = await api.get(`/permissions/user/${userId}`);
-      setPermsData(r.data);
+      const [permsRes, keysRes] = await Promise.all([
+        api.get(`/permissions/user/${userId}`),
+        api.get('/permissions/keys'),
+      ]);
+      setPermsData(permsRes.data);
+      setPermissionKeys(keysRes.data);
       const map: Record<string, boolean> = {};
-      r.data.permissions.forEach((p: Permission) => {
+      permsRes.data.permissions.forEach((p: Permission) => {
         map[p.permissionKey] = p.granted;
       });
-      setGrants(map as any);
+      setGrants(map);
     } catch (err) {
       console.error(err);
     } finally {
@@ -184,7 +135,7 @@ export default function UserDetailPage() {
     if (tab === 'permissoes') loadPermissions();
   }, [tab, loadPermissions]);
 
-  const handleToggle = (key: PermissionKey) => {
+  const handleToggle = (key: string) => {
     if (permsData?.isDirector) return;
     setGrants((prev) => ({ ...prev, [key]: !prev[key] }));
     setSaved(false);
@@ -196,7 +147,7 @@ export default function UserDetailPage() {
     setSaved(false);
     setSaveError('');
     try {
-      const permissions = (Object.keys(grants) as PermissionKey[]).map((key) => ({
+      const permissions = Object.keys(grants).map((key) => ({
         permissionKey: key,
         granted: grants[key],
       }));
@@ -319,19 +270,19 @@ export default function UserDetailPage() {
 
                 {/* Mostra todos como ativados e travados */}
                 <div className="mt-8 space-y-6 text-left">
-                  {CATEGORIES.map((cat) => (
+                  {groupByCategory(permissionKeys).map((cat) => (
                     <div key={cat.label}>
                       <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">
                         {cat.label}
                       </p>
                       <div className="space-y-2">
-                        {cat.keys.map((key) => (
+                        {cat.items.map(({ key, label }) => (
                           <div
                             key={key}
                             className="flex items-center justify-between py-3 px-4 rounded-xl bg-gray-50 dark:bg-gray-800"
                           >
                             <span className="text-sm text-gray-700 dark:text-gray-300">
-                              {PERMISSION_LABELS[key]}
+                              {label}
                             </span>
                             <ToggleSwitch checked={true} locked />
                           </div>
@@ -344,7 +295,7 @@ export default function UserDetailPage() {
             ) : (
               /* Usuário normal — toggles editáveis */
               <div className="space-y-6">
-                {CATEGORIES.map((cat) => (
+                {groupByCategory(permissionKeys).map((cat) => (
                   <div
                     key={cat.label}
                     className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6"
@@ -353,7 +304,7 @@ export default function UserDetailPage() {
                       {cat.label}
                     </p>
                     <div className="space-y-2">
-                      {cat.keys.map((key) => (
+                      {cat.items.map(({ key, label }) => (
                         <button
                           key={key}
                           type="button"
@@ -361,7 +312,7 @@ export default function UserDetailPage() {
                           className="w-full flex items-center justify-between py-3 px-4 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group"
                         >
                           <span className="text-sm text-gray-700 dark:text-gray-300 text-left">
-                            {PERMISSION_LABELS[key]}
+                            {label}
                           </span>
                           <ToggleSwitch checked={grants[key] ?? false} />
                         </button>
