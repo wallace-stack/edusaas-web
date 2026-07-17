@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
+import { usePermissions } from '../../../lib/permissions-context';
+import { canModifyNotification } from '../../../lib/notification-permissions';
 import { ArrowLeft, Bell, Plus, X, BookOpen, AlertTriangle, XCircle, Megaphone, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -15,6 +17,7 @@ interface Notification {
   type: string;
   createdAt: string;
   isRead: boolean;
+  createdById?: number;
   class?: { name: string };
 }
 
@@ -39,6 +42,7 @@ const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border
 export default function ProfessorNotificacoesPage() {
   const router = useRouter();
   const user = getUser();
+  const { can, loading: permsLoading } = usePermissions();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [loading, setLoading] = useState(true);
@@ -171,21 +175,23 @@ export default function ProfessorNotificacoesPage() {
                             <span className="text-xs text-gray-400 dark:text-gray-500">· {n.class.name}</span>
                           )}
                         </div>
-                        <div className="flex items-center gap-1">
-                          <button
-                            onClick={e => { e.stopPropagation(); setEditNotif(n); }}
-                            className="text-xs text-gray-400 hover:text-[#1E3A5F] dark:hover:text-white px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                          >
-                            Editar
-                          </button>
-                          <button
-                            onClick={e => { e.stopPropagation(); handleDelete(n.id); }}
-                            disabled={deleting === n.id}
-                            className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 transition-colors disabled:opacity-50"
-                          >
-                            {deleting === n.id ? '...' : 'Excluir'}
-                          </button>
-                        </div>
+                        {!permsLoading && canModifyNotification(n, user, can) && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={e => { e.stopPropagation(); setEditNotif(n); }}
+                              className="text-xs text-gray-400 hover:text-[#1E3A5F] dark:hover:text-white px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            >
+                              Editar
+                            </button>
+                            <button
+                              onClick={e => { e.stopPropagation(); handleDelete(n.id); }}
+                              disabled={deleting === n.id}
+                              className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950 transition-colors disabled:opacity-50"
+                            >
+                              {deleting === n.id ? '...' : 'Excluir'}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
