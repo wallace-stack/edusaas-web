@@ -34,7 +34,8 @@ type PermissionKey =
   | 'receber_caderno_planejamento'
   | 'configurar_modulo_infantil'
   | 'editar_usuario'
-  | 'excluir_usuario';
+  | 'excluir_usuario'
+  | 'moderar_avisos';
 
 interface Permission {
   id: number;
@@ -80,12 +81,13 @@ const PERMISSION_LABELS: Record<PermissionKey, string> = {
   configurar_modulo_infantil: 'Configurar módulo infantil',
   editar_usuario: 'Editar dados de usuários',
   excluir_usuario: 'Excluir / desativar usuários',
+  moderar_avisos: 'Moderar avisos (editar/excluir de outras pessoas)',
 };
 
 const CATEGORIES: { label: string; keys: PermissionKey[] }[] = [
   {
     label: 'Comunicação',
-    keys: ['criar_aviso_global', 'criar_aviso_turma'],
+    keys: ['criar_aviso_global', 'criar_aviso_turma', 'moderar_avisos'],
   },
   {
     label: 'Acadêmico',
