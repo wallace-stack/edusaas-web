@@ -6,7 +6,7 @@ import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import {
   ArrowLeft, Plus, X, Heart, Zap, Smile, Star, BookOpen,
-  ToggleLeft, ToggleRight, Pencil, Send,
+  ToggleLeft, ToggleRight, Pencil, Send, Trash2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -20,6 +20,7 @@ interface SystemMessage {
   isActive: boolean;
   sentCount: number;
   createdAt: string;
+  schoolId?: number;
 }
 
 const categoryConfig: Record<Category, { label: string; color: string; icon: any }> = {
@@ -105,6 +106,17 @@ export default function MensagensSistemaPage() {
       toast.success(msg.isActive ? 'Mensagem desativada.' : 'Mensagem ativada!');
     } catch {
       toast.error('Erro ao alterar status.');
+    }
+  };
+
+  const handleDelete = async (msg: SystemMessage) => {
+    if (!confirm('Excluir esta mensagem?')) return;
+    try {
+      await api.delete(`/notifications/system-messages/${msg.id}`);
+      setMessages(prev => prev.filter(m => m.id !== msg.id));
+      toast.success('Mensagem excluída.');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erro ao excluir mensagem.');
     }
   };
 
@@ -231,23 +243,34 @@ export default function MensagensSistemaPage() {
                       )}
                     </div>
 
-                    {/* Ações */}
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <button
-                        onClick={() => openEdit(msg)}
-                        className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                        title="Editar"
-                      >
-                        <Pencil size={14} />
-                      </button>
-                      <button
-                        onClick={() => handleToggle(msg)}
-                        className={`p-1.5 rounded-lg ${msg.isActive ? 'text-green-500 hover:bg-green-50 dark:hover:bg-green-950' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-                        title={msg.isActive ? 'Desativar' : 'Ativar'}
-                      >
-                        {msg.isActive ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
-                      </button>
-                    </div>
+                    {/* Ações — só nas mensagens da própria escola (schoolId preenchido);
+                        as globais da plataforma (schoolId NULL) o backend nega com 403,
+                        então nem mostramos o botão pra não prometer uma ação que vai falhar. */}
+                    {msg.schoolId && (
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button
+                          onClick={() => openEdit(msg)}
+                          className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                          title="Editar"
+                        >
+                          <Pencil size={14} />
+                        </button>
+                        <button
+                          onClick={() => handleToggle(msg)}
+                          className={`p-1.5 rounded-lg ${msg.isActive ? 'text-green-500 hover:bg-green-50 dark:hover:bg-green-950' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                          title={msg.isActive ? 'Desativar' : 'Ativar'}
+                        >
+                          {msg.isActive ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(msg)}
+                          className="p-1.5 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg text-red-400 hover:text-red-600"
+                          title="Excluir"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
