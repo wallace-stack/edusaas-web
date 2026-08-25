@@ -8,6 +8,7 @@ import { ArrowLeft, Plus, Search, X, ChevronRight, Upload, Download } from 'luci
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
 import ImportarAlunosCSV from '@/components/ImportarAlunosCSV';
+import EnrollmentActions from '@/components/EnrollmentActions';
 
 interface Student {
   id: number;
@@ -62,12 +63,6 @@ export default function SecretariaAlunosPage() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [turmaFilter, setTurmaFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [transferClassId, setTransferClassId] = useState('');
-  const [transferring, setTransferring] = useState(false);
-  const [deactivating, setDeactivating] = useState(false);
-  const [confirmDeactivate, setConfirmDeactivate] = useState(false);
-  const [unenrolling, setUnenrolling] = useState(false);
-  const [confirmUnenroll, setConfirmUnenroll] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -117,7 +112,6 @@ export default function SecretariaAlunosPage() {
 
   const handleSelectStudent = (s: Student) => {
     setSelectedStudent(s);
-    setTransferClassId('');
     setEditing(false);
     setEditForm({
       name: s.name || '',
@@ -143,56 +137,6 @@ export default function SecretariaAlunosPage() {
       toast.error('Erro ao salvar dados.');
     } finally {
       setEditSaving(false);
-    }
-  };
-
-  const handleTransfer = async () => {
-    if (!selectedStudent || !transferClassId) return;
-    try {
-      setTransferring(true);
-      await api.post('/enrollments/transfer', {
-        studentId: selectedStudent.id,
-        newClassId: Number(transferClassId),
-      });
-      setSelectedStudent(null);
-      setTransferClassId('');
-      loadData();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Erro ao matricular');
-    } finally {
-      setTransferring(false);
-    }
-  };
-
-  const handleDeactivate = async () => {
-    if (!selectedStudent) return;
-    try {
-      setDeactivating(true);
-      await api.delete(`/secretary/users/${selectedStudent.id}`);
-      toast.success(`${selectedStudent.name} foi removido com sucesso.`);
-      setSelectedStudent(null);
-      setConfirmDeactivate(false);
-      loadData();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Erro ao remover aluno');
-    } finally {
-      setDeactivating(false);
-    }
-  };
-
-  const handleUnenroll = async () => {
-    if (!selectedStudent?.enrollmentId) return;
-    try {
-      setUnenrolling(true);
-      await api.delete(`/enrollments/${selectedStudent.enrollmentId}`);
-      toast.success(`${selectedStudent.name} foi desmatriculado da turma.`);
-      setSelectedStudent(null);
-      setConfirmUnenroll(false);
-      loadData();
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Erro ao desmatricular aluno');
-    } finally {
-      setUnenrolling(false);
     }
   };
 
@@ -614,7 +558,7 @@ export default function SecretariaAlunosPage() {
                     Editar
                   </button>
                 )}
-                <button onClick={() => { setSelectedStudent(null); setConfirmDeactivate(false); setEditing(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
+                <button onClick={() => { setSelectedStudent(null); setEditing(false); }} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
                   <X size={18} />
                 </button>
               </div>
@@ -729,102 +673,14 @@ export default function SecretariaAlunosPage() {
                 <p className="text-xs text-gray-400 mb-0.5">Turma atual</p>
                 <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.class?.name ?? 'Não matriculado'}</p>
               </div>
-              <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
-                <p className="text-xs text-gray-400 mb-2">
-                  {selectedStudent?.class ? 'Transferir para outra turma' : 'Matricular em uma turma'}
-                </p>
-                <select
-                  value={transferClassId}
-                  onChange={e => setTransferClassId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-700 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] mb-2"
-                >
-                  <option value="">Selecione a turma</option>
-                  {classes.map(c => (
-                    <option key={c.id} value={c.id}>{c.name} — {c.year}</option>
-                  ))}
-                </select>
-                <button
-                  onClick={handleTransfer}
-                  disabled={!transferClassId || transferring}
-                  className="w-full py-2.5 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50 transition-colors"
-                >
-                  {transferring ? 'Salvando...' : selectedStudent?.class ? 'Confirmar transferência' : 'Matricular nesta turma'}
-                </button>
-              </div>
-
-              {/* Desmatricular (mantém conta ativa, só tira da turma) */}
-              {selectedStudent.enrollmentId != null && (
-                <div className="pt-2">
-                  {!confirmUnenroll ? (
-                    <button
-                      onClick={() => setConfirmUnenroll(true)}
-                      className="w-full py-2.5 rounded-xl border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 text-sm font-medium hover:bg-amber-50 dark:hover:bg-amber-950 transition-colors"
-                    >
-                      Desmatricular
-                    </button>
-                  ) : (
-                    <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-xl p-3 space-y-2">
-                      <p className="text-xs text-amber-800 dark:text-amber-300 font-medium text-center">
-                        Desmatricular {selectedStudent.name} da turma {selectedStudent.class?.name ?? ''}?
-                      </p>
-                      <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
-                        O aluno continua ativo no sistema, mas sem turma até ser matriculado novamente.
-                      </p>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setConfirmUnenroll(false)}
-                          className="flex-1 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
-                        >
-                          Cancelar
-                        </button>
-                        <button
-                          onClick={handleUnenroll}
-                          disabled={unenrolling}
-                          className="flex-1 py-2 rounded-xl bg-amber-500 text-white text-xs font-medium hover:bg-amber-600 disabled:opacity-50 transition-colors"
-                        >
-                          {unenrolling ? 'Desmatriculando...' : 'Confirmar'}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Desativar conta */}
-              <div className="pt-2">
-                {!confirmDeactivate ? (
-                  <button
-                    onClick={() => setConfirmDeactivate(true)}
-                    className="w-full py-2.5 rounded-xl border border-red-200 dark:border-red-800 text-red-500 dark:text-red-400 text-sm font-medium hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
-                  >
-                    Desativar conta
-                  </button>
-                ) : (
-                  <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-xl p-3 space-y-2">
-                    <p className="text-xs text-red-700 dark:text-red-300 font-medium text-center">
-                      Confirmar desativação de {selectedStudent.name}?
-                    </p>
-                    <p className="text-xs text-red-500 dark:text-red-400 text-center">
-                      O aluno perderá acesso ao sistema{selectedStudent.enrollmentId != null ? ' e a matrícula ativa será cancelada' : ''}.
-                    </p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setConfirmDeactivate(false)}
-                        className="flex-1 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        onClick={handleDeactivate}
-                        disabled={deactivating}
-                        className="flex-1 py-2 rounded-xl bg-red-500 text-white text-xs font-medium hover:bg-red-600 disabled:opacity-50 transition-colors"
-                      >
-                        {deactivating ? 'Desativando...' : 'Confirmar desativação'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <EnrollmentActions
+                studentId={selectedStudent.id}
+                studentName={selectedStudent.name}
+                className={selectedStudent.class?.name ?? null}
+                enrollmentId={selectedStudent.enrollmentId}
+                classes={classes}
+                onDone={() => { setSelectedStudent(null); loadData(); }}
+              />
             </div>
           </div>
         </div>

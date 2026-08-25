@@ -6,6 +6,7 @@ import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import { ArrowLeft, Search, Users, AlertTriangle } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
+import EnrollmentActions from '@/components/EnrollmentActions';
 
 interface Student {
   id: number;
@@ -33,6 +34,7 @@ interface StudentDetail {
   guardianName?: string | null;
   guardianPhone?: string | null;
   guardianRelation?: string | null;
+  enrollmentId?: number | null;
 }
 
 const situationConfig: Record<string, { label: string; cls: string }> = {
@@ -72,6 +74,7 @@ function CoordenadorAlunosContent() {
   const filtroUrl = searchParams.get('filtro');
   const user = getUser();
   const [students, setStudents] = useState<Student[]>([]);
+  const [classes, setClasses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [turmaFilter, setTurmaFilter] = useState('');
@@ -96,6 +99,10 @@ function CoordenadorAlunosContent() {
     } finally {
       setLoading(false);
     }
+    try {
+      const r = await api.get('/secretary/classes');
+      setClasses(r.data);
+    } catch (err) { console.error(err); }
   };
 
   const openDetail = async (s: Student) => {
@@ -343,6 +350,15 @@ function CoordenadorAlunosContent() {
                     )}
                   </div>
                 )}
+
+                <EnrollmentActions
+                  studentId={detail.id}
+                  studentName={detail.name}
+                  className={detail.className ?? detail.class?.name ?? null}
+                  enrollmentId={detail.enrollmentId}
+                  classes={classes}
+                  onDone={() => { setSheetOpen(false); setDetail(null); loadStudents(); }}
+                />
               </div>
             ) : null}
           </div>
