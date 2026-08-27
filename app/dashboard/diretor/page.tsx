@@ -138,7 +138,10 @@ export default function DiretorDashboard() {
 
         {/* Acadêmico + Financeiro */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
+          <button
+            onClick={() => router.push('/dashboard/diretor/alunos?filtro=risco-academico')}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-left"
+          >
             <div className="w-9 h-9 bg-green-50 dark:bg-green-950 rounded-xl flex items-center justify-center mb-3">
               <TrendingUp size={18} className="text-green-600" />
             </div>
@@ -146,9 +149,12 @@ export default function DiretorDashboard() {
               {avgGrade}
             </p>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Média geral</p>
-          </div>
+          </button>
 
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
+          <button
+            onClick={() => router.push('/dashboard/diretor/alunos?filtro=baixa-frequencia')}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-left"
+          >
             <div className="w-9 h-9 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center mb-3">
               <CheckSquare size={18} className="text-blue-600" />
             </div>
@@ -156,9 +162,12 @@ export default function DiretorDashboard() {
               {data?.academic.avgAttendance || '0%'}
             </p>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Frequência média</p>
-          </div>
+          </button>
 
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
+          <button
+            onClick={() => router.push('/dashboard/diretor/financeiro?status=inadimplente')}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 text-left"
+          >
             <div className="w-9 h-9 bg-emerald-50 dark:bg-emerald-950 rounded-xl flex items-center justify-center mb-3">
               <DollarSign size={18} className="text-emerald-600" />
             </div>
@@ -166,7 +175,7 @@ export default function DiretorDashboard() {
               {data?.financial?.defaultRate || '0%'}
             </p>
             <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Taxa de inadimplência</p>
-          </div>
+          </button>
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800">
             <div className="w-9 h-9 bg-gray-50 dark:bg-gray-800 rounded-xl flex items-center justify-center mb-3">
@@ -229,8 +238,11 @@ export default function DiretorDashboard() {
         {data?.attendance && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
             {/* Rosca — frequência geral */}
-            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4">
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência Geral da Escola</p>
+            <button
+              onClick={() => router.push('/dashboard/diretor/alunos?filtro=baixa-frequencia')}
+              className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
+            >
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência Geral da Escola — clique para ver alunos</p>
               <div className="flex items-center gap-6">
                 <div className="relative" style={{ width: 140, height: 140, flexShrink: 0 }}>
                   <Doughnut
@@ -258,12 +270,15 @@ export default function DiretorDashboard() {
                   </div>
                 </div>
               </div>
-            </div>
+            </button>
 
             {/* Barras — frequência por turma */}
             {data.attendance.classAttendance?.length > 0 && (
-              <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência Média por Turma</p>
+              <button
+                onClick={() => router.push('/dashboard/diretor/alunos?filtro=baixa-frequencia')}
+                className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
+              >
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência Média por Turma — clique para ver alunos</p>
                 <div style={{ height: 180 }}>
                   <Bar
                     data={{
@@ -283,7 +298,7 @@ export default function DiretorDashboard() {
                     }}
                   />
                 </div>
-              </div>
+              </button>
             )}
           </div>
         )}

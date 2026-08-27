@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getUser, getToken } from '../../../lib/auth';
 import api from '../../../lib/api';
 import { ArrowLeft, DollarSign, TrendingUp, AlertTriangle, Users, Search, Download, FileText } from 'lucide-react';
@@ -39,12 +39,25 @@ function fmt(val: number) {
 const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
 export default function DiretorFinanceiroPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <DiretorFinanceiroContent />
+    </Suspense>
+  );
+}
+
+function DiretorFinanceiroContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const user = getUser();
   const [data, setData] = useState<FinancialData | null>(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') === 'inadimplente' ? 'Inadimplente' : '');
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
   const [exportingContab, setExportingContab] = useState(false);

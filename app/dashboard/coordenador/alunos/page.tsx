@@ -128,11 +128,11 @@ function CoordenadorAlunosContent() {
       s.email.toLowerCase().includes(search.toLowerCase());
     const matchTurma = !turmaFilter || (s.className ?? s.class?.name) === turmaFilter;
 
-    // Filtro via URL (?filtro=frequencia_irregular ou ?filtro=risco_academico)
+    // Filtro via URL (?filtro=baixa-frequencia ou ?filtro=risco-academico)
     let matchFiltroUrl = true;
-    if (filtroUrl === 'frequencia_irregular') {
+    if (filtroUrl === 'baixa-frequencia') {
       matchFiltroUrl = s.attendanceRate != null && s.attendanceRate < 75;
-    } else if (filtroUrl === 'risco_academico') {
+    } else if (filtroUrl === 'risco-academico') {
       matchFiltroUrl = s.situation === 'RECOVERY' || s.situation === 'FAILED';
     }
 
@@ -158,8 +158,8 @@ function CoordenadorAlunosContent() {
           <div className="flex items-center gap-2 mb-4 px-4 py-2.5 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-xl">
             <AlertTriangle size={14} className="text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
             <span className="text-sm text-yellow-800 dark:text-yellow-300 flex-1">
-              {filtroUrl === 'frequencia_irregular' && '⚠️ Exibindo: alunos com frequência irregular (abaixo de 75%)'}
-              {filtroUrl === 'risco_academico' && '⚠️ Exibindo: alunos em risco acadêmico (recuperação ou reprovados)'}
+              {filtroUrl === 'baixa-frequencia' && '⚠️ Exibindo: alunos com frequência irregular (abaixo de 75%)'}
+              {filtroUrl === 'risco-academico' && '⚠️ Exibindo: alunos em risco acadêmico (recuperação ou reprovados)'}
             </span>
             <button
               onClick={() => router.push(window.location.pathname)}

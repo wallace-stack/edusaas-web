@@ -170,6 +170,8 @@ export default function SecretariaFinanceiroPage() {
   const [tuitions, setTuitions] = useState<Tuition[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Default já é 'overdue' — cobre o link do dashboard da secretaria (?status=inadimplente)
+  // sem precisar ler a querystring; não há outro valor de status linkado hoje.
   const [activeTab, setActiveTab] = useState<'overdue' | 'pending' | 'paid'>('overdue');
   const [search, setSearch] = useState('');
 

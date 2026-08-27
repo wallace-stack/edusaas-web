@@ -147,7 +147,7 @@ export default function CoordenadorDashboard() {
           </button>
 
           <button
-            onClick={() => router.push('/dashboard/coordenador/alunos?filtro=risco_academico')}
+            onClick={() => router.push('/dashboard/coordenador/alunos?filtro=risco-academico')}
             className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-red-300 dark:hover:border-red-700 hover:shadow-sm hover:scale-[1.02] transition-all duration-150 text-left"
           >
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-red-50 dark:bg-red-950 rounded-xl flex items-center justify-center mb-3">
@@ -163,7 +163,7 @@ export default function CoordenadorDashboard() {
           </button>
 
           <button
-            onClick={() => router.push('/dashboard/coordenador/alunos?filtro=frequencia_irregular')}
+            onClick={() => router.push('/dashboard/coordenador/alunos?filtro=baixa-frequencia')}
             className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-orange-300 dark:hover:border-orange-700 hover:shadow-sm hover:scale-[1.02] transition-all duration-150 text-left"
           >
             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-orange-50 dark:bg-orange-950 rounded-xl flex items-center justify-center mb-3">
@@ -179,7 +179,7 @@ export default function CoordenadorDashboard() {
         {/* Alertas */}
         {data?.alerts.gradesAlert && (
           <div
-            onClick={() => router.push('/dashboard/coordenador/alunos?filtro=risco_academico')}
+            onClick={() => router.push('/dashboard/coordenador/alunos?filtro=risco-academico')}
             className="bg-red-50 dark:bg-red-950 border border-red-100 dark:border-red-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-3 cursor-pointer hover:border-red-300 dark:hover:border-red-600 transition-colors"
           >
             <div className="flex items-center gap-3 flex-1">
@@ -193,7 +193,7 @@ export default function CoordenadorDashboard() {
         )}
         {data?.alerts.attendanceAlert && (
           <div
-            onClick={() => router.push('/dashboard/coordenador/alunos?filtro=frequencia_irregular')}
+            onClick={() => router.push('/dashboard/coordenador/alunos?filtro=baixa-frequencia')}
             className="bg-orange-50 dark:bg-orange-950 border border-orange-100 dark:border-orange-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4 cursor-pointer hover:border-orange-300 dark:hover:border-orange-600 transition-colors"
           >
             <div className="flex items-center gap-3 flex-1">
@@ -252,7 +252,7 @@ export default function CoordenadorDashboard() {
             {/* Barras — frequência por turma */}
             {(data.classAttendance?.length ?? 0) > 0 && (
               <button
-                onClick={() => router.push('/dashboard/coordenador/alunos?filtro=frequencia_irregular')}
+                onClick={() => router.push('/dashboard/coordenador/alunos?filtro=baixa-frequencia')}
                 className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
               >
                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência por Turma — clique para ver irregulares</p>

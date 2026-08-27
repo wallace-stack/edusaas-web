@@ -125,7 +125,10 @@ export default function SecretariaDashboard() {
 
         {/* Cards de métricas */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
+          <button
+            onClick={() => router.push('/dashboard/secretaria/alunos')}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 text-left"
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center">
                 <Users size={20} className="text-blue-600" />
@@ -134,9 +137,12 @@ export default function SecretariaDashboard() {
             </div>
             <p className="text-3xl font-bold text-[#1E3A5F] dark:text-white">{data?.totalStudents ?? 0}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Total de Alunos</p>
-          </div>
+          </button>
 
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
+          <button
+            onClick={() => router.push('/dashboard/secretaria/turmas')}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 text-left"
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 bg-purple-50 dark:bg-purple-950 rounded-xl flex items-center justify-center">
                 <BookOpen size={20} className="text-purple-600" />
@@ -145,9 +151,12 @@ export default function SecretariaDashboard() {
             </div>
             <p className="text-3xl font-bold text-[#1E3A5F] dark:text-white">{data?.totalClasses ?? 0}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Total de Turmas</p>
-          </div>
+          </button>
 
-          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
+          <button
+            onClick={() => router.push('/dashboard/secretaria/financeiro?status=inadimplente')}
+            className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800 cursor-pointer hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm hover:scale-[1.02] active:scale-[0.98] transition-all duration-150 text-left"
+          >
             <div className="flex items-center justify-between mb-4">
               <div className="w-10 h-10 bg-red-50 dark:bg-red-950 rounded-xl flex items-center justify-center">
                 <AlertTriangle size={20} className="text-red-500" />
@@ -158,7 +167,7 @@ export default function SecretariaDashboard() {
             </div>
             <p className="text-3xl font-bold text-red-500">{data?.totalDefaulters ?? 0}</p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Inadimplentes</p>
-          </div>
+          </button>
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-100 dark:border-gray-800">
             <div className="flex items-center justify-between mb-4">
