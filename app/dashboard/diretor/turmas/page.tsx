@@ -7,6 +7,7 @@ import api from '../../../lib/api';
 import { ArrowLeft, Plus, BookOpen, Users, TrendingUp, CheckSquare, X, ChevronRight, Phone, MapPin, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { maskCPF } from '../../../lib/utils';
+import EnrollmentActions from '@/components/EnrollmentActions';
 
 interface SchoolClass {
   id: number;
@@ -35,6 +36,7 @@ interface StudentDetail {
   guardianPhone?: string | null;
   guardianRelation?: string | null;
   isActive: boolean;
+  enrollmentId?: number | null;
 }
 
 function initials(name: string) {
@@ -399,6 +401,18 @@ export default function DiretorTurmasPage() {
                       <InfoRow label="Telefone" value={selectedStudent.guardianPhone} />
                     </div>
                   </div>
+
+                  <EnrollmentActions
+                    studentId={selectedStudent.id}
+                    studentName={selectedStudent.name}
+                    className={studentsClass?.name ?? null}
+                    enrollmentId={selectedStudent.enrollmentId}
+                    classes={classes}
+                    onDone={() => {
+                      setSelectedStudent(null);
+                      if (studentsClass) openStudentsDrawer(studentsClass);
+                    }}
+                  />
                 </div>
               )}
             </div>
