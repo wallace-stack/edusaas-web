@@ -130,7 +130,7 @@ function DiretorFinanceiroContent() {
     maintainAspectRatio: false,
     animation: { duration: 800 },
     plugins: {
-      legend: { position: 'top' as const },
+      legend: { position: 'top' as const, onClick: () => {} }, // legenda é só rótulo — clique não deve esconder a série
       tooltip: {
         callbacks: {
           label: (ctx: any) => ` ${fmt(ctx.raw)}`,
@@ -160,7 +160,7 @@ function DiretorFinanceiroContent() {
     animation: { duration: 800 },
     cutout: '65%',
     plugins: {
-      legend: { position: 'top' as const },
+      legend: { position: 'top' as const, onClick: () => {} }, // legenda é só rótulo — clique não deve esconder a série
       tooltip: {
         callbacks: {
           label: (ctx: any) => {

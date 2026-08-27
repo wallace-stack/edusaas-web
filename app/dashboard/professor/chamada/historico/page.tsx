@@ -197,7 +197,7 @@ export default function ProfessorChamadaHistoricoPage() {
     maintainAspectRatio: false,
     animation: { duration: 700 },
     plugins: {
-      legend: { position: 'bottom' as const },
+      legend: { position: 'bottom' as const, onClick: () => {} }, // legenda é só rótulo — clique não deve esconder a série
       tooltip: { callbacks: { label: (ctx: any) => ctx.raw != null ? ` ${ctx.raw}% de presença` : ' Sem dados' } },
     },
     scales: {
