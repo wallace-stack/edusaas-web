@@ -24,7 +24,7 @@ interface FinancialData {
   mensalidadeUnitaria: number;
   totalEsperado: number;
   totalRecebido: number;
-  totalInadimplente: number;
+  taxaInadimplencia: number;
   adimplentes: number;
   inadimplentes: number;
   taxaAdimplencia: number;
@@ -240,15 +240,15 @@ function DiretorFinanceiroContent() {
             <div className="w-9 h-9 bg-red-50 dark:bg-red-950 rounded-xl flex items-center justify-center mb-3">
               <AlertTriangle size={18} className="text-red-500" />
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Inadimplência</p>
-            <p className="text-xl font-bold text-red-500">{fmt(data.totalInadimplente)}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Inadimplência do mês (valor)</p>
+            <p className="text-xl font-bold text-red-500">{data.taxaInadimplencia}%</p>
           </div>
 
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
             <div className="w-9 h-9 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center mb-3">
               <Users size={18} className="text-blue-600" />
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Taxa de adimplência</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Alunos com mensalidade paga no mês</p>
             <p className="text-xl font-bold text-blue-600">{data.taxaAdimplencia}%</p>
           </div>
         </div>
