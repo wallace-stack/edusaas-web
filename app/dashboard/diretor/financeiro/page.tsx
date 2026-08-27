@@ -36,6 +36,8 @@ function fmt(val: number) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 }
 
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
 export default function DiretorFinanceiroPage() {
   const router = useRouter();
   const user = getUser();
@@ -50,11 +52,12 @@ export default function DiretorFinanceiroPage() {
 
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
-    api.get('/metrics/director/financial')
+    setLoading(true);
+    api.get('/metrics/director/financial', { params: { month, year } })
       .then(r => setData(r.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [month, year]);
 
   const handleExport = async (tipo: 'contabilidade' | 'completo') => {
     const setter = tipo === 'contabilidade' ? setExportingContab : setExportingCompleto;
@@ -183,6 +186,25 @@ export default function DiretorFinanceiroPage() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
 
+        {/* Período — governa toda a tela (gráficos, lista e export) */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Período</span>
+          <select
+            value={month}
+            onChange={e => setMonth(Number(e.target.value))}
+            className="text-xs px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+          >
+            {MONTHS.map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
+          </select>
+          <select
+            value={year}
+            onChange={e => setYear(Number(e.target.value))}
+            className="text-xs px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
+          >
+            {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
+          </select>
+        </div>
+
         {/* Cards de resumo */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
           <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 sm:p-5 border border-gray-100 dark:border-gray-800 shadow-sm">
@@ -255,25 +277,11 @@ export default function DiretorFinanceiroPage() {
 
         {/* Exportar */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm p-4 sm:p-5">
-          <h2 className="text-sm font-semibold text-[#1E3A5F] dark:text-white mb-3">Exportar relatórios</h2>
+          <h2 className="text-sm font-semibold text-[#1E3A5F] dark:text-white mb-1">Exportar relatórios</h2>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
+            Exportando dados de {MONTHS[month - 1]}/{year} — troque o período no topo da página.
+          </p>
           <div className="flex flex-wrap items-center gap-3">
-            {/* Filtro de período */}
-            <select
-              value={month}
-              onChange={e => setMonth(Number(e.target.value))}
-              className="text-xs px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
-            >
-              {['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro']
-                .map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
-            </select>
-            <select
-              value={year}
-              onChange={e => setYear(Number(e.target.value))}
-              className="text-xs px-2 py-1.5 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
-            >
-              {[2024, 2025, 2026, 2027].map(y => <option key={y} value={y}>{y}</option>)}
-            </select>
-
             <div className="flex gap-2 flex-wrap">
               <button
                 onClick={() => handleExport('contabilidade')}
@@ -298,7 +306,10 @@ export default function DiretorFinanceiroPage() {
         {/* Tabela de alunos */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
           <div className="p-4 sm:p-5 border-b border-gray-100 dark:border-gray-800">
-            <h2 className="text-sm font-semibold text-[#1E3A5F] dark:text-white mb-3">Status Financeiro por Aluno</h2>
+            <h2 className="text-sm font-semibold text-[#1E3A5F] dark:text-white mb-1">Status Financeiro por Aluno</h2>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
+              Mensalidades de {MONTHS[month - 1]}/{year} — o filtro de status abaixo busca dentro desse período.
+            </p>
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="relative flex-1">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
