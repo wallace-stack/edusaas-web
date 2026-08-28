@@ -20,6 +20,17 @@ interface SchoolClass {
   teacher?: { name: string };
 }
 
+interface Subject {
+  id: number;
+  name: string;
+  teacher?: { id: number; name: string };
+}
+
+interface Teacher {
+  id: number;
+  name: string;
+}
+
 interface StudentDetail {
   id: number;
   name: string;
@@ -60,6 +71,12 @@ export default function DiretorTurmasPage() {
   const [error, setError] = useState('');
   const [form, setForm] = useState({ name: '', year: new Date().getFullYear().toString(), shift: 'morning' });
 
+  const [manageClass, setManageClass] = useState<SchoolClass | null>(null);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [subjectForm, setSubjectForm] = useState({ name: '', teacherId: '' });
+  const [savingSubject, setSavingSubject] = useState(false);
+
   // Drawer de alunos
   const [studentsClass, setStudentsClass] = useState<SchoolClass | null>(null);
   const [students, setStudents] = useState<StudentDetail[]>([]);
@@ -98,6 +115,43 @@ export default function DiretorTurmasPage() {
     }
   };
 
+  const openManageModal = async (c: SchoolClass) => {
+    setManageClass(c);
+    try {
+      const [subRes, teachRes] = await Promise.all([
+        api.get(`/classes/${c.id}/subjects`),
+        api.get('/secretary/teachers'),
+      ]);
+      setSubjects(subRes.data);
+      setTeachers(teachRes.data);
+    } catch (err) { console.error(err); }
+  };
+
+  const handleAddSubject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manageClass) return;
+    try {
+      setSavingSubject(true);
+      await api.post(`/classes/${manageClass.id}/subjects`, {
+        name: subjectForm.name,
+        teacherId: Number(subjectForm.teacherId),
+      });
+      setSubjectForm({ name: '', teacherId: '' });
+      const res = await api.get(`/classes/${manageClass.id}/subjects`);
+      setSubjects(res.data);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erro ao adicionar disciplina');
+    } finally { setSavingSubject(false); }
+  };
+
+  const handleRemoveSubject = async (subjectId: number) => {
+    if (!manageClass || !confirm('Remover esta disciplina?')) return;
+    try {
+      await api.delete(`/classes/${manageClass.id}/subjects/${subjectId}`);
+      setSubjects(prev => prev.filter(s => s.id !== subjectId));
+    } catch (err) { console.error(err); }
+  };
+
   const openStudentsDrawer = async (c: SchoolClass) => {
     setStudentsClass(c);
     setSelectedStudent(null);
@@ -124,6 +178,8 @@ export default function DiretorTurmasPage() {
     afternoon: 'Tarde',
     evening: 'Noite',
   };
+
+  const inputCls = "w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] dark:bg-gray-800 dark:text-gray-100";
 
   if (loading) {
     return (
@@ -209,12 +265,20 @@ export default function DiretorTurmasPage() {
                   </p>
                 )}
 
-                <button
-                  onClick={() => openStudentsDrawer(c)}
-                  className="w-full text-xs text-[#F97316] border border-[#F97316] py-2 rounded-xl hover:bg-orange-50 dark:hover:bg-orange-950 transition-colors"
-                >
-                  Ver alunos
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openStudentsDrawer(c)}
+                    className="flex-1 text-xs text-[#F97316] border border-[#F97316] py-2 rounded-xl hover:bg-orange-50 dark:hover:bg-orange-950 transition-colors"
+                  >
+                    Ver alunos
+                  </button>
+                  <button
+                    onClick={() => openManageModal(c)}
+                    className="flex-1 text-xs text-[#1E3A5F] dark:text-blue-400 border border-[#1E3A5F] dark:border-blue-400 py-2 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+                  >
+                    Disciplinas
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -268,6 +332,77 @@ export default function DiretorTurmasPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Gerenciar disciplinas */}
+      {manageClass && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h2 className="text-lg font-bold text-[#1E3A5F] dark:text-white">Disciplinas</h2>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{manageClass.name} · {manageClass.year}</p>
+              </div>
+              <button onClick={() => setManageClass(null)} className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-400">
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-2 mb-5">
+              {subjects.length === 0 ? (
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Nenhuma disciplina ainda</p>
+              ) : (
+                subjects.map(s => (
+                  <div key={s.id} className="flex items-center justify-between bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3">
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{s.name}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">
+                        {s.teacher ? `Prof. ${s.teacher.name}` : 'Sem professor'}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveSubject(s.id)}
+                      className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
+              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-3">Adicionar disciplina</p>
+              <form onSubmit={handleAddSubject} className="space-y-3">
+                <input
+                  value={subjectForm.name}
+                  onChange={e => setSubjectForm({ ...subjectForm, name: e.target.value })}
+                  placeholder="Nome da disciplina (ex: Matemática)"
+                  required
+                  className={inputCls}
+                />
+                <select
+                  value={subjectForm.teacherId}
+                  onChange={e => setSubjectForm({ ...subjectForm, teacherId: e.target.value })}
+                  required
+                  className={inputCls}
+                >
+                  <option value="">Selecione o professor *</option>
+                  {teachers.map(t => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+                <button
+                  type="submit"
+                  disabled={savingSubject}
+                  className="w-full py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50"
+                >
+                  {savingSubject ? 'Adicionando...' : 'Adicionar disciplina'}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       )}
