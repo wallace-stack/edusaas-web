@@ -41,7 +41,6 @@ export default function SecretariaUsuariosPage() {
   const [form, setForm] = useState({
     name: '',
     email: '',
-    password: '',
     role: 'teacher',
   });
 
@@ -67,7 +66,7 @@ export default function SecretariaUsuariosPage() {
       setSaving(true);
       await api.post('/secretary/users', form);
       setShowModal(false);
-      setForm({ name: '', email: '', password: '', role: 'teacher' });
+      setForm({ name: '', email: '', role: 'teacher' });
       loadUsers();
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Erro ao criar usuário');
@@ -207,14 +206,9 @@ export default function SecretariaUsuariosPage() {
                 required
                 className={inputCls}
               />
-              <input
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                type="password"
-                placeholder="Senha"
-                required
-                className={inputCls}
-              />
+              <p className="text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3">
+                A pessoa receberá um e-mail para definir a própria senha.
+              </p>
               <select
                 value={form.role}
                 onChange={(e) => setForm({ ...form, role: e.target.value })}

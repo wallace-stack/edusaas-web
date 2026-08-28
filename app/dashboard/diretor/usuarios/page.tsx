@@ -114,8 +114,8 @@ export default function UsuariosPage() {
 
   // Modal
   const [showModal,  setShowModal]  = useState(false);
-  const [staffForm,  setStaffForm]  = useState({ name: '', email: '', password: '', role: 'coordinator' });
-  const [studentForm,setStudentForm]= useState({ name: '', email: '', password: '' });
+  const [staffForm,  setStaffForm]  = useState({ name: '', email: '', role: 'coordinator' });
+  const [studentForm,setStudentForm]= useState({ name: '', email: '' });
   const [saving,     setSaving]     = useState(false);
   const [formError,  setFormError]  = useState('');
 
@@ -210,8 +210,8 @@ export default function UsuariosPage() {
 
   const openModal = () => {
     setFormError('');
-    setStaffForm({ name: '', email: '', password: '', role: 'coordinator' });
-    setStudentForm({ name: '', email: '', password: '' });
+    setStaffForm({ name: '', email: '', role: 'coordinator' });
+    setStudentForm({ name: '', email: '' });
     setShowModal(true);
   };
 
@@ -527,14 +527,9 @@ export default function UsuariosPage() {
                   required
                   className={INPUT_CLS}
                 />
-                <input
-                  value={studentForm.password}
-                  onChange={e => setStudentForm({ ...studentForm, password: e.target.value })}
-                  type="password"
-                  placeholder="Senha"
-                  required
-                  className={INPUT_CLS}
-                />
+                <p className="text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3">
+                  A pessoa receberá um e-mail para definir a própria senha.
+                </p>
                 {formError && <p className="text-red-500 dark:text-red-400 text-xs">{formError}</p>}
                 <ModalActions onCancel={() => setShowModal(false)} saving={saving} label="Criar aluno" />
               </form>
@@ -555,14 +550,9 @@ export default function UsuariosPage() {
                   required
                   className={INPUT_CLS}
                 />
-                <input
-                  value={staffForm.password}
-                  onChange={e => setStaffForm({ ...staffForm, password: e.target.value })}
-                  type="password"
-                  placeholder="Senha"
-                  required
-                  className={INPUT_CLS}
-                />
+                <p className="text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-3">
+                  A pessoa receberá um e-mail para definir a própria senha.
+                </p>
                 <select
                   value={staffForm.role}
                   onChange={e => setStaffForm({ ...staffForm, role: e.target.value })}
