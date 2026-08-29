@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import {
-  ArrowLeft, Plus, Search, Trash2,
+  ArrowLeft, Plus, Search, Trash2, RotateCcw,
   ShieldCheck, Users, GraduationCap,
   ChevronLeft, ChevronRight,
 } from 'lucide-react';
@@ -105,9 +105,10 @@ export default function UsuariosPage() {
   const [studentsLoaded, setStudentsLoaded] = useState(false);
 
   // Filtros
-  const [search,      setSearch]      = useState('');
-  const [roleFilter,  setRoleFilter]  = useState('');
-  const [classFilter, setClassFilter] = useState('');
+  const [search,       setSearch]       = useState('');
+  const [roleFilter,   setRoleFilter]   = useState('');
+  const [classFilter,  setClassFilter]  = useState('');
+  const [showInactive, setShowInactive] = useState(false);
 
   // Paginação (alunos)
   const [page, setPage] = useState(1);
@@ -140,10 +141,16 @@ export default function UsuariosPage() {
   // Reseta página ao mudar filtros
   useEffect(() => { setPage(1); }, [search, classFilter]);
 
+  // Recarrega a aba atual ao ligar/desligar "mostrar inativos"
+  useEffect(() => {
+    loadStaff();
+    if (studentsLoaded) loadStudents();
+  }, [showInactive]);
+
   const loadStaff = async () => {
     setLoadingStaff(true);
     try {
-      const { data } = await api.get('/users');
+      const { data } = await api.get('/users', { params: { includeInactive: showInactive } });
       setStaff(
         (data as any[])
           .filter(u => u.role !== 'student')
@@ -156,7 +163,7 @@ export default function UsuariosPage() {
   const loadStudents = async () => {
     setLoadingStudents(true);
     try {
-      const { data } = await api.get('/users?role=student');
+      const { data } = await api.get('/users', { params: { role: 'student', includeInactive: showInactive } });
       setStudents(
         (data as any[]).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR')),
       );
@@ -205,6 +212,15 @@ export default function UsuariosPage() {
       await api.delete(`/users/${id}`);
       if (isStudent) setStudents(prev => prev.filter(u => u.id !== id));
       else           setStaff(prev => prev.filter(u => u.id !== id));
+    } catch (err) { console.error(err); }
+  };
+
+  const handleReactivate = async (id: number, isStudent: boolean) => {
+    if (!confirm('Reativar este usuário? Um novo convite por e-mail será enviado.')) return;
+    try {
+      await api.post(`/users/${id}/reactivate`);
+      if (isStudent) loadStudents();
+      else           loadStaff();
     } catch (err) { console.error(err); }
   };
 
@@ -290,18 +306,24 @@ export default function UsuariosPage() {
       <main className="max-w-7xl mx-auto px-6 py-8">
 
         {/* Busca — sempre visível ─────────────────────────────────────────── */}
-        <div className="relative mb-4">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder={
-              activeTab === 'funcionarios'
-                ? 'Buscar funcionário por nome ou email...'
-                : 'Buscar aluno por nome ou email...'
-            }
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] bg-white dark:bg-gray-800 dark:text-gray-100"
-          />
+        <div className="flex flex-col sm:flex-row gap-2 mb-4">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder={
+                activeTab === 'funcionarios'
+                  ? 'Buscar funcionário por nome ou email...'
+                  : 'Buscar aluno por nome ou email...'
+              }
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] bg-white dark:bg-gray-800 dark:text-gray-100"
+            />
+          </div>
+          <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 cursor-pointer bg-white dark:bg-gray-800 whitespace-nowrap">
+            <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} />
+            Mostrar inativos
+          </label>
         </div>
 
         {/* ── Aba Funcionários ──────────────────────────────────────────────── */}
@@ -379,13 +401,23 @@ export default function UsuariosPage() {
                                 <ShieldCheck size={16} />
                               </button>
                             )}
-                            <button
-                              title="Desativar usuário"
-                              onClick={e => { e.stopPropagation(); handleDelete(u.id, false); }}
-                              className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-colors"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                            {u.isActive ? (
+                              <button
+                                title="Desativar usuário"
+                                onClick={e => { e.stopPropagation(); handleDelete(u.id, false); }}
+                                className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-colors"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            ) : (
+                              <button
+                                title="Reativar usuário"
+                                onClick={e => { e.stopPropagation(); handleReactivate(u.id, false); }}
+                                className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-950 rounded-lg transition-colors"
+                              >
+                                <RotateCcw size={16} />
+                              </button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -459,13 +491,23 @@ export default function UsuariosPage() {
                           <ActiveBadge active={u.isActive} />
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button
-                            title="Desativar aluno"
-                            onClick={e => { e.stopPropagation(); handleDelete(u.id, true); }}
-                            className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-colors"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          {u.isActive ? (
+                            <button
+                              title="Desativar aluno"
+                              onClick={e => { e.stopPropagation(); handleDelete(u.id, true); }}
+                              className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-colors"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          ) : (
+                            <button
+                              title="Reativar aluno"
+                              onClick={e => { e.stopPropagation(); handleReactivate(u.id, true); }}
+                              className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-950 rounded-lg transition-colors"
+                            >
+                              <RotateCcw size={16} />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}

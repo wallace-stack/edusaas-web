@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, Search, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Search, Trash2, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface StaffUser {
@@ -36,6 +36,7 @@ export default function SecretariaUsuariosPage() {
   const [users, setUsers] = useState<StaffUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -47,11 +48,11 @@ export default function SecretariaUsuariosPage() {
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
     loadUsers();
-  }, []);
+  }, [showInactive]);
 
   const loadUsers = async () => {
     try {
-      const response = await api.get('/secretary/users');
+      const response = await api.get('/secretary/users', { params: { includeInactive: showInactive } });
       setUsers(response.data);
     } catch (err) {
       console.error(err);
@@ -85,6 +86,17 @@ export default function SecretariaUsuariosPage() {
     }
   };
 
+  const handleReactivate = async (id: number, name: string) => {
+    if (!confirm(`Reativar "${name}"? Um novo convite por e-mail será enviado.`)) return;
+    try {
+      await api.post(`/secretary/users/${id}/reactivate`);
+      toast.success(`${name} reativado(a). Convite enviado por e-mail.`);
+      loadUsers();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erro ao reativar usuário');
+    }
+  };
+
   const filtered = users.filter(u =>
     u.name.toLowerCase().includes(search.toLowerCase()) ||
     u.email.toLowerCase().includes(search.toLowerCase())
@@ -113,14 +125,20 @@ export default function SecretariaUsuariosPage() {
       <main className="max-w-7xl mx-auto px-6 py-8">
 
         {/* Busca */}
-        <div className="relative mb-6">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por nome ou email..."
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] bg-white dark:bg-gray-800 dark:text-gray-100"
-          />
+        <div className="flex flex-col sm:flex-row gap-2 mb-6">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por nome ou email..."
+              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] bg-white dark:bg-gray-800 dark:text-gray-100"
+            />
+          </div>
+          <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 cursor-pointer bg-white dark:bg-gray-800 whitespace-nowrap">
+            <input type="checkbox" checked={showInactive} onChange={(e) => setShowInactive(e.target.checked)} />
+            Mostrar inativos
+          </label>
         </div>
 
         {/* Lista */}
@@ -167,13 +185,21 @@ export default function SecretariaUsuariosPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      {u.isActive && (
+                      {u.isActive ? (
                         <button
                           onClick={() => handleDeactivate(u.id, u.name)}
                           className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg transition-colors"
                           title="Desativar usuário"
                         >
                           <Trash2 size={16} />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleReactivate(u.id, u.name)}
+                          className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-950 rounded-lg transition-colors"
+                          title="Reativar usuário"
+                        >
+                          <RotateCcw size={16} />
                         </button>
                       )}
                     </td>
