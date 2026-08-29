@@ -29,6 +29,7 @@ interface Student {
   class?: { id: number; name: string } | null;
   classId?: number | null;
   enrollmentId?: number | null;
+  isActive?: boolean;
   financialStatus: string;
   overdueCount: number;
 }
@@ -63,6 +64,7 @@ export default function SecretariaAlunosPage() {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [turmaFilter, setTurmaFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({
@@ -82,7 +84,7 @@ export default function SecretariaAlunosPage() {
     console.log('TOKEN:', Cookies.get('token'));
     if (!user) { router.push('/login'); return; }
     loadData();
-  }, []);
+  }, [showInactive]);
 
   const loadData = async (attempt = 1) => {
     if (loadingRef.current) return;
@@ -90,7 +92,7 @@ export default function SecretariaAlunosPage() {
     setLoadError('');
     try {
       const [studentsRes, classesRes] = await Promise.all([
-        api.get('/secretary/students'),
+        api.get('/secretary/students', { params: { includeInactive: showInactive } }),
         api.get('/secretary/classes'),
       ]);
       setStudents(studentsRes.data);
@@ -252,6 +254,10 @@ export default function SecretariaAlunosPage() {
               <option value="overdue">Inadimplente</option>
             </select>
           </div>
+          <label className="flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs text-gray-600 dark:text-gray-300 cursor-pointer bg-white dark:bg-gray-800 whitespace-nowrap">
+            <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} />
+            Mostrar inativos
+          </label>
         </div>
 
         {/* Lista agrupada por turma */}
@@ -329,6 +335,11 @@ export default function SecretariaAlunosPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                          {s.isActive === false && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400">
+                              Inativo
+                            </span>
+                          )}
                           {(s as any).situation && (s as any).situation !== 'NO_GRADES' && (
                             <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium hidden sm:inline ${
                               (s as any).situation === 'APPROVED' ? 'bg-green-50 dark:bg-green-950 text-green-700'
@@ -679,6 +690,7 @@ export default function SecretariaAlunosPage() {
                 className={selectedStudent.class?.name ?? null}
                 enrollmentId={selectedStudent.enrollmentId}
                 classes={classes}
+                isActive={selectedStudent.isActive}
                 onDone={() => { setSelectedStudent(null); loadData(); }}
               />
             </div>

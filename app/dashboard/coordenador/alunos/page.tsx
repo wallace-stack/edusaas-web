@@ -35,6 +35,7 @@ interface StudentDetail {
   guardianPhone?: string | null;
   guardianRelation?: string | null;
   enrollmentId?: number | null;
+  isActive?: boolean;
 }
 
 const situationConfig: Record<string, { label: string; cls: string }> = {
@@ -78,6 +79,7 @@ function CoordenadorAlunosContent() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [turmaFilter, setTurmaFilter] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [detail, setDetail] = useState<StudentDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -85,15 +87,15 @@ function CoordenadorAlunosContent() {
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
     loadStudents();
-  }, []);
+  }, [showInactive]);
 
   const loadStudents = async () => {
     try {
-      const r = await api.get('/secretary/students');
+      const r = await api.get('/secretary/students', { params: { includeInactive: showInactive } });
       setStudents(r.data);
     } catch {
       try {
-        const r = await api.get('/users?role=student');
+        const r = await api.get('/users', { params: { role: 'student', includeInactive: showInactive } });
         setStudents(r.data);
       } catch (err) { console.error(err); }
     } finally {
@@ -191,6 +193,10 @@ function CoordenadorAlunosContent() {
               {turmas.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           )}
+          <label className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-300 cursor-pointer bg-white dark:bg-gray-800 whitespace-nowrap">
+            <input type="checkbox" checked={showInactive} onChange={e => setShowInactive(e.target.checked)} />
+            Mostrar inativos
+          </label>
         </div>
 
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
@@ -357,6 +363,7 @@ function CoordenadorAlunosContent() {
                   className={detail.className ?? detail.class?.name ?? null}
                   enrollmentId={detail.enrollmentId}
                   classes={classes}
+                  isActive={detail.isActive}
                   onDone={() => { setSheetOpen(false); setDetail(null); loadStudents(); }}
                 />
               </div>

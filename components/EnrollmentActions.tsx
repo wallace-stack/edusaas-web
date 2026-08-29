@@ -17,6 +17,8 @@ interface EnrollmentActionsProps {
   className?: string | null;
   enrollmentId?: number | null;
   classes: ClassOption[];
+  /** Default true — quando ausente, o chamador não sabe/não checa o status da conta. */
+  isActive?: boolean;
   onDone: () => void;
 }
 
@@ -26,6 +28,7 @@ export default function EnrollmentActions({
   className,
   enrollmentId,
   classes,
+  isActive = true,
   onDone,
 }: EnrollmentActionsProps) {
   const { can, loading: permsLoading } = usePermissions();
@@ -35,6 +38,7 @@ export default function EnrollmentActions({
   const [unenrolling, setUnenrolling] = useState(false);
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
   const [deactivating, setDeactivating] = useState(false);
+  const [reactivating, setReactivating] = useState(false);
 
   useEffect(() => {
     setTransferClassId('');
@@ -87,7 +91,37 @@ export default function EnrollmentActions({
     }
   };
 
+  const handleReactivate = async () => {
+    try {
+      setReactivating(true);
+      await api.post(`/secretary/users/${studentId}/reactivate`);
+      toast.success(`${studentName} reativado(a). Convite enviado por e-mail.`);
+      onDone();
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Erro ao reativar aluno');
+    } finally {
+      setReactivating(false);
+    }
+  };
+
   if (permsLoading || !can('matricular_aluno')) return null;
+
+  if (!isActive) {
+    return (
+      <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-xl p-3 space-y-2">
+        <p className="text-xs text-amber-800 dark:text-amber-300 text-center">
+          Esta conta está desativada.
+        </p>
+        <button
+          onClick={handleReactivate}
+          disabled={reactivating}
+          className="w-full py-2.5 rounded-xl bg-amber-500 text-white text-sm font-medium hover:bg-amber-600 disabled:opacity-50 transition-colors"
+        >
+          {reactivating ? 'Reativando...' : 'Reativar conta'}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">

@@ -615,6 +615,7 @@ export default function SecretariaTurmasPage() {
                     className={studentsClass?.name ?? null}
                     enrollmentId={selectedStudent.enrollmentId}
                     classes={classes}
+                    isActive={selectedStudent.isActive}
                     onDone={() => {
                       setSelectedStudent(null);
                       if (studentsClass) openStudentsDrawer(studentsClass);

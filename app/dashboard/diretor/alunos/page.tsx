@@ -35,6 +35,7 @@ interface StudentDetail {
   guardianPhone?: string | null;
   guardianRelation?: string | null;
   enrollmentId?: number | null;
+  isActive?: boolean;
 }
 
 const situationConfig: Record<string, { label: string; cls: string }> = {
@@ -364,6 +365,7 @@ function DiretorAlunosContent() {
                   className={detail.className ?? detail.class?.name ?? null}
                   enrollmentId={detail.enrollmentId}
                   classes={classes}
+                  isActive={detail.isActive}
                   onDone={() => { setSheetOpen(false); setDetail(null); loadStudents(); }}
                 />
               </div>
