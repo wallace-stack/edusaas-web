@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, Search, X, ChevronRight, Upload, Download } from 'lucide-react';
+import { Plus, Search, X, ChevronRight, Upload, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
 import ImportarAlunosCSV from '@/components/ImportarAlunosCSV';
 import EnrollmentActions from '@/components/EnrollmentActions';
+import { DashboardHeader } from '@/components/dashboard-header';
 
 interface Student {
   id: number;
@@ -186,15 +187,11 @@ export default function SecretariaAlunosPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 py-3">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-              <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
-            </button>
-            <h1 className="font-bold text-[#1E3A5F] dark:text-white">Alunos</h1>
-          </div>
-          <div className="flex items-center gap-2">
+      <DashboardHeader
+        subtitle="Alunos"
+        showBack
+        actions={
+          <>
             <button
               onClick={() => setShowImport(true)}
               className="flex items-center gap-1.5 border border-[#1E3A5F] text-[#1E3A5F] dark:border-indigo-400 dark:text-indigo-400 px-3 py-2 rounded-xl text-xs font-medium hover:bg-[#1E3A5F]/5 transition-colors whitespace-nowrap"
@@ -216,9 +213,9 @@ export default function SecretariaAlunosPage() {
               <Plus size={14} />
               Matricular aluno
             </button>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       <main className="max-w-7xl mx-auto px-4 py-4">
         {/* Filtros */}

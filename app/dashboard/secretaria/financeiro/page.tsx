@@ -7,10 +7,11 @@ import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
 import Cookies from 'js-cookie';
 import {
-  ArrowLeft, DollarSign, AlertTriangle, Clock, Check,
+  DollarSign, AlertTriangle, Clock, Check,
   Bell, Search, X,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { DashboardHeader } from '@/components/dashboard-header';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -334,21 +335,11 @@ export default function SecretariaFinanceiroPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
 
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
-              <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
-            </button>
-            <div>
-              <h1 className="font-bold text-[#1E3A5F] dark:text-white">Financeiro</h1>
-              <p className="text-xs text-gray-400">{MONTHS[month - 1]} {year}</p>
-            </div>
-          </div>
-
-          {/* Period selector */}
-          <div className="flex items-center gap-2">
+      <DashboardHeader
+        subtitle={`Financeiro — ${MONTHS[month - 1]} ${year}`}
+        showBack
+        actions={
+          <>
             <select
               value={month}
               onChange={e => setMonth(Number(e.target.value))}
@@ -382,9 +373,9 @@ export default function SecretariaFinanceiroPage() {
               <Bell size={13} />
               {notifying ? 'Enviando…' : 'Cobrar inadimplentes'}
             </button>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       <main className="max-w-5xl mx-auto px-6 py-6 space-y-5">
 

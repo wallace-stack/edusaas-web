@@ -1,15 +1,14 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUser, clearAuth } from '../../lib/auth';
+import { getUser } from '../../lib/auth';
 import api from '../../lib/api';
 import {
   Users, BookOpen, DollarSign, UserPlus,
-  AlertTriangle, LogOut, Bell, Newspaper, NotebookPen
+  AlertTriangle, Newspaper, NotebookPen
 } from 'lucide-react';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { DashboardHeader } from '@/components/dashboard-header';
 
 interface DashboardData {
   totalStudents: number;
@@ -54,11 +53,6 @@ export default function SecretariaDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    clearAuth();
-    router.push('/login');
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center">
@@ -73,41 +67,7 @@ export default function SecretariaDashboard() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
 
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-                      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
-            <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Wall</span><span className="text-[#F5A623]">adm</span></span>
-          </Link>
-            <span className="text-gray-300 dark:text-gray-600">|</span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">Painel da Secretaria</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => router.push('/dashboard/secretaria/notificacoes')} className="relative p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
-              <Bell size={20} />
-              {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">{unreadCount > 9 ? '9+' : unreadCount}</span>}
-            </button>
-            <button onClick={() => router.push('/dashboard/perfil')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-[#F97316] rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">
-                  {user?.name?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">{user?.name}</span>
-            </button>
-            <ThemeToggle />
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-            >
-              <LogOut size={16} />
-              <span className="hidden sm:block">Sair</span>
-            </button>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader subtitle="Painel da Secretaria" unreadCount={unreadCount} />
 
       <main className="max-w-7xl mx-auto px-6 py-8">
 
