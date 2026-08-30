@@ -20,6 +20,24 @@ interface Grade {
 }
 interface SchoolClass { id: number; name: string; mode?: 'regular' | 'infantil'; }
 interface Subject { id: number; name: string; }
+interface InfantilRecordView {
+  studentId: number;
+  studentName: string;
+  period: number;
+  conceito: string | null;
+  parecer: string | null;
+}
+
+const CONCEITO_LABELS: Record<string, string> = {
+  desenvolvido: 'Desenvolvido',
+  em_desenvolvimento: 'Em desenvolvimento',
+  nao_desenvolvido: 'Não desenvolvido',
+};
+const CONCEITO_COLORS: Record<string, string> = {
+  desenvolvido: 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300',
+  em_desenvolvimento: 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300',
+  nao_desenvolvido: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300',
+};
 
 interface DetailPopover {
   studentName: string;
@@ -36,6 +54,7 @@ export default function ProfessorNotasHistoricoPage() {
   const [classes, setClasses] = useState<SchoolClass[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [grades, setGrades] = useState<Grade[]>([]);
+  const [records, setRecords] = useState<InfantilRecordView[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingGrades, setLoadingGrades] = useState(false);
   const [classFilter, setClassFilter] = useState('');
@@ -68,11 +87,15 @@ export default function ProfessorNotasHistoricoPage() {
     if (classFilter && (subjectFilter || isInfantil)) {
       setLoadingGrades(true);
       api.get(`/grades/class/${classFilter}`, { params: subjectFilter ? { subjectId: subjectFilter } : {} })
-        .then(r => setGrades(r.data))
+        .then(r => {
+          setGrades(r.data.grades ?? []);
+          setRecords(r.data.records ?? []);
+        })
         .catch(console.error)
         .finally(() => setLoadingGrades(false));
     } else {
       setGrades([]);
+      setRecords([]);
     }
   }, [classFilter, subjectFilter, isInfantil]);
 
@@ -135,6 +158,14 @@ export default function ProfessorNotasHistoricoPage() {
 
   const sortedStudents = Object.keys(byStudent).sort((a, b) => a.localeCompare(b));
 
+  // Agrupa pareceres por aluno (turma infantil)
+  const recordsByStudent: Record<string, InfantilRecordView[]> = {};
+  records.forEach(r => {
+    if (!recordsByStudent[r.studentName]) recordsByStudent[r.studentName] = [];
+    recordsByStudent[r.studentName].push(r);
+  });
+  const sortedInfantilStudents = Object.keys(recordsByStudent).sort((a, b) => a.localeCompare(b));
+
   const selectCls = "px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]";
 
   return (
@@ -172,6 +203,46 @@ export default function ProfessorNotasHistoricoPage() {
           <div className="flex justify-center py-10">
             <div className="w-8 h-8 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin"></div>
           </div>
+        ) : isInfantil ? (
+          sortedInfantilStudents.length === 0 ? (
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-10 text-center">
+              <p className="text-gray-400 dark:text-gray-500 text-sm">Nenhum parecer lançado ainda</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {sortedInfantilStudents.map(studentName => (
+                <div key={studentName} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-xs font-bold">{studentName.charAt(0)}</span>
+                    </div>
+                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">{studentName}</span>
+                  </div>
+                  <div className="space-y-3 pl-10">
+                    {recordsByStudent[studentName]
+                      .sort((a, b) => a.period - b.period)
+                      .map((r, i) => (
+                        <div key={i} className="border-l-2 border-gray-100 dark:border-gray-800 pl-3">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{r.period}º período</span>
+                            {r.conceito && (
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${CONCEITO_COLORS[r.conceito] ?? ''}`}>
+                                {CONCEITO_LABELS[r.conceito] ?? r.conceito}
+                              </span>
+                            )}
+                          </div>
+                          {r.parecer ? (
+                            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{r.parecer}</p>
+                          ) : (
+                            <p className="text-xs text-gray-300 dark:text-gray-600">Sem parecer descritivo</p>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
         ) : sortedStudents.length === 0 ? (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-10 text-center">
             <p className="text-gray-400 dark:text-gray-500 text-sm">Nenhuma nota lançada ainda</p>

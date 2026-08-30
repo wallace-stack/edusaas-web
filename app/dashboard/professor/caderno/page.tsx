@@ -163,12 +163,13 @@ const emptyForm = () => ({
 // COMPONENTE STEPPER HEADER
 // ══════════════════════════════════════════════════════════════════════════════
 
-const STEPS = ['Identificação', 'BNCC', 'Desenvolvimento', 'Anexos'];
+const STEPS_REGULAR  = ['Identificação', 'BNCC', 'Desenvolvimento', 'Anexos'];
+const STEPS_INFANTIL = ['Identificação', 'Campos de Experiência', 'Desenvolvimento', 'Anexos'];
 
-function StepperHeader({ current }: { current: number }) {
+function StepperHeader({ current, steps }: { current: number; steps: string[] }) {
   return (
     <div className="flex items-center gap-0 mb-8">
-      {STEPS.map((label, i) => {
+      {steps.map((label, i) => {
         const done    = i < current;
         const active  = i === current;
         return (
@@ -185,7 +186,7 @@ function StepperHeader({ current }: { current: number }) {
                 active ? 'text-[#F5A623]' : done ? 'text-[#1E3A5F] dark:text-white' : 'text-gray-400 dark:text-gray-500'
               }`}>{label}</span>
             </div>
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <div className={`flex-1 h-0.5 mx-2 transition-all ${
                 i < current ? 'bg-[#1E3A5F]' : 'bg-gray-200 dark:bg-gray-700'
               }`} />
@@ -923,7 +924,7 @@ export default function CadernoPage() {
         </header>
 
         <main className="max-w-2xl mx-auto px-4 py-6">
-          <StepperHeader current={step} />
+          <StepperHeader current={step} steps={form.moduleType === 'infantil' ? STEPS_INFANTIL : STEPS_REGULAR} />
           {renderStepContent()}
 
           {/* Nav anterior / próximo */}

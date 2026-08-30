@@ -15,6 +15,23 @@ interface Grade {
   subject: { name: string };
   createdAt: string;
 }
+interface InfantilRecordView {
+  studentId: number;
+  studentName: string;
+  period: number;
+  conceito: string | null;
+  parecer: string | null;
+}
+const CONCEITO_LABELS: Record<string, string> = {
+  desenvolvido: 'Desenvolvido',
+  em_desenvolvimento: 'Em desenvolvimento',
+  nao_desenvolvido: 'Não desenvolvido',
+};
+const CONCEITO_COLORS: Record<string, string> = {
+  desenvolvido: 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300',
+  em_desenvolvimento: 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300',
+  nao_desenvolvido: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300',
+};
 
 interface AttendanceSummary {
   summary: { total: number; present: number; absent: number; percentage: number };
@@ -33,6 +50,8 @@ export default function AlunoDashboard() {
   const router = useRouter();
   const user = getUser();
   const [grades, setGrades] = useState<Grade[]>([]);
+  const [records, setRecords] = useState<InfantilRecordView[]>([]);
+  const [mode, setMode] = useState<'regular' | 'infantil'>('regular');
   const [attendance, setAttendance] = useState<AttendanceSummary | null>(null);
   const [tuitions, setTuitions] = useState<Tuition[]>([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +75,9 @@ export default function AlunoDashboard() {
         api.get('/attendance/my-attendance'),
         api.get('/finance/tuitions/my'),
       ]);
-      setGrades(gradesRes.data.slice(0, 5));
+      setMode(gradesRes.data.mode ?? 'regular');
+      setGrades((gradesRes.data.grades ?? []).slice(0, 5));
+      setRecords((gradesRes.data.records ?? []).sort((a: InfantilRecordView, b: InfantilRecordView) => b.period - a.period).slice(0, 5));
       setAttendance(attendanceRes.data);
       setTuitions(tuitionsRes.data.filter((t: Tuition) => t.status !== 'paid').slice(0, 3));
     } catch (err) {
@@ -106,8 +127,8 @@ export default function AlunoDashboard() {
             <div className="w-10 h-10 bg-blue-50 dark:bg-blue-950 rounded-xl flex items-center justify-center mb-4">
               <TrendingUp size={20} className="text-blue-600" />
             </div>
-            <p className="text-3xl font-bold text-[#1E3A5F] dark:text-white">{grades.length}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Notas lançadas</p>
+            <p className="text-3xl font-bold text-[#1E3A5F] dark:text-white">{mode === 'infantil' ? records.length : grades.length}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{mode === 'infantil' ? 'Pareceres' : 'Notas lançadas'}</p>
           </div>
 
           <div className={`rounded-2xl p-6 border ${attendance && attendance.summary.percentage < 75 ? 'bg-red-50 dark:bg-red-950 border-red-100 dark:border-red-800' : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800'}`}>
@@ -142,15 +163,35 @@ export default function AlunoDashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-          {/* Últimas notas */}
+          {/* Últimas notas / pareceres */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-[#1E3A5F] dark:text-white">Últimas notas</h2>
+              <h2 className="font-semibold text-[#1E3A5F] dark:text-white">{mode === 'infantil' ? 'Parecer' : 'Últimas notas'}</h2>
               <button onClick={() => router.push('/dashboard/aluno/notas')} className="text-xs text-[#F97316] hover:underline">
-                Ver todas
+                Ver {mode === 'infantil' ? 'todos' : 'todas'}
               </button>
             </div>
-            {grades.length === 0 ? (
+            {mode === 'infantil' ? (
+              records.length === 0 ? (
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Nenhum parecer lançado ainda</p>
+              ) : (
+                <div className="space-y-3">
+                  {records.map((r, i) => (
+                    <div key={i} className="py-2 border-b border-gray-50 dark:border-gray-800 last:border-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{r.period}º período</span>
+                        {r.conceito && (
+                          <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${CONCEITO_COLORS[r.conceito] ?? ''}`}>
+                            {CONCEITO_LABELS[r.conceito] ?? r.conceito}
+                          </span>
+                        )}
+                      </div>
+                      {r.parecer && <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{r.parecer}</p>}
+                    </div>
+                  ))}
+                </div>
+              )
+            ) : grades.length === 0 ? (
               <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-4">Nenhuma nota lançada ainda</p>
             ) : (
               <div className="space-y-3">

@@ -39,10 +39,13 @@ interface StudentDetail {
 }
 
 const situationConfig: Record<string, { label: string; cls: string }> = {
-  APPROVED:  { label: 'Aprovado',    cls: 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300' },
-  RECOVERY:  { label: 'Recuperação', cls: 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300' },
-  FAILED:    { label: 'Reprovado',   cls: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' },
-  NO_GRADES: { label: 'Sem notas',   cls: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
+  APPROVED:      { label: 'Aprovado',           cls: 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300' },
+  RECOVERY:      { label: 'Recuperação',        cls: 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300' },
+  FAILED:        { label: 'Reprovado',          cls: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' },
+  NO_GRADES:     { label: 'Sem notas',          cls: 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400' },
+  DEVELOPED:     { label: 'Desenvolvido',       cls: 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300' },
+  DEVELOPING:    { label: 'Em desenvolvimento', cls: 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300' },
+  NOT_DEVELOPED: { label: 'Não desenvolvido',   cls: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300' },
 };
 
 function AttBadge({ rate }: { rate?: number }) {

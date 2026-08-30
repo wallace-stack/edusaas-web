@@ -133,7 +133,7 @@ function LancarNotasPage() {
         .map((e: any) => e.student).filter(Boolean)
         .sort((a: Student, b: Student) => a.name.localeCompare(b.name));
 
-      const grades: any[] = gradesRes.data;
+      const grades: any[] = gradesRes.data.grades ?? [];
       const mapped: StudentGrades[] = students.map(student => {
         const instruments: [GradeData, GradeData, GradeData] = [emptyInstrument(), emptyInstrument(), emptyInstrument()];
         grades.filter((g: any) => g.studentId === student.id && g.period === period).forEach((g: any) => {

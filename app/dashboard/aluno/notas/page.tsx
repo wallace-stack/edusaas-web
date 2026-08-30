@@ -17,18 +17,42 @@ interface Grade {
   description: string;
   subject: { name: string };
 }
+interface InfantilRecordView {
+  studentId: number;
+  studentName: string;
+  period: number;
+  conceito: string | null;
+  parecer: string | null;
+}
+
+const CONCEITO_LABELS: Record<string, string> = {
+  desenvolvido: 'Desenvolvido',
+  em_desenvolvimento: 'Em desenvolvimento',
+  nao_desenvolvido: 'Não desenvolvido',
+};
+const CONCEITO_COLORS: Record<string, string> = {
+  desenvolvido: 'bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300',
+  em_desenvolvimento: 'bg-yellow-50 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-300',
+  nao_desenvolvido: 'bg-red-50 dark:bg-red-950 text-red-700 dark:text-red-300',
+};
 
 export default function AlunoNotasPage() {
   const router = useRouter();
   const user = getUser();
   const [grades, setGrades] = useState<Grade[]>([]);
+  const [records, setRecords] = useState<InfantilRecordView[]>([]);
+  const [mode, setMode] = useState<'regular' | 'infantil'>('regular');
   const [loading, setLoading] = useState(true);
   const [periodFilter, setPeriodFilter] = useState('');
 
   useEffect(() => {
     if (!user) { router.push('/login'); return; }
     api.get('/grades/my-grades')
-      .then(r => setGrades(r.data))
+      .then(r => {
+        setMode(r.data.mode ?? 'regular');
+        setGrades(r.data.grades ?? []);
+        setRecords((r.data.records ?? []).sort((a: InfantilRecordView, b: InfantilRecordView) => a.period - b.period));
+      })
       .catch(console.error)
       .finally(() => setLoading(false));
   }, []);
@@ -70,18 +94,46 @@ export default function AlunoNotasPage() {
             <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
               <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
             </button>
-            <h1 className="font-bold text-[#1E3A5F] dark:text-white text-base">Minhas notas</h1>
+            <h1 className="font-bold text-[#1E3A5F] dark:text-white text-base">{mode === 'infantil' ? 'Meu parecer' : 'Minhas notas'}</h1>
           </div>
-          <select value={periodFilter} onChange={e => setPeriodFilter(e.target.value)}
-            className="px-2 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]">
-            <option value="">Todos</option>
-            {[1,2,3,4].map(b => <option key={b} value={b}>{b}º Bim</option>)}
-          </select>
+          {mode !== 'infantil' && (
+            <select value={periodFilter} onChange={e => setPeriodFilter(e.target.value)}
+              className="px-2 py-2 rounded-xl border border-gray-200 dark:border-gray-700 text-xs bg-white dark:bg-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]">
+              <option value="">Todos</option>
+              {[1,2,3,4].map(b => <option key={b} value={b}>{b}º Bim</option>)}
+            </select>
+          )}
         </div>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 py-6">
-        {Object.keys(bySubject).length === 0 ? (
+        {mode === 'infantil' ? (
+          records.length === 0 ? (
+            <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center">
+              <p className="text-gray-400 dark:text-gray-500 text-sm">Nenhum parecer lançado ainda</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {records.map((r, i) => (
+                <div key={i} className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">{r.period}º período</span>
+                    {r.conceito && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${CONCEITO_COLORS[r.conceito] ?? ''}`}>
+                        {CONCEITO_LABELS[r.conceito] ?? r.conceito}
+                      </span>
+                    )}
+                  </div>
+                  {r.parecer ? (
+                    <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{r.parecer}</p>
+                  ) : (
+                    <p className="text-xs text-gray-300 dark:text-gray-600">Sem parecer descritivo</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )
+        ) : Object.keys(bySubject).length === 0 ? (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-8 text-center">
             <p className="text-gray-400 dark:text-gray-500 text-sm">Nenhuma nota lançada ainda</p>
           </div>
