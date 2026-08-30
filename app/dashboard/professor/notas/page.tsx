@@ -127,7 +127,7 @@ function LancarNotasPage() {
     try {
       const [enrollRes, gradesRes] = await Promise.all([
         api.get(`/enrollments/class/${classId}`),
-        api.get(`/grades/class/${classId}/subject/${subjectId}`),
+        api.get(`/grades/class/${classId}`, { params: { subjectId } }),
       ]);
       const students: Student[] = enrollRes.data
         .map((e: any) => e.student).filter(Boolean)

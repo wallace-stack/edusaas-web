@@ -7,7 +7,7 @@ import api from '../../../lib/api';
 import { ArrowLeft, CheckCircle, XCircle, MinusCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface SchoolClass { id: number; name: string; year: number; }
+interface SchoolClass { id: number; name: string; year: number; mode?: 'regular' | 'infantil'; }
 interface Subject { id: number; name: string; }
 interface Student { id: number; name: string; }
 interface AttendanceItem { studentId: number; status: 'present' | 'absent' | 'justified'; }
@@ -45,6 +45,9 @@ function ChamadaPage() {
     if (form.classId) loadSubjectsAndStudents(Number(form.classId));
   }, [form.classId]);
 
+  const selectedClass = classes.find(c => c.id === Number(form.classId));
+  const isInfantil = selectedClass?.mode === 'infantil';
+
   const loadClasses = async () => {
     try {
       const response = await api.get('/classes/my');
@@ -79,7 +82,7 @@ function ChamadaPage() {
       setSaving(true);
       await api.post('/attendance/bulk', {
         date: form.date,
-        subjectId: Number(form.subjectId),
+        subjectId: form.subjectId ? Number(form.subjectId) : undefined,
         classId: Number(form.classId),
         attendances,
       });
@@ -107,7 +110,10 @@ function ChamadaPage() {
           <button onClick={() => router.back()} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg">
             <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
           </button>
-          <h1 className="font-bold text-[#1E3A5F] dark:text-white">Registrar Chamada</h1>
+          <div>
+            <h1 className="font-bold text-[#1E3A5F] dark:text-white">Registrar Chamada</h1>
+            {isInfantil && <p className="text-[10px] text-purple-500 font-medium">🎨 Modo Educação Infantil</p>}
+          </div>
         </div>
       </header>
 
@@ -128,18 +134,20 @@ function ChamadaPage() {
                 {classes.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Disciplina</label>
-              <select
-                value={form.subjectId}
-                onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
-                disabled={!form.classId}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] disabled:opacity-50 dark:bg-gray-800 dark:text-gray-100"
-              >
-                <option value="">Selecione</option>
-                {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
-            </div>
+            {!isInfantil && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Disciplina</label>
+                <select
+                  value={form.subjectId}
+                  onChange={(e) => setForm({ ...form, subjectId: e.target.value })}
+                  disabled={!form.classId}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-[#1E3A5F] disabled:opacity-50 dark:bg-gray-800 dark:text-gray-100"
+                >
+                  <option value="">Selecione</option>
+                  {subjects.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Data</label>
               <input
@@ -208,7 +216,7 @@ function ChamadaPage() {
 
             <button
               type="submit"
-              disabled={saving || !form.classId || !form.subjectId}
+              disabled={saving || !form.classId || (!isInfantil && !form.subjectId)}
               className="w-full bg-[#1E3A5F] text-white py-3 rounded-xl font-medium hover:bg-[#162d4a] disabled:opacity-50 transition-colors"
             >
               {saving ? 'Salvando...' : 'Salvar chamada'}

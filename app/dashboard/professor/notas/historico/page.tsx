@@ -18,7 +18,7 @@ interface Grade {
   student: { id: number; name: string };
   subject: { id: number; name: string };
 }
-interface SchoolClass { id: number; name: string; }
+interface SchoolClass { id: number; name: string; mode?: 'regular' | 'infantil'; }
 interface Subject { id: number; name: string; }
 
 interface DetailPopover {
@@ -61,17 +61,20 @@ export default function ProfessorNotasHistoricoPage() {
     }
   }, [classFilter]);
 
+  const selectedClass = classes.find(c => c.id === Number(classFilter));
+  const isInfantil = selectedClass?.mode === 'infantil';
+
   useEffect(() => {
-    if (classFilter && subjectFilter) {
+    if (classFilter && (subjectFilter || isInfantil)) {
       setLoadingGrades(true);
-      api.get(`/grades/class/${classFilter}/subject/${subjectFilter}`)
+      api.get(`/grades/class/${classFilter}`, { params: subjectFilter ? { subjectId: subjectFilter } : {} })
         .then(r => setGrades(r.data))
         .catch(console.error)
         .finally(() => setLoadingGrades(false));
     } else {
       setGrades([]);
     }
-  }, [classFilter, subjectFilter]);
+  }, [classFilter, subjectFilter, isInfantil]);
 
   // Fecha detail ao clicar fora
   useEffect(() => {
@@ -152,14 +155,16 @@ export default function ProfessorNotasHistoricoPage() {
             <option value="">Selecione a turma</option>
             {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
-          <select value={subjectFilter} onChange={e => setSubjectFilter(e.target.value)} disabled={!classFilter} className={`${selectCls} disabled:opacity-50`}>
-            <option value="">Selecione a disciplina</option>
-            {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
+          {!isInfantil && (
+            <select value={subjectFilter} onChange={e => setSubjectFilter(e.target.value)} disabled={!classFilter} className={`${selectCls} disabled:opacity-50`}>
+              <option value="">Selecione a disciplina</option>
+              {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          )}
         </div>
 
         {/* Conteúdo */}
-        {!classFilter || !subjectFilter ? (
+        {!classFilter || (!isInfantil && !subjectFilter) ? (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-10 text-center">
             <p className="text-gray-400 dark:text-gray-500 text-sm">Selecione turma e disciplina para ver o boletim</p>
           </div>

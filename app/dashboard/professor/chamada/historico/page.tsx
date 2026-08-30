@@ -28,7 +28,7 @@ interface AttendanceRecord {
   student: { id: number; name: string };
   subject: { id: number; name: string };
 }
-interface SchoolClass { id: number; name: string; }
+interface SchoolClass { id: number; name: string; mode?: 'regular' | 'infantil'; }
 interface Subject { id: number; name: string; }
 
 function localDate(dateStr: string) {
@@ -68,6 +68,9 @@ export default function ProfessorChamadaHistoricoPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const selectedClass = classes.find(c => c.id === Number(classFilter));
+  const isInfantil = selectedClass?.mode === 'infantil';
+
   useEffect(() => {
     if (classFilter) {
       api.get(`/classes/${classFilter}/subjects`)
@@ -79,9 +82,9 @@ export default function ProfessorChamadaHistoricoPage() {
   }, [classFilter]);
 
   useEffect(() => {
-    if (classFilter && subjectFilter) {
+    if (classFilter && (subjectFilter || isInfantil)) {
       setLoadingRecords(true);
-      api.get(`/attendance/class/${classFilter}/subject/${subjectFilter}`)
+      api.get(`/attendance/class/${classFilter}`, { params: subjectFilter ? { subjectId: subjectFilter } : {} })
         .then((r: { data: AttendanceRecord[] }) => {
           setRecords(r.data);
           if (r.data.length > 0) {
@@ -92,7 +95,7 @@ export default function ProfessorChamadaHistoricoPage() {
         .catch(console.error)
         .finally(() => setLoadingRecords(false));
     }
-  }, [classFilter, subjectFilter]);
+  }, [classFilter, subjectFilter, isInfantil]);
 
   // Agrupa por data
   const byDate: Record<string, AttendanceRecord[]> = {};
@@ -245,13 +248,15 @@ export default function ProfessorChamadaHistoricoPage() {
               {classes.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           )}
-          <select value={subjectFilter} onChange={e => setSubjectFilter(e.target.value)} disabled={!classFilter} className={`${selectCls} disabled:opacity-50`}>
-            <option value="">Selecione a disciplina</option>
-            {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
+          {!isInfantil && (
+            <select value={subjectFilter} onChange={e => setSubjectFilter(e.target.value)} disabled={!classFilter} className={`${selectCls} disabled:opacity-50`}>
+              <option value="">Selecione a disciplina</option>
+              {subjects.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          )}
         </div>
 
-        {!classFilter || !subjectFilter ? (
+        {!classFilter || (!isInfantil && !subjectFilter) ? (
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-10 text-center">
             <p className="text-gray-400 dark:text-gray-500 text-sm">Selecione turma e disciplina para ver o histórico</p>
           </div>
