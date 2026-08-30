@@ -129,9 +129,9 @@ function useFadeIn() {
   return ref;
 }
 
-/* ─── MOCK DASHBOARD ─────────────────────────── */
+/* ─── SCREENSHOT DO PRODUTO (moldura de navegador) ───────────── */
 
-function MockDashboard() {
+function HeroScreenshot() {
   return (
     <div className="w-full max-w-2xl mx-auto rounded-2xl overflow-hidden border border-white/10 shadow-2xl shadow-black/60" style={{ background: '#111118' }}>
       <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5" style={{ background: '#0D0D14' }}>
@@ -140,45 +140,7 @@ function MockDashboard() {
         <span className="w-3 h-3 rounded-full bg-green-500/70" />
         <span className="ml-3 text-xs text-white/30 font-mono">dashboard · Walladm</span>
       </div>
-      <div className="p-5">
-        <div className="grid grid-cols-3 gap-3 mb-4">
-          {[
-            { label: 'Alunos',       value: '348',     color: '#3B82F6' },
-            { label: 'Frequência',   value: '92%',     color: '#22C55E' },
-            { label: 'Mensalidades', value: 'R$ 42k',  color: '#8B5CF6' },
-          ].map((s) => (
-            <div key={s.label} className="rounded-xl p-3 border border-white/5" style={{ background: '#0D0D14' }}>
-              <p className="text-xs mb-1" style={{ color: '#64748B' }}>{s.label}</p>
-              <p className="text-lg font-bold" style={{ color: s.color }}>{s.value}</p>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-xl p-4 border border-white/5 mb-4" style={{ background: '#0D0D14' }}>
-          <p className="text-xs mb-3" style={{ color: '#64748B' }}>Notas por bimestre</p>
-          <div className="flex items-end gap-2 h-16">
-            {[65, 80, 72, 88, 75, 90, 68, 85].map((h, i) => (
-              <div key={i} className="flex-1 rounded-t-sm" style={{ height: `${h}%`, background: i % 2 === 0 ? 'rgba(59,130,246,0.6)' : 'rgba(139,92,246,0.6)' }} />
-            ))}
-          </div>
-        </div>
-        <div className="rounded-xl border border-white/5" style={{ background: '#0D0D14' }}>
-          {[
-            { name: 'Ana Clara Silva', status: 'Presente', color: '#22C55E' },
-            { name: 'Bruno Mendes',    status: 'Ausente',  color: '#EF4444' },
-            { name: 'Carla Souza',     status: 'Presente', color: '#22C55E' },
-          ].map((s) => (
-            <div key={s.name} className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 last:border-0">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'rgba(99,102,241,0.2)', color: '#818CF8' }}>
-                  {s.name[0]}
-                </div>
-                <span className="text-xs" style={{ color: '#94A3B8' }}>{s.name}</span>
-              </div>
-              <span className="text-xs font-medium" style={{ color: s.color }}>{s.status}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <img src="/screenshots/dashboard-diretor.png" alt="Dashboard do diretor no Walladm" className="w-full h-auto block" />
     </div>
   );
 }
@@ -217,6 +179,7 @@ export default function LandingPage() {
   const heroRef  = useFadeIn();
   const featRef  = useFadeIn();
   const stepsRef = useFadeIn();
+  const showcaseRef = useFadeIn();
   const planosRef = useFadeIn();
   const faqRef   = useFadeIn();
   const ctaRef   = useFadeIn();
@@ -344,7 +307,7 @@ export default function LandingPage() {
             </span>
           </div>
 
-          <div className="mt-16"><MockDashboard /></div>
+          <div className="mt-16"><HeroScreenshot /></div>
         </div>
       </section>
 
@@ -433,6 +396,29 @@ export default function LandingPage() {
                 <p className="text-sm leading-relaxed" style={{ color: '#64748B' }}>{s.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRODUTO EM USO ── */}
+      <section className="py-24 px-6">
+        <div ref={showcaseRef} style={fadeStyle} className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">O sistema em uso</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl shadow-black/40">
+                <img src="/screenshots/avaliacao-infantil.png" alt="Parecer descritivo da educação infantil no Walladm" className="w-full h-auto block" />
+              </div>
+              <p className="text-sm mt-3 text-center" style={{ color: '#64748B' }}>Parecer descritivo da educação infantil, texto individual por criança.</p>
+            </div>
+            <div>
+              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl shadow-black/40">
+                <img src="/screenshots/financeiro.png" alt="Tela financeira do Walladm" className="w-full h-auto block" />
+              </div>
+              <p className="text-sm mt-3 text-center" style={{ color: '#64748B' }}>Financeiro completo: mensalidades, formas de pagamento e inadimplência.</p>
+            </div>
           </div>
         </div>
       </section>
