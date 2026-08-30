@@ -406,16 +406,47 @@ export default function LandingPage() {
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">O sistema em uso</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex flex-col gap-10">
             <div>
-              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl shadow-black/40">
+              {/* Captura de tela: legivel a partir de tablet. Em celular, screenshot de
+                  paragrafo inteiro fica pequeno demais pra ler, mesmo bem recortado
+                  (testado). Card abaixo mostra o mesmo texto real, so que como texto. */}
+              <div className="hidden sm:block rounded-2xl overflow-hidden border border-white/10 shadow-xl shadow-black/40">
                 <img src="/screenshots/avaliacao-infantil.png" alt="Parecer descritivo da educação infantil no Walladm" className="w-full h-auto block" />
               </div>
-              <p className="text-sm mt-3 text-center" style={{ color: '#64748B' }}>Parecer descritivo da educação infantil, texto individual por criança.</p>
+              <div className="sm:hidden rounded-2xl border border-white/10 p-5" style={{ background: '#111118' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ background: '#A855F7' }}>A</div>
+                  <span className="text-sm font-semibold text-white">Ana Julia Correia</span>
+                  <span className="ml-auto text-[10px] px-2 py-0.5 rounded-full font-medium flex-shrink-0" style={{ background: 'rgba(34,197,94,0.15)', color: '#4ADE80' }}>Desenvolvido</span>
+                </div>
+                <p className="text-sm leading-relaxed" style={{ color: '#CBD5E1' }}>
+                  Ana Julia é referência de autonomia na turma: guarda os próprios pertences, lava as mãos sozinha e ajuda os colegas menores. Participa ativamente das histórias contadas, antecipando falas conhecidas.
+                </p>
+              </div>
+              <p className="text-sm mt-3 text-center" style={{ color: '#64748B' }}>Parecer descritivo da educação infantil: texto individual por criança.</p>
             </div>
             <div>
-              <div className="rounded-2xl overflow-hidden border border-white/10 shadow-xl shadow-black/40">
+              <div className="hidden sm:block rounded-2xl overflow-hidden border border-white/10 shadow-xl shadow-black/40">
                 <img src="/screenshots/financeiro.png" alt="Tela financeira do Walladm" className="w-full h-auto block" />
+              </div>
+              <div className="sm:hidden grid grid-cols-2 gap-3">
+                <div className="rounded-xl border border-white/10 p-4" style={{ background: '#111118' }}>
+                  <p className="text-xs mb-1" style={{ color: '#64748B' }}>Recebido</p>
+                  <p className="text-lg font-bold" style={{ color: '#22C55E' }}>R$ 28.800,00</p>
+                </div>
+                <div className="rounded-xl border border-white/10 p-4" style={{ background: '#111118' }}>
+                  <p className="text-xs mb-1" style={{ color: '#64748B' }}>Em atraso</p>
+                  <p className="text-lg font-bold" style={{ color: '#EF4444' }}>R$ 4.800,00</p>
+                </div>
+                <div className="rounded-xl border border-white/10 p-4" style={{ background: '#111118' }}>
+                  <p className="text-xs mb-1" style={{ color: '#64748B' }}>Inadimplência</p>
+                  <p className="text-lg font-bold text-white">14%</p>
+                </div>
+                <div className="rounded-xl border border-white/10 p-4" style={{ background: '#111118' }}>
+                  <p className="text-xs mb-1" style={{ color: '#64748B' }}>Formas de pagamento</p>
+                  <p className="text-sm font-medium text-white">PIX, Boleto, Cartão</p>
+                </div>
               </div>
               <p className="text-sm mt-3 text-center" style={{ color: '#64748B' }}>Financeiro completo: mensalidades, formas de pagamento e inadimplência.</p>
             </div>
