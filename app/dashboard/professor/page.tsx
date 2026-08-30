@@ -1,12 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUser, clearAuth } from '../../lib/auth';
+import { getUser } from '../../lib/auth';
 import api from '../../lib/api';
-import { BookOpen, Users, ClipboardList, LogOut, CheckSquare, Newspaper, Bell, NotebookPen } from 'lucide-react';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { BookOpen, Users, ClipboardList, CheckSquare, Newspaper, Bell, NotebookPen } from 'lucide-react';
+import { DashboardHeader } from '@/components/dashboard-header';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Filler, Tooltip, Legend } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 
@@ -69,34 +68,7 @@ export default function ProfessorDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-                      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
-            <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Wall</span><span className="text-[#F5A623]">adm</span></span>
-          </Link>
-            <span className="text-gray-300 dark:text-gray-600 hidden sm:inline">|</span>
-            <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">Painel do Professor</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => router.push('/dashboard/professor/notificacoes')} className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-              <Bell size={20} />
-              {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">{unreadCount > 9 ? '9+' : unreadCount}</span>}
-            </button>
-            <button onClick={() => router.push('/dashboard/perfil')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">{user?.name?.charAt(0).toUpperCase()}</span>
-              </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">{user?.name}</span>
-            </button>
-            <ThemeToggle />
-            <button onClick={() => { clearAuth(); router.push('/login'); }} className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400">
-              <LogOut size={16} />
-            </button>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader subtitle="Docente" unreadCount={unreadCount} notificationsHref="/dashboard/professor/notificacoes" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-8">
@@ -119,7 +91,7 @@ export default function ProfessorDashboard() {
               href: '/dashboard/professor/notas/historico',
             },
             {
-              value: data?.avgGrade != null ? Number(data.avgGrade).toFixed(2) : '—',
+              value: data?.avgGrade != null ? Number(data.avgGrade).toFixed(2) : '-',
               label: 'Média das notas',
               icon: BookOpen,
               color: 'bg-green-50 dark:bg-green-950 text-green-600',
@@ -168,7 +140,7 @@ export default function ProfessorDashboard() {
                 className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
               >
                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                  Frequência — clique para detalhes
+                  Frequência
                 </p>
                 <div style={{ height: 180 }}>
                   <Bar
@@ -199,7 +171,7 @@ export default function ProfessorDashboard() {
                 className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
               >
                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                  Notas — clique para detalhes
+                  Notas
                 </p>
                 <div style={{ height: 180 }}>
                   <Line

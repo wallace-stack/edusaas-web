@@ -80,7 +80,7 @@ export default function SecretariaDashboard() {
           ) : (
             <div className="h-7 w-52 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
           )}
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Secretária — aqui está o resumo da escola hoje.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Aqui está o resumo da escola hoje.</p>
         </div>
 
         {/* Cards de métricas */}

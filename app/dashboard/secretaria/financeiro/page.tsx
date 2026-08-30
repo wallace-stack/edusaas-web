@@ -1,4 +1,3 @@
-// v3 — força rebuild Vercel — fix hidratação SSR
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -72,7 +71,7 @@ function fmt(v: number) {
 }
 
 function fmtDate(d?: string) {
-  if (!d) return '—';
+  if (!d) return '-';
   return new Date(d).toLocaleDateString('pt-BR');
 }
 
@@ -171,7 +170,7 @@ export default function SecretariaFinanceiroPage() {
   const [tuitions, setTuitions] = useState<Tuition[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Default já é 'overdue' — cobre o link do dashboard da secretaria (?status=inadimplente)
+  // Default já é 'overdue', cobre o link do dashboard da secretaria (?status=inadimplente)
   // sem precisar ler a querystring; não há outro valor de status linkado hoje.
   const [activeTab, setActiveTab] = useState<'overdue' | 'pending' | 'paid'>('overdue');
   const [search, setSearch] = useState('');
@@ -336,7 +335,7 @@ export default function SecretariaFinanceiroPage() {
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
 
       <DashboardHeader
-        subtitle={`Financeiro — ${MONTHS[month - 1]} ${year}`}
+        subtitle={`Financeiro · ${MONTHS[month - 1]} ${year}`}
         showBack
         actions={
           <>

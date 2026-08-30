@@ -1,12 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUser, clearAuth } from '../../lib/auth';
+import { getUser } from '../../lib/auth';
 import api from '../../lib/api';
-import { BookOpen, CheckSquare, DollarSign, Bell, LogOut, TrendingUp, AlertTriangle, Newspaper, ArrowLeft } from 'lucide-react';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { BookOpen, CheckSquare, DollarSign, Bell, TrendingUp, AlertTriangle, Newspaper } from 'lucide-react';
+import { DashboardHeader } from '@/components/dashboard-header';
 
 interface Grade {
   id: number;
@@ -93,42 +92,7 @@ export default function AlunoDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.back()}
-              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg"
-            >
-              <ArrowLeft size={18} className="text-gray-600 dark:text-gray-400" />
-            </button>
-            <div className="flex items-center gap-2">
-                        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
-            <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Wall</span><span className="text-[#F5A623]">adm</span></span>
-          </Link>
-              <span className="text-gray-300 dark:text-gray-600 hidden sm:block">|</span>
-              <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:block">Portal do Aluno</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <button onClick={() => router.push('/dashboard/aluno/notificacoes')} className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-              <Bell size={20} />
-              {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">{unreadCount > 9 ? '9+' : unreadCount}</span>}
-            </button>
-            <button onClick={() => router.push('/dashboard/perfil')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">{user?.name?.charAt(0).toUpperCase()}</span>
-              </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">{user?.name}</span>
-            </button>
-            <ThemeToggle />
-            <button onClick={() => { clearAuth(); router.push('/login'); }} className="text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400">
-              <LogOut size={16} />
-            </button>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader subtitle="Portal do Estudante" unreadCount={unreadCount} notificationsHref="/dashboard/aluno/notificacoes" />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
@@ -171,7 +135,7 @@ export default function AlunoDashboard() {
             <AlertTriangle size={20} className="text-red-500 dark:text-red-400 flex-shrink-0" />
             <div>
               <p className="text-sm font-medium text-red-700 dark:text-red-300">Frequência irregular!</p>
-              <p className="text-xs text-red-500 dark:text-red-400">Sua frequência está abaixo de 75% — risco de reprovação.</p>
+              <p className="text-xs text-red-500 dark:text-red-400">Sua frequência está abaixo de 75%, risco de reprovação.</p>
             </div>
           </div>
         )}

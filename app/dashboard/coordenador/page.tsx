@@ -1,12 +1,11 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUser, clearAuth } from '../../lib/auth';
+import { getUser } from '../../lib/auth';
 import api from '../../lib/api';
-import { Users, AlertTriangle, LogOut, Bell, BookOpen, TrendingDown, Newspaper, UserCog, NotebookPen } from 'lucide-react';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { Users, AlertTriangle, Bell, BookOpen, TrendingDown, Newspaper, UserCog, NotebookPen } from 'lucide-react';
+import { DashboardHeader } from '@/components/dashboard-header';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
@@ -77,34 +76,7 @@ export default function CoordenadorDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
-      <header className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-                      <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src="/logo-icon.png" alt="Walladm" className="h-9 w-auto" />
-            <span className="font-bold text-lg tracking-tight"><span className="text-[#1E3A5F] dark:text-white">Wall</span><span className="text-[#F5A623]">adm</span></span>
-          </Link>
-            <span className="text-gray-300 dark:text-gray-600 hidden sm:inline">|</span>
-            <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">Coordenação</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <button onClick={() => router.push('/dashboard/coordenador/notificacoes')} className="relative p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-              <Bell size={20} />
-              {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">{unreadCount > 9 ? '9+' : unreadCount}</span>}
-            </button>
-            <button onClick={() => router.push('/dashboard/perfil')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-[#1E3A5F] rounded-full flex items-center justify-center">
-                <span className="text-white text-xs font-bold">{user?.name?.charAt(0).toUpperCase()}</span>
-              </div>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-200 hidden sm:block">{user?.name}</span>
-            </button>
-            <ThemeToggle />
-            <button onClick={() => { clearAuth(); router.push('/login'); }} className="text-gray-400 hover:text-red-500 transition-colors">
-              <LogOut size={16} />
-            </button>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader subtitle="Coordenação" unreadCount={unreadCount} notificationsHref="/dashboard/coordenador/notificacoes" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <div className="mb-6">
@@ -219,13 +191,13 @@ export default function CoordenadorDashboard() {
         {/* Mini gráficos clicáveis */}
         {data && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
-            {/* Rosca — situação acadêmica */}
+            {/* Rosca, situação acadêmica */}
             {data.academicSituation && (
               <button
                 onClick={() => router.push('/dashboard/coordenador/alunos')}
                 className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
               >
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Situação Acadêmica — clique para ver alunos</p>
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Situação Acadêmica</p>
                 <div className="flex items-center gap-4">
                   <div className="relative" style={{ width: 120, height: 120, flexShrink: 0 }}>
                     <Doughnut
@@ -249,13 +221,13 @@ export default function CoordenadorDashboard() {
               </button>
             )}
 
-            {/* Barras — frequência por turma */}
+            {/* Barras, frequência por turma */}
             {(data.classAttendance?.length ?? 0) > 0 && (
               <button
                 onClick={() => router.push('/dashboard/coordenador/alunos?filtro=baixa-frequencia')}
                 className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 text-left cursor-pointer hover:opacity-90 hover:shadow-sm transition-all"
               >
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência por Turma — clique para ver irregulares</p>
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">Frequência por Turma</p>
                 <div style={{ height: 150 }}>
                   <Bar
                     data={{
@@ -335,7 +307,7 @@ export default function CoordenadorDashboard() {
                       <div className="flex flex-wrap gap-1 mt-2">
                         {p.subjects.map((s, i) => (
                           <span key={i} className="text-[10px] px-2 py-0.5 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 rounded-full border border-blue-100 dark:border-blue-900">
-                            {s.subjectName} — {s.className}
+                            {s.subjectName} · {s.className}
                           </span>
                         ))}
                       </div>

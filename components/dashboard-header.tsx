@@ -21,7 +21,7 @@ interface DashboardHeaderProps {
   actions?: ReactNode;
 }
 
-// Nome da escola nunca vem de valor espelhado no cliente (cookie de user, etc.) —
+// Nome da escola nunca vem de valor espelhado no cliente (cookie de user, etc.),
 // sempre buscado aqui, resolvido no backend a partir do schoolId do token. Evita
 // mostrar a escola errada pra quem tem conta em mais de uma (login multi-escola).
 function useSchoolName(): string | null {
@@ -65,7 +65,7 @@ export function DashboardHeader({
               <img src="/logo-icon.png" alt="Walladm" className="h-8 w-auto" />
             </Link>
           )}
-          {/* Marca por extenso some primeiro no mobile — nome da escola tem prioridade,
+          {/* Marca por extenso some primeiro no mobile, nome da escola tem prioridade,
               a pessoa pode confundir a escola, dificilmente esquece o próprio papel. */}
           <span className="hidden sm:inline font-bold text-base tracking-tight text-[#1E3A5F] dark:text-white flex-shrink-0">
             Wall<span className="text-[#F5A623]">adm</span>

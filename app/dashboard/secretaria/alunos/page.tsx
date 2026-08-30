@@ -524,7 +524,7 @@ export default function SecretariaAlunosPage() {
               <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 pt-2">Acesso</p>
               <select value={form.classId} onChange={e => setForm({ ...form, classId: e.target.value })} required className={inputCls}>
                 <option value="">Selecione a turma *</option>
-                {classes.map(c => <option key={c.id} value={c.id}>{c.name} — {c.year}</option>)}
+                {classes.map(c => <option key={c.id} value={c.id}>{c.name} · {c.year}</option>)}
               </select>
               <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-xl">
                 <span className="text-blue-600 text-lg">📧</span>
@@ -600,7 +600,7 @@ export default function SecretariaAlunosPage() {
                     className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
                   />
                 ) : (
-                  <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.phone || '—'}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.phone || '-'}</p>
                 )}
               </div>
 
@@ -614,7 +614,7 @@ export default function SecretariaAlunosPage() {
                     className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#1E3A5F]"
                   />
                 ) : (
-                  <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.cpf || '—'}</p>
+                  <p className="text-sm text-gray-700 dark:text-gray-200">{selectedStudent.cpf || '-'}</p>
                 )}
               </div>
 
@@ -638,7 +638,7 @@ export default function SecretariaAlunosPage() {
                         {selectedStudent.state && ` - ${selectedStudent.state}`}
                         {selectedStudent.zipCode && ` · CEP ${selectedStudent.zipCode}`}
                       </>
-                    ) : '—'}
+                    ) : '-'}
                   </p>
                 )}
               </div>
@@ -674,7 +674,7 @@ export default function SecretariaAlunosPage() {
                         <p className="text-xs text-gray-400">{selectedStudent.guardianPhone} · {selectedStudent.guardianRelation}</p>
                       )}
                     </>
-                  ) : <p className="text-sm text-gray-700 dark:text-gray-200">—</p>
+                  ) : <p className="text-sm text-gray-700 dark:text-gray-200">-</p>
                 )}
               </div>
               <div className="px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-xl">
