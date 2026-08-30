@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from 'react';
 import {
   Menu, X, Check, ChevronDown,
   BarChart3, Users, DollarSign, ClipboardList, CalendarCheck, ShieldCheck,
-  Sparkles, School, UserPlus, Rocket, Quote, Star, ArrowRight,
+  Sparkles, School, UserPlus, Rocket, Star, ArrowRight,
 } from 'lucide-react';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -16,23 +16,17 @@ const inter = Inter({ subsets: ['latin'] });
 
 const features = [
   { Icon: BarChart3,    title: 'Métricas em tempo real',    desc: 'Dashboards com indicadores da instituição atualizados automaticamente para cada perfil de acesso.' },
-  { Icon: Users,        title: 'Gestão multi-perfil',        desc: 'Perfis separados para diretor, coordenador, professor e aluno — cada um vê exatamente o que precisa.' },
+  { Icon: Users,        title: 'Gestão multi-perfil',        desc: 'Perfis separados para diretor, coordenador, professor e aluno. Cada um vê exatamente o que precisa.' },
   { Icon: DollarSign,   title: 'Controle financeiro',        desc: 'Mensalidades, inadimplência e fluxo de caixa em um painel completo. Nunca perca um pagamento.' },
   { Icon: ClipboardList,title: 'Lançamento de notas',        desc: 'Professores lançam notas por turma, disciplina e bimestre de forma simples, rápida e rastreável.' },
   { Icon: CalendarCheck,title: 'Controle de frequência',     desc: 'Chamadas com status presente, ausente ou justificado. Histórico completo por aluno e turma.' },
-  { Icon: ShieldCheck,  title: 'Segurança e privacidade', desc: 'Seus dados e os dados dos alunos protegidos com criptografia de ponta. Acesso controlado por perfil — cada usuário vê apenas o que precisa.' },
+  { Icon: ShieldCheck,  title: 'Segurança e privacidade', desc: 'Acesso controlado por perfil. Cada usuário vê apenas o que precisa, e cada escola só acessa os próprios dados.' },
 ];
 
 const steps = [
   { Icon: School,   step: '01', title: 'Cadastre sua escola', desc: 'Crie sua conta em menos de 2 minutos. Preencha os dados da instituição e comece o trial.' },
   { Icon: UserPlus, step: '02', title: 'Convide sua equipe',  desc: 'Adicione diretores, coordenadores, professores e alunos. Cada um recebe acesso personalizado.' },
   { Icon: Rocket,   step: '03', title: 'Comece a usar',       desc: 'Lance notas, registre chamadas, acompanhe o financeiro. Tudo funcionando desde o primeiro dia.' },
-];
-
-const testimonials = [
-  { initials: 'MA', color: '#3B82F6', name: 'Marcos Andrade',  role: 'Diretor',                  school: 'Colégio São Lucas — SP',  text: 'Reduzimos em 80% o tempo gasto com planilhas. A equipe adaptou rápido e o suporte é excelente.' },
-  { initials: 'CF', color: '#8B5CF6', name: 'Cláudia Ferreira', role: 'Coordenadora Pedagógica', school: 'Instituto Educar — MG',    text: 'Ver as notas e frequências em tempo real mudou completamente nossa tomada de decisão pedagógica.' },
-  { initials: 'RP', color: '#F97316', name: 'Roberto Pinheiro', role: 'Diretor Administrativo',  school: 'Escola Nova Era — RJ',    text: 'O módulo financeiro sozinho já pagou o investimento. Adimplência subiu 30% no primeiro trimestre.' },
 ];
 
 const faqs = [
@@ -50,15 +44,15 @@ const faqs = [
   },
   {
     q: 'Como funciona o suporte?',
-    a: 'No Starter o suporte é por e-mail. No Pro e no Escola, suporte prioritário por WhatsApp. No plano Rede, você tem um gerente de conta dedicado com SLA garantido.',
+    a: 'No Starter o suporte é por e-mail. No Pro, suporte prioritário por WhatsApp. Para escolas com mais de 500 alunos, suporte dedicado, fale com a gente.',
   },
   {
     q: 'Quantos alunos posso cadastrar?',
-    a: 'No Starter até 150 alunos, no Pro até 500, no Escola até 1.000. O plano Rede atende redes e franquias sem limite fixo — entre em contato para um orçamento.',
+    a: 'No Starter até 150 alunos, no Pro até 500. Mais que isso, fale com a gente para um plano sob medida.',
   },
   {
-    q: 'Qual a diferença entre o plano mensal e anual?',
-    a: 'No plano anual você economiza 20%. O valor é cobrado uma vez por ano via Pix, boleto ou cartão de crédito. Você pode voltar para o mensal na renovação.',
+    q: 'Como funciona a cobrança?',
+    a: 'O pagamento é em combos de 3 ou 6 meses, via Pix, boleto ou cartão de crédito. O combo de 6 meses sai mais barato por mês que o de 3.',
   },
   {
     q: 'Como faço para migrar minha escola para a plataforma?',
@@ -66,7 +60,7 @@ const faqs = [
   },
   {
     q: 'A plataforma funciona no celular?',
-    a: 'Sim. A plataforma é totalmente responsiva e funciona em qualquer dispositivo — computador, tablet ou celular — sem precisar instalar nada.',
+    a: 'Sim. A plataforma é totalmente responsiva e funciona em qualquer dispositivo (computador, tablet ou celular), sem precisar instalar nada.',
   },
 ];
 
@@ -74,8 +68,7 @@ const PLANS = [
   {
     id: 'starter',
     name: 'Starter',
-    price: { monthly: 97, annual: 78 },
-    subtitle: 'Para escolas pequenas que querem começar',
+    price: { threeMonth: 197, sixMonth: 349 },
     badge: '14 dias grátis',
     badgeGradient: 'linear-gradient(135deg, #2563EB, #3B82F6)',
     highlight: false,
@@ -96,8 +89,7 @@ const PLANS = [
   {
     id: 'pro',
     name: 'Pro',
-    price: { monthly: 197, annual: 158 },
-    subtitle: 'Para escolas que querem crescer com controle',
+    price: { threeMonth: 397, sixMonth: 697 },
     badge: 'Mais popular',
     badgeGradient: 'linear-gradient(135deg, #7C3AED, #A855F7)',
     highlight: true,
@@ -116,51 +108,9 @@ const PLANS = [
     href: '/cadastro',
     ctaStyle: { background: 'linear-gradient(135deg, #7C3AED, #A855F7)', color: 'white' } as React.CSSProperties,
   },
-  {
-    id: 'escola',
-    name: 'Escola',
-    price: { monthly: 397, annual: 318 },
-    subtitle: 'Para escolas que precisam de gestão completa',
-    badge: '14 dias grátis',
-    badgeGradient: 'linear-gradient(135deg, #059669, #10B981)',
-    highlight: false,
-    checkColor: '#10B981',
-    features: [
-      'Até 1.000 alunos',
-      'Tudo do Pro',
-      'Relatórios para secretaria de educação',
-      'Múltiplos coordenadores',
-      'Exportação de relatório fiscal para contabilidade',
-      'Suporte por WhatsApp prioritário em até 1h',
-      'Trial 14 dias grátis',
-    ],
-    cta: 'Começar grátis',
-    href: '/cadastro',
-    ctaStyle: { background: '#111118', color: 'white', border: '1px solid rgba(255,255,255,0.12)' } as React.CSSProperties,
-  },
-  {
-    id: 'rede',
-    name: 'Rede',
-    price: { monthly: 0, annual: 0 },
-    subtitle: 'Para redes e franquias com múltiplas unidades',
-    badge: null,
-    badgeGradient: 'linear-gradient(135deg, #D97706, #F59E0B)',
-    highlight: false,
-    checkColor: '#F59E0B',
-    features: [
-      'Múltiplas unidades',
-      'Painel centralizado (em breve)',
-      'Tudo do plano Escola',
-      'Treinamento da equipe incluído',
-      'SLA 99% garantido',
-      'Gerente de conta dedicado',
-      'Suporte por WhatsApp 24h',
-    ],
-    cta: 'Falar com especialista',
-    href: 'https://wa.me/5521979911987?text=Olá,+tenho+interesse+no+plano+Rede+do+Walladm',
-    ctaStyle: { background: '#111118', color: 'white', border: '1px solid rgba(255,255,255,0.12)' } as React.CSSProperties,
-  },
 ];
+
+const CONTATO_GRANDE_ESCOLA_HREF = 'https://wa.me/5521979911987?text=Ol%C3%A1,+minha+escola+tem+mais+de+500+alunos+e+quero+saber+sobre+o+Walladm';
 
 /* ─── HOOK FADE-IN ───────────────────────────── */
 
@@ -262,12 +212,11 @@ function FaqItem({ q, a }: { q: string; a: string }) {
 
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isAnnual, setIsAnnual] = useState(false);
+  const [isSixMonth, setIsSixMonth] = useState(false);
 
   const heroRef  = useFadeIn();
   const featRef  = useFadeIn();
   const stepsRef = useFadeIn();
-  const testiRef = useFadeIn();
   const planosRef = useFadeIn();
   const faqRef   = useFadeIn();
   const ctaRef   = useFadeIn();
@@ -348,14 +297,13 @@ export default function LandingPage() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-7xl font-extrabold leading-tight mb-6 tracking-tight">
-            Gerencie sua escola<br />
             <span style={{ background: 'linear-gradient(90deg,#60A5FA,#A78BFA)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-              de forma inteligente
+              Gerencie sua escola
             </span>
           </h1>
 
           <p className="text-base sm:text-lg max-w-xl mx-auto mb-10 leading-relaxed" style={{ color: '#94A3B8' }}>
-            Uma plataforma completa para diretores, coordenadores, professores e alunos. Tudo integrado, seguro e pronto para usar.
+            Notas, frequência e financeiro em um só lugar, sem planilha.
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:gap-4 justify-center mb-6">
@@ -380,7 +328,7 @@ export default function LandingPage() {
           <div className="flex flex-wrap justify-center gap-6 mt-8 text-white/60 text-xs">
             <span className="flex items-center gap-1.5">
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 1a4.5 4.5 0 00-4.5 4.5V9H5a2 2 0 00-2 2v6a2 2 0 002 2h10a2 2 0 002-2v-6a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm3 8V5.5a3 3 0 10-6 0V9h6z" clipRule="evenodd"/></svg>
-              Dados 100% seguros
+              Dados isolados por escola
             </span>
             <span className="flex items-center gap-1.5">
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/></svg>
@@ -388,7 +336,7 @@ export default function LandingPage() {
             </span>
             <span className="flex items-center gap-1.5">
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
-              Suporte humanizado
+              Suporte por e-mail e WhatsApp
             </span>
             <span className="flex items-center gap-1.5">
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z" clipRule="evenodd"/></svg>
@@ -415,7 +363,7 @@ export default function LandingPage() {
               },
               {
                 icon: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>,
-                text: 'Suporte humanizado',
+                text: 'Suporte por e-mail e WhatsApp',
               },
               {
                 icon: <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
@@ -466,7 +414,6 @@ export default function LandingPage() {
         <div ref={stepsRef} style={fadeStyle} className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">Como funciona</h2>
-            <p style={{ color: '#94A3B8' }}>Três passos simples para transformar sua gestão escolar.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
             <div className="hidden md:block absolute top-10 left-1/3 right-1/3 h-px" style={{ background: 'linear-gradient(90deg,#3B82F6,#8B5CF6)' }} />
@@ -490,75 +437,38 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── DEPOIMENTOS ── */}
-      <section className="py-24 px-6">
-        <div ref={testiRef} style={fadeStyle} className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">O que dizem os diretores</h2>
-            <p style={{ color: '#94A3B8' }}>Instituições que transformaram sua gestão com o Walladm.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {testimonials.map((t) => (
-              <div key={t.name} className="card-hover rounded-2xl p-6 border flex flex-col gap-4"
-                style={{ background: '#111118', borderColor: 'rgba(255,255,255,0.07)' }}>
-                <Quote size={20} style={{ color: 'rgba(59,130,246,0.4)' }} />
-                <p className="text-sm leading-relaxed flex-1" style={{ color: '#94A3B8' }}>{t.text}</p>
-                <div className="flex items-center gap-3 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                    style={{ background: t.color }}>
-                    {t.initials}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">{t.name}</p>
-                    <p className="text-xs" style={{ color: '#64748B' }}>{t.role} · {t.school}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ── PLANOS ── */}
       <section id="planos" className="py-24 px-6" style={{ background: '#0D0D14' }}>
         <div ref={planosRef} style={fadeStyle} className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Planos simples e transparentes</h2>
-            <p style={{ color: '#94A3B8' }}>Comece grátis, escale quando precisar. Sem surpresas.</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Planos e preços</h2>
           </div>
 
-          {/* Toggle mensal / anual */}
+          {/* Toggle 3 / 6 meses */}
           <div className="flex items-center justify-center gap-3 mb-12">
-            <span className="text-sm font-medium" style={{ color: isAnnual ? '#64748B' : '#F1F5F9' }}>Mensal</span>
+            <span className="text-sm font-medium" style={{ color: isSixMonth ? '#64748B' : '#F1F5F9' }}>3 meses</span>
             <button
-              onClick={() => setIsAnnual(a => !a)}
+              onClick={() => setIsSixMonth(v => !v)}
               className="relative w-12 h-6 rounded-full transition-colors duration-300 focus:outline-none"
-              style={{ background: isAnnual ? 'linear-gradient(135deg,#3B82F6,#8B5CF6)' : 'rgba(255,255,255,0.12)' }}
-              aria-label="Alternar cobrança anual"
+              style={{ background: isSixMonth ? 'linear-gradient(135deg,#3B82F6,#8B5CF6)' : 'rgba(255,255,255,0.12)' }}
+              aria-label="Alternar para combo de 6 meses"
             >
               <span
                 className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300"
-                style={{ transform: isAnnual ? 'translateX(26px)' : 'translateX(2px)' }}
+                style={{ transform: isSixMonth ? 'translateX(26px)' : 'translateX(2px)' }}
               />
             </button>
-            <span className="text-sm font-medium" style={{ color: isAnnual ? '#F1F5F9' : '#64748B' }}>
-              Anual
+            <span className="text-sm font-medium" style={{ color: isSixMonth ? '#F1F5F9' : '#64748B' }}>
+              6 meses
             </span>
-            {isAnnual && (
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full"
-                style={{ background: 'rgba(16,185,129,0.15)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)' }}>
-                20% OFF
-              </span>
-            )}
           </div>
 
-          {/* Grid 4 planos */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 items-stretch">
-            {PLANS.map((plan) => {
-              const p = plan as typeof plan & { pricePrefix?: string };
-              const price         = p.price.monthly ? (isAnnual ? p.price.annual : p.price.monthly) : null;
-              const annualSavings = p.price.monthly ? Math.round(p.price.monthly * 0.2 * 12) : 0;
-              const isWA          = p.href.startsWith('https://wa');
+          {/* Grid 2 planos */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-stretch max-w-2xl mx-auto">
+            {PLANS.map((p) => {
+              const months   = isSixMonth ? 6 : 3;
+              const price    = isSixMonth ? p.price.sixMonth : p.price.threeMonth;
+              const perMonth = (price / months).toFixed(2).replace('.', ',');
 
               return p.highlight ? (
                 /* ── Pro (destaque com borda gradiente) ── */
@@ -575,21 +485,10 @@ export default function LandingPage() {
                       {p.name}
                     </span>
                     <div className="flex flex-wrap items-end gap-1 mb-1">
-                      {price !== null ? (
-                        <>
-                          {p.pricePrefix && <span className="text-xs font-medium self-center mb-1.5" style={{ color: '#64748B' }}>{p.pricePrefix}</span>}
-                          <span className="text-base font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
-                          <span className="text-4xl font-extrabold">{price}</span>
-                          <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
-                        </>
-                      ) : (
-                        <span className="text-2xl font-extrabold" style={{ color: '#94A3B8' }}>Sob consulta</span>
-                      )}
+                      <span className="text-base font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
+                      <span className="text-4xl font-extrabold">{price}</span>
                     </div>
-                    {isAnnual && price !== null && (
-                      <p className="text-xs mb-1" style={{ color: '#10B981' }}>Economize R$ {annualSavings}/ano</p>
-                    )}
-                    <p className="text-sm mb-6" style={{ color: '#64748B' }}>{p.subtitle}</p>
+                    <p className="text-xs mb-6" style={{ color: '#64748B' }}>cobrado a cada {months} meses (R$ {perMonth}/mês)</p>
                     <ul className="space-y-2.5 flex-1 mb-6">
                       {p.features.map((f) => (
                         <li key={f} className="flex items-center gap-2.5 text-sm font-medium">
@@ -597,23 +496,15 @@ export default function LandingPage() {
                         </li>
                       ))}
                     </ul>
-                    {isWA ? (
-                      <a href={p.href} target="_blank" rel="noopener noreferrer"
-                        className="w-full text-center py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5"
-                        style={p.ctaStyle}>
-                        {p.cta}
-                      </a>
-                    ) : (
-                      <Link href={p.href}
-                        className="w-full text-center py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5"
-                        style={p.ctaStyle}>
-                        {p.cta}
-                      </Link>
-                    )}
+                    <Link href={p.href}
+                      className="w-full text-center py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-1.5"
+                      style={p.ctaStyle}>
+                      {p.cta}
+                    </Link>
                   </div>
                 </div>
               ) : (
-                /* ── Outros planos ── */
+                /* ── Starter ── */
                 <div key={p.id} className="rounded-2xl border p-6 flex flex-col"
                   style={{ background: '#111118', borderColor: 'rgba(255,255,255,0.08)', position: 'relative' }}>
                   {p.badge && (
@@ -629,21 +520,10 @@ export default function LandingPage() {
                     {p.name}
                   </span>
                   <div className="flex flex-wrap items-end gap-1 mb-1">
-                    {price !== null ? (
-                      <>
-                        {p.pricePrefix && <span className="text-xs font-medium self-center mb-1.5" style={{ color: '#64748B' }}>{p.pricePrefix}</span>}
-                        <span className="text-base font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
-                        <span className="text-4xl font-extrabold">{price}</span>
-                        <span className="text-sm mb-1 ml-0.5" style={{ color: '#64748B' }}>/mês</span>
-                      </>
-                    ) : (
-                      <span className="text-2xl font-extrabold" style={{ color: '#94A3B8' }}>Sob consulta</span>
-                    )}
+                    <span className="text-base font-medium mb-1" style={{ color: '#64748B' }}>R$</span>
+                    <span className="text-4xl font-extrabold">{price}</span>
                   </div>
-                  {isAnnual && price !== null && (
-                    <p className="text-xs mb-1" style={{ color: '#10B981' }}>Economize R$ {annualSavings}/ano</p>
-                  )}
-                  <p className="text-sm mb-6" style={{ color: '#64748B' }}>{p.subtitle}</p>
+                  <p className="text-xs mb-6" style={{ color: '#64748B' }}>cobrado a cada {months} meses (R$ {perMonth}/mês)</p>
                   <ul className="space-y-2.5 flex-1 mb-6">
                     {p.features.map((f) => (
                       <li key={f} className="flex items-center gap-2.5 text-sm" style={{ color: '#94A3B8' }}>
@@ -651,23 +531,19 @@ export default function LandingPage() {
                       </li>
                     ))}
                   </ul>
-                  {isWA ? (
-                    <a href={p.href} target="_blank" rel="noopener noreferrer"
-                      className="w-full text-center py-3 rounded-xl font-bold text-sm border flex items-center justify-center gap-1.5 transition-colors"
-                      style={p.ctaStyle}>
-                      {p.cta}
-                    </a>
-                  ) : (
-                    <Link href={p.href}
-                      className="w-full text-center py-3 rounded-xl font-bold text-sm border flex items-center justify-center gap-1.5 transition-colors"
-                      style={p.ctaStyle}>
-                      {p.cta}
-                    </Link>
-                  )}
+                  <Link href={p.href}
+                    className="w-full text-center py-3 rounded-xl font-bold text-sm border flex items-center justify-center gap-1.5 transition-colors"
+                    style={p.ctaStyle}>
+                    {p.cta}
+                  </Link>
                 </div>
               );
             })}
           </div>
+
+          <p className="text-center text-sm mt-8" style={{ color: '#64748B' }}>
+            Mais de 500 alunos? <a href={CONTATO_GRANDE_ESCOLA_HREF} target="_blank" rel="noopener noreferrer" className="font-medium underline" style={{ color: '#94A3B8' }}>Fale com a gente</a>.
+          </p>
         </div>
       </section>
 
@@ -689,7 +565,7 @@ export default function LandingPage() {
         <div ref={ctaRef} style={fadeStyle} className="max-w-2xl mx-auto text-center">
           <div className="rounded-3xl border p-12"
             style={{ background: 'linear-gradient(135deg,rgba(59,130,246,0.08),rgba(139,92,246,0.08))', borderColor: 'rgba(59,130,246,0.2)' }}>
-            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Pronto para transformar sua escola?</h2>
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Crie sua conta em 2 minutos</h2>
             <p className="mb-8 leading-relaxed" style={{ color: '#94A3B8' }}>
               Comece grátis hoje. Sem cartão de crédito.
             </p>
@@ -697,7 +573,7 @@ export default function LandingPage() {
               style={{ background: 'linear-gradient(135deg,#3B82F6,#8B5CF6)' }}>
               Criar minha conta gratuitamente <ArrowRight size={18} />
             </Link>
-            <p className="text-xs mt-4" style={{ color: '#475569' }}>Sem cartão de crédito · Suporte humanizado</p>
+            <p className="text-xs mt-4" style={{ color: '#475569' }}>Sem cartão de crédito · Suporte por e-mail e WhatsApp</p>
           </div>
         </div>
       </section>
@@ -711,7 +587,7 @@ export default function LandingPage() {
                 <img src="/logo.png" alt="Walladm" className="h-10 w-auto" />
               </Link>
               <p className="text-sm leading-relaxed max-w-xs" style={{ color: '#475569' }}>
-                Plataforma SaaS para gestão educacional. Simples, completo e seguro.
+                Sistema de gestão escolar: notas, frequência e financeiro.
               </p>
             </div>
             <div>
