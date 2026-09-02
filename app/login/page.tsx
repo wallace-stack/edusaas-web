@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,6 +25,68 @@ interface School {
 
 type Step = 'credentials' | 'select-school';
 
+/* ── RETRY DE COLD START ───────────────────────────────────────────────────
+ * O navegador não deixa o JS diferenciar um bloqueio de CORS de uma falha de
+ * rede genuína — os dois chegam como "sem resposta", sem detalhe. Mas um cold
+ * start de verdade (Render acordando) DEMORA vários segundos antes de falhar
+ * ou responder; CORS, DNS ou config errada falham quase na hora. Por isso a
+ * heurística usa o tempo decorrido, não só a ausência de resposta: falha
+ * rápida é erro de verdade (mostra na hora), falha lenta ou timeout explícito
+ * é cold start (retry automático com mensagem neutra, não vermelha).
+ */
+const MAX_LOGIN_ATTEMPTS = 3;
+const RETRY_BASE_DELAY_MS = 3000;
+const COLD_START_FAST_FAIL_MS = 4000;
+
+function isColdStartError(err: any, elapsedMs: number): boolean {
+  if (err.code === 'ECONNABORTED') return true;
+  if (!err.response && elapsedMs > COLD_START_FAST_FAIL_MS) return true;
+  return false;
+}
+
+function sleep(ms: number) {
+  return new Promise<void>(resolve => setTimeout(resolve, ms));
+}
+
+type RetryResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: any; coldStartExhausted: boolean };
+
+/**
+ * Tenta a requisição até MAX_LOGIN_ATTEMPTS vezes, mas só re-tenta quando o
+ * erro parece cold start de verdade (ver isColdStartError acima). Erro com
+ * resposta do servidor (401, 403, 500...) ou falha rápida demais pra ser cold
+ * start (CORS, DNS) sai já na primeira tentativa — re-tentar não muda nada.
+ */
+async function withColdStartRetry<T>(
+  request: () => Promise<T>,
+  onSlow: () => void,
+  onRetrying: (attempt: number) => void,
+): Promise<RetryResult<T>> {
+  let lastErr: any;
+  for (let attempt = 1; attempt <= MAX_LOGIN_ATTEMPTS; attempt++) {
+    const startedAt = Date.now();
+    const slowTimer = setTimeout(onSlow, 8_000);
+    try {
+      const data = await request();
+      clearTimeout(slowTimer);
+      return { ok: true, data };
+    } catch (err: any) {
+      clearTimeout(slowTimer);
+      lastErr = err;
+      const elapsed = Date.now() - startedAt;
+      const coldStart = isColdStartError(err, elapsed);
+      if (coldStart && attempt < MAX_LOGIN_ATTEMPTS) {
+        onRetrying(attempt + 1);
+        await sleep(RETRY_BASE_DELAY_MS * attempt);
+        continue;
+      }
+      return { ok: false, error: err, coldStartExhausted: coldStart };
+    }
+  }
+  return { ok: false, error: lastErr, coldStartExhausted: false };
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>('credentials');
@@ -32,7 +94,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
-  const slowTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Dados do passo 1 guardados para o passo 2
   const [schools, setSchools] = useState<School[]>([]);
@@ -47,78 +108,93 @@ export default function LoginPage() {
 
   // ── Passo 1: e-mail + senha ──────────────────────────────────────────────
   const onSubmit = async (data: LoginForm) => {
-    try {
-      setLoading(true);
-      setError('');
-      setLoadingMsg('');
-      slowTimerRef.current = setTimeout(() => {
-        setLoadingMsg('Aguardando o servidor acordar… isso pode levar até 30 segundos na primeira vez.');
-      }, 8_000);
+    setLoading(true);
+    setError('');
+    setLoadingMsg('');
 
-      const response = await registerApi.post('/auth/login', data);
+    const result = await withColdStartRetry(
+      () => registerApi.post('/auth/login', data),
+      () => setLoadingMsg('Iniciando o sistema… isso pode levar até 30 segundos na primeira vez.'),
+      (attempt) => setLoadingMsg(`Iniciando o sistema… tentando de novo (${attempt} de ${MAX_LOGIN_ATTEMPTS})`),
+    );
+
+    if (result.ok) {
+      const response = result.data;
 
       // Usuário vinculado a várias escolas com a mesma senha → passo 2
       if (response.data.requiresSchoolSelection) {
         setSchools(response.data.schools);
         setPendingCreds(data);
         setStep('select-school');
+        setLoading(false);
+        setLoadingMsg('');
         return;
       }
 
       const { access_token, user } = response.data;
       setAuth(access_token, user);
       router.push(getDashboardRoute(user.role));
-    } catch (err: any) {
-      const status = err.response?.status;
-      if (!err.response || err.code === 'ECONNABORTED') {
-        setError('Servidor acordando… aguarde 10 segundos e tente novamente.');
-      } else if (status === 401) {
-        setError('E-mail ou senha incorretos.');
-      } else if (status === 403) {
-        setError('Usuário inativo. Entre em contato com o suporte.');
-      } else {
-        setError(err.response?.data?.message || 'Erro ao fazer login. Tente novamente.');
-      }
-    } finally {
-      setLoading(false);
-      setLoadingMsg('');
-      if (slowTimerRef.current) clearTimeout(slowTimerRef.current);
+      return;
     }
+
+    const { error: err, coldStartExhausted } = result;
+    const status = err.response?.status;
+    if (coldStartExhausted) {
+      setError('Não foi possível conectar ao servidor após algumas tentativas. Verifique sua conexão e tente novamente em instantes.');
+    } else if (status === 401) {
+      setError('E-mail ou senha incorretos.');
+    } else if (status === 403) {
+      setError('Usuário inativo. Entre em contato com o suporte.');
+    } else if (!err.response) {
+      setError('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+    } else {
+      setError(err.response?.data?.message || 'Erro ao fazer login. Tente novamente.');
+    }
+    setLoading(false);
+    setLoadingMsg('');
   };
 
   // ── Passo 2: seleção de escola ───────────────────────────────────────────
   const handleSelectSchool = async (schoolId: number) => {
     if (!pendingCreds) return;
-    try {
-      setSelectingSchoolId(schoolId);
-      setError('');
+    setSelectingSchoolId(schoolId);
+    setError('');
+    setLoadingMsg('');
 
-      const response = await registerApi.post('/auth/login/select-school', {
-        ...pendingCreds,
-        schoolId,
-      });
+    const result = await withColdStartRetry(
+      () => registerApi.post('/auth/login/select-school', { ...pendingCreds, schoolId }),
+      () => setLoadingMsg('Iniciando o sistema… isso pode levar até 30 segundos na primeira vez.'),
+      (attempt) => setLoadingMsg(`Iniciando o sistema… tentando de novo (${attempt} de ${MAX_LOGIN_ATTEMPTS})`),
+    );
 
-      const { access_token, user } = response.data;
+    if (result.ok) {
+      const { access_token, user } = result.data.data;
       setAuth(access_token, user);
       router.push(getDashboardRoute(user.role));
-    } catch (err: any) {
-      const status = err.response?.status;
-      if (!err.response || err.code === 'ECONNABORTED') {
-        setError('Servidor acordando… aguarde 10 segundos e tente novamente.');
-      } else if (status === 401) {
-        setError('Sessão expirada. Por favor, faça login novamente.');
-        setStep('credentials');
-      } else {
-        setError(err.response?.data?.message || 'Erro ao selecionar escola. Tente novamente.');
-      }
-    } finally {
-      setSelectingSchoolId(null);
+      return;
     }
+
+    const { error: err, coldStartExhausted } = result;
+    const status = err.response?.status;
+    if (coldStartExhausted) {
+      setError('Não foi possível conectar ao servidor após algumas tentativas. Verifique sua conexão e tente novamente em instantes.');
+    } else if (status === 401) {
+      setError('Sessão expirada. Por favor, faça login novamente.');
+      setStep('credentials');
+    } else if (!err.response) {
+      setError('Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.');
+    } else {
+      setError(err.response?.data?.message || 'Erro ao selecionar escola. Tente novamente.');
+    }
+    setSelectingSchoolId(null);
+    setLoadingMsg('');
   };
 
   // ── Layout externo (compartilhado pelos dois passos) ─────────────────────
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Theme toggle */}
       <div style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 50 }}>
@@ -253,11 +329,9 @@ export default function LoginPage() {
               ) : 'Entrar'}
             </button>
 
-            <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
-
             {loadingMsg && (
-              <p style={{ fontSize: '13px', color: '#F97316', textAlign: 'center', margin: '0' }}>
-                ⏳ {loadingMsg}
+              <p style={{ fontSize: '13px', color: '#F97316', textAlign: 'center', margin: '0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> {loadingMsg}
               </p>
             )}
           </form>
@@ -335,6 +409,13 @@ export default function LoginPage() {
                 </button>
               );
             })}
+
+            {/* Iniciando/retry — estado neutro, não é erro */}
+            {loadingMsg && (
+              <p style={{ fontSize: '13px', color: '#F97316', textAlign: 'center', margin: '4px 0 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> {loadingMsg}
+              </p>
+            )}
 
             {/* Erro */}
             {error && (
