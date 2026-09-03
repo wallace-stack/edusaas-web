@@ -44,7 +44,7 @@ export default function ClassModeSelector({ mode, onModeChange, infantilConfig, 
             key={m}
             type="button"
             onClick={() => onModeChange(m)}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-medium border-2 transition-all ${
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-3 rounded-xl text-sm font-medium leading-none border-2 whitespace-nowrap transition-all ${
               mode === m
                 ? m === 'infantil'
                   ? 'border-purple-500 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
@@ -52,8 +52,8 @@ export default function ClassModeSelector({ mode, onModeChange, infantilConfig, 
                 : 'border-gray-200 dark:border-gray-700 text-gray-400 hover:border-gray-300'
             }`}
           >
-            {m === 'regular' ? <GraduationCap size={16} /> : <Baby size={16} />}
-            {m === 'regular' ? 'Regular' : 'Educação Infantil'}
+            {m === 'regular' ? <GraduationCap size={16} className="shrink-0" /> : <Baby size={16} className="shrink-0" />}
+            {m === 'regular' ? 'Regular' : 'Infantil'}
           </button>
         ))}
       </div>
