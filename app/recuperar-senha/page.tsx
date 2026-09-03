@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { registerApi } from '../lib/api';
+import { Mail, AlertCircle } from 'lucide-react';
 
 const schema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -48,7 +49,7 @@ export default function ForgotPasswordPage() {
         {sent ? (
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">📧</span>
+              <Mail size={32} className="text-green-600" />
             </div>
             <h2 className="text-xl font-bold text-gray-800 mb-2">E-mail enviado!</h2>
             <p className="text-gray-500 text-sm mb-6">
@@ -89,14 +90,14 @@ export default function ForgotPasswordPage() {
                 />
                 {errors.email && (
                   <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                    <span>⚠</span> {errors.email.message}
+                    <AlertCircle size={12} /> {errors.email.message}
                   </p>
                 )}
               </div>
 
               {error && (
                 <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-xl flex items-start gap-2">
-                  <span>⚠</span> <span>{error}</span>
+                  <AlertCircle size={15} className="mt-0.5 shrink-0" /> <span>{error}</span>
                 </div>
               )}
 

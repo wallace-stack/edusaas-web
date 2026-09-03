@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, BookOpen, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, BookOpen, Trash2, Baby } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SchoolClass { id: number; name: string; }
@@ -88,7 +88,7 @@ export default function DiarioBordoPage() {
             </button>
             <div>
               <h1 className="font-bold text-[#1E3A5F] dark:text-white text-base">Diário de Bordo</h1>
-              <p className="text-[10px] text-purple-500 font-medium">🎨 Educação Infantil</p>
+              <p className="text-[10px] text-purple-500 font-medium flex items-center gap-1"><Baby size={11} /> Educação Infantil</p>
             </div>
           </div>
           {classId && (

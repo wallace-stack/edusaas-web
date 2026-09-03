@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Sparkles, ArrowRight, Shield, ChevronDown } from 'lucide-react';
+import { Sparkles, ArrowRight, Shield, ChevronDown, Frown, Star, Check } from 'lucide-react';
 import { toast } from 'sonner';
 
 const faqItems = [
@@ -171,7 +171,7 @@ function PlanosContent() {
 
       {planCancelled && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-gray-800 text-white px-4 py-3 flex items-center justify-center gap-3">
-          <span className="text-lg">😔</span>
+          <Frown size={18} />
           <p className="text-sm font-medium">
             Seu plano foi cancelado. Escolha um plano abaixo para reativar o acesso.
           </p>
@@ -266,8 +266,8 @@ function PlanosContent() {
                       {plan.name}
                     </span>
                     {plan.isPro && (
-                      <span className="text-[9px] bg-indigo-500 text-white px-2 py-0.5 rounded-full">
-                        ⭐ Mais popular
+                      <span className="inline-flex items-center gap-0.5 text-[9px] bg-indigo-500 text-white px-2 py-0.5 rounded-full">
+                        <Star size={9} /> Mais popular
                       </span>
                     )}
                   </div>
@@ -292,8 +292,8 @@ function PlanosContent() {
                   <ul className="space-y-2 flex-1">
                     {plan.features.map(f => (
                       <li key={f} className="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300">
-                        <span className={`w-4 h-4 rounded-full ${plan.checkBg} flex items-center justify-center text-[9px] ${plan.checkCls} flex-shrink-0`}>
-                          ✓
+                        <span className={`w-4 h-4 rounded-full ${plan.checkBg} flex items-center justify-center ${plan.checkCls} flex-shrink-0`}>
+                          <Check size={10} />
                         </span>
                         {f}
                       </li>

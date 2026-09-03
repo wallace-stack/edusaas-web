@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, BookOpen, Users, ClipboardList, CheckSquare, BookMarked, CalendarDays } from 'lucide-react';
+import { ArrowLeft, BookOpen, Users, ClipboardList, CheckSquare, BookMarked, CalendarDays, Baby } from 'lucide-react';
 
 interface InfantilConfig {
   useConceito:     boolean;
@@ -122,8 +122,8 @@ export default function ProfessorTurmasPage() {
                   </div>
                 )}
                 {c.mode === 'infantil' && (
-                  <span className="inline-block mb-2 text-[10px] px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-300 font-medium">
-                    🎨 Educação Infantil
+                  <span className="inline-flex items-center gap-1 mb-2 text-[10px] px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-300 font-medium">
+                    <Baby size={11} /> Educação Infantil
                   </span>
                 )}
                 <div className={`grid gap-2 pt-3 border-t border-gray-50 dark:border-gray-800 ${c.mode === 'infantil' ? 'grid-cols-2' : 'grid-cols-2'}`}>

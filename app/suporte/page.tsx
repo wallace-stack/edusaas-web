@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { CheckCircle2, AlertTriangle } from 'lucide-react';
 
 export default function SuportePage() {
   const [key, setKey] = useState('');
@@ -62,7 +63,7 @@ export default function SuportePage() {
         )}
         {result && (
           <div className="bg-green-950 border border-green-800 rounded-xl px-4 py-4 space-y-2">
-            <p className="text-green-400 font-semibold text-sm">✅ Acesso criado!</p>
+            <p className="text-green-400 font-semibold text-sm flex items-center gap-1.5"><CheckCircle2 size={15} /> Acesso criado!</p>
             <div className="bg-gray-900 rounded-lg p-3 space-y-1">
               <p className="text-xs text-gray-400">E-mail</p>
               <p className="text-white text-sm font-mono">{result.email}</p>
@@ -71,7 +72,7 @@ export default function SuportePage() {
               <p className="text-xs text-gray-400">Senha temporária</p>
               <p className="text-white text-lg font-mono font-bold tracking-wider">{result.password}</p>
             </div>
-            <p className="text-yellow-500 text-xs">⚠️ {result.expiresIn}</p>
+            <p className="text-yellow-500 text-xs flex items-center gap-1"><AlertTriangle size={12} /> {result.expiresIn}</p>
           </div>
         )}
       </div>

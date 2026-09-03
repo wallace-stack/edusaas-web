@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { AlertTriangle } from 'lucide-react';
 
 export default function Error({
   error,
@@ -18,7 +19,7 @@ export default function Error({
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center p-4">
       <div className="text-center space-y-4 max-w-md">
         <div className="w-20 h-20 bg-red-100 dark:bg-red-950 rounded-2xl flex items-center justify-center mx-auto">
-          <span className="text-red-500 text-3xl">⚠️</span>
+          <AlertTriangle size={36} className="text-red-500" />
         </div>
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
           Algo deu errado

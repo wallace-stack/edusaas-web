@@ -321,9 +321,9 @@ export default function ProfessorChamadaHistoricoPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <div className="flex gap-2 text-xs">
-                          <span className="text-green-600 font-medium">✓ {present}</span>
-                          <span className="text-red-500 font-medium">✗ {absent}</span>
-                          {justified > 0 && <span className="text-orange-500 font-medium">~ {justified}</span>}
+                          <span className="text-green-600 font-medium inline-flex items-center gap-0.5"><CheckCircle size={12} /> {present}</span>
+                          <span className="text-red-500 font-medium inline-flex items-center gap-0.5"><XCircle size={12} /> {absent}</span>
+                          {justified > 0 && <span className="text-orange-500 font-medium inline-flex items-center gap-0.5"><MinusCircle size={12} /> {justified}</span>}
                         </div>
                         {isExpanded ? <ChevronUp size={16} className="text-gray-400" /> : <ChevronDown size={16} className="text-gray-400" />}
                       </div>

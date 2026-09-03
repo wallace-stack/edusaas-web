@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, CheckCircle, XCircle, MinusCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle, MinusCircle, Baby } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SchoolClass { id: number; name: string; year: number; mode?: 'regular' | 'infantil'; }
@@ -112,7 +112,7 @@ function ChamadaPage() {
           </button>
           <div>
             <h1 className="font-bold text-[#1E3A5F] dark:text-white">Registrar Chamada</h1>
-            {isInfantil && <p className="text-[10px] text-purple-500 font-medium">🎨 Modo Educação Infantil</p>}
+            {isInfantil && <p className="text-[10px] text-purple-500 font-medium flex items-center gap-1"><Baby size={11} /> Modo Educação Infantil</p>}
           </div>
         </div>
       </header>
@@ -167,8 +167,8 @@ function ChamadaPage() {
               <div className="px-6 py-3 bg-gray-50 dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-600 dark:text-gray-300">{students.length} alunos</span>
                 <div className="flex gap-4">
-                  <span className="text-sm text-green-600 font-medium">✓ {presentCount} presentes</span>
-                  <span className="text-sm text-red-500 font-medium">✗ {absentCount} ausentes</span>
+                  <span className="text-sm text-green-600 font-medium inline-flex items-center gap-1"><CheckCircle size={14} /> {presentCount} presentes</span>
+                  <span className="text-sm text-red-500 font-medium inline-flex items-center gap-1"><XCircle size={14} /> {absentCount} ausentes</span>
                 </div>
               </div>
               <div className="divide-y divide-gray-50 dark:divide-gray-800">

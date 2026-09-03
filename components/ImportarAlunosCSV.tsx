@@ -248,8 +248,8 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
               <Download size={15} />
               Baixar template CSV
             </button>
-            <p className="text-xs text-amber-600 dark:text-amber-400">
-              ⚠️ O nome da turma deve ser exatamente igual ao cadastrado (ex: &apos;1º Ano A&apos;, não &apos;1 Ano A&apos;)
+            <p className="text-xs text-amber-600 dark:text-amber-400 flex items-center gap-1">
+              <AlertTriangle size={12} /> O nome da turma deve ser exatamente igual ao cadastrado (ex: &apos;1º Ano A&apos;, não &apos;1 Ano A&apos;)
             </p>
             {classes && classes.length > 0 && (
               <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl px-4 py-3">
@@ -269,7 +269,7 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
               </div>
             )}
             <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-3">
-              <span className="text-amber-500 text-base shrink-0">⚠️</span>
+              <AlertTriangle size={16} className="text-amber-500 shrink-0" />
               <p className="text-xs text-amber-700 dark:text-amber-300">
                 <strong>Use apenas o template de importação.</strong> O arquivo exportado (com 16 colunas) não é compatível com a importação. Baixe o template acima para preencher.
               </p>
@@ -278,7 +278,7 @@ export default function ImportarAlunosCSV({ onClose, onSuccess, classes }: Props
 
           {/* Dica Excel */}
           <div className="flex items-start gap-2 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-xl px-4 py-3">
-            <span className="text-green-500 text-base shrink-0">✅</span>
+            <CheckCircle2 size={16} className="text-green-500 shrink-0" />
             <div className="text-xs text-green-700 dark:text-green-300 space-y-1">
               <p><strong>Recomendado: Google Sheets</strong></p>
               <p>Abra o template no <a href="https://sheets.google.com" target="_blank" className="underline">Google Sheets</a>, preencha e baixe como <em>Arquivo → Fazer download → CSV</em>. Funciona sempre.</p>

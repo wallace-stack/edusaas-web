@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { Plus, Search, X, ChevronRight, Upload, Download } from 'lucide-react';
+import { Plus, Search, X, ChevronRight, Upload, Download, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import Cookies from 'js-cookie';
 import ImportarAlunosCSV from '@/components/ImportarAlunosCSV';
@@ -527,7 +527,7 @@ export default function SecretariaAlunosPage() {
                 {classes.map(c => <option key={c.id} value={c.id}>{c.name} · {c.year}</option>)}
               </select>
               <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950 rounded-xl">
-                <span className="text-blue-600 text-lg">📧</span>
+                <Mail size={18} className="text-blue-600 shrink-0" />
                 <p className="text-xs text-blue-700 dark:text-blue-300">
                   As credenciais de acesso serão geradas automaticamente e enviadas para o email do aluno.
                 </p>

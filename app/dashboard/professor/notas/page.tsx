@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, AlertCircle } from 'lucide-react';
+import { ArrowLeft, AlertCircle, Baby } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SchoolClass {
@@ -284,7 +284,9 @@ function LancarNotasPage() {
       {showTutorial && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-sm w-full p-6">
-            <p className="text-2xl mb-2">🎨</p>
+            <div className="w-11 h-11 bg-purple-50 dark:bg-purple-950 rounded-2xl flex items-center justify-center mb-3">
+              <Baby size={22} className="text-purple-500" />
+            </div>
             <h2 className="font-bold text-[#1E3A5F] dark:text-white text-lg mb-3">Turma de Educação Infantil</h2>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Nesta turma você avalia por <strong>conceito</strong> e pode adicionar um <strong>parecer descritivo</strong> por aluno.</p>
             <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1 mb-4 list-disc list-inside">
@@ -309,7 +311,7 @@ function LancarNotasPage() {
             <h1 className="font-bold text-[#1E3A5F] dark:text-white text-base">
               {isInfantil ? 'Avaliação Infantil' : 'Lançar notas'}
             </h1>
-            {isInfantil && <p className="text-[10px] text-purple-500 font-medium">🎨 Modo Educação Infantil</p>}
+            {isInfantil && <p className="text-[10px] text-purple-500 font-medium flex items-center gap-1"><Baby size={11} /> Modo Educação Infantil</p>}
           </div>
         </div>
       </header>

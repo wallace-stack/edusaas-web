@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, BookOpen, Users, X, ChevronRight, Phone, MapPin, User } from 'lucide-react';
+import { ArrowLeft, Plus, BookOpen, Users, X, ChevronRight, Phone, MapPin, User, Baby } from 'lucide-react';
 import { toast } from 'sonner';
 import { maskCPF } from '../../../lib/utils';
 import EnrollmentActions from '@/components/EnrollmentActions';
@@ -282,8 +282,8 @@ export default function SecretariaTurmasPage() {
                   </p>
                 )}
                 {c.mode === 'infantil' && (
-                  <span className="inline-block mb-3 text-[10px] px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-300 font-medium">
-                    🎨 Educação Infantil
+                  <span className="inline-flex items-center gap-1 mb-3 text-[10px] px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-300 font-medium">
+                    <Baby size={11} /> Educação Infantil
                   </span>
                 )}
                 <div className="flex gap-2">

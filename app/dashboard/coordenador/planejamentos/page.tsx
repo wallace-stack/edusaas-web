@@ -7,7 +7,8 @@ import api from '../../../lib/api';
 import {
   ArrowLeft, BookOpen, Eye, CheckCircle, Clock, Send,
   Filter, X, FileText, ChevronLeft, Tag,
-  Users, Pencil, Gamepad2, Star, Loader2, Paperclip
+  Users, Pencil, Gamepad2, Star, Loader2, Paperclip,
+  Baby, GraduationCap
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -314,7 +315,9 @@ export default function PlanejamentosGestaoPage() {
               {[
                 { label: 'Período', value: `${PERIOD_LABELS[detail.periodType]} — ${planDate(detail)}` },
                 { label: 'Turma',   value: detail.schoolClass?.name },
-                { label: 'Módulo',  value: detail.moduleType === 'infantil' ? '🎨 Educação Infantil' : '📚 Ensino Regular' },
+                { label: 'Módulo',  value: detail.moduleType === 'infantil'
+                    ? <span className="inline-flex items-center gap-1"><Baby size={13} /> Educação Infantil</span>
+                    : <span className="inline-flex items-center gap-1"><GraduationCap size={13} /> Ensino Regular</span> },
                 ...(detail.ageGroup  ? [{ label: 'Faixa etária',       value: detail.ageGroup }]  : []),
                 ...(detail.gradeLevel ? [{ label: 'Ano / Série',       value: detail.gradeLevel }] : []),
                 ...(detail.subject?.name ? [{ label: 'Componente',      value: detail.subject.name }] : []),
@@ -584,7 +587,7 @@ export default function PlanejamentosGestaoPage() {
                 <div className="flex items-center gap-2 flex-wrap mb-1.5">
                   <StatusBadge status={plan.status} pulse={plan.status === 'sent'} />
                   {plan.moduleType === 'infantil' && (
-                    <span className="text-[10px] font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30 px-2 py-0.5 rounded-full">🎨 Infantil</span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30 px-2 py-0.5 rounded-full"><Baby size={10} /> Infantil</span>
                   )}
                   <span className="text-[11px] text-gray-400 dark:text-gray-500">
                     {PERIOD_LABELS[plan.periodType]} · {planDate(plan)}

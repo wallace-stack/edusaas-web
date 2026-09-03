@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, XCircle, CheckCircle2, Frown } from 'lucide-react';
 import api from '@/app/lib/api';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -68,15 +68,15 @@ export default function CancelarPlano({ onClose }: Props) {
               </p>
               <ul className="space-y-2 text-sm text-gray-500 dark:text-gray-400">
                 <li className="flex items-start gap-2">
-                  <span className="text-red-400 shrink-0 mt-0.5">✗</span>
+                  <XCircle size={15} className="text-red-400 shrink-0 mt-0.5" />
                   Todos os usuários perderão acesso imediatamente
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-red-400 shrink-0 mt-0.5">✗</span>
+                  <XCircle size={15} className="text-red-400 shrink-0 mt-0.5" />
                   Os dados ficam salvos por 30 dias
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-500 shrink-0 mt-0.5">✓</span>
+                  <CheckCircle2 size={15} className="text-green-500 shrink-0 mt-0.5" />
                   Você pode reativar a qualquer momento escolhendo um plano
                 </li>
               </ul>
@@ -138,7 +138,7 @@ export default function CancelarPlano({ onClose }: Props) {
           {step === 'done' && (
             <div className="text-center space-y-4">
               <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto">
-                <span className="text-3xl">😔</span>
+                <Frown size={32} className="text-gray-400" />
               </div>
               <div>
                 <p className="font-semibold text-gray-800 dark:text-white">Plano cancelado</p>

@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../../lib/auth';
 import api from '../../../../lib/api';
-import { ArrowLeft, X } from 'lucide-react';
+import { ArrowLeft, X, CheckCircle, MinusCircle, XCircle } from 'lucide-react';
 
 interface Grade {
   id: number;
@@ -369,14 +369,14 @@ export default function ProfessorNotasHistoricoPage() {
                         </td>
                         <td className="px-4 py-3 text-center">
                           {avg !== null ? (
-                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-medium ${
                               approved
                                 ? 'bg-green-50 dark:bg-green-950 text-green-700'
                                 : recovering
                                 ? 'bg-orange-50 dark:bg-orange-950 text-orange-700'
                                 : 'bg-red-50 dark:bg-red-950 text-red-700'
                             }`}>
-                              {approved ? '✓ Aprovado' : recovering ? '~ Recuperação' : '✗ Reprovado'}
+                              {approved ? <><CheckCircle size={12} /> Aprovado</> : recovering ? <><MinusCircle size={12} /> Recuperação</> : <><XCircle size={12} /> Reprovado</>}
                             </span>
                           ) : (
                             <span className="text-xs text-gray-300 dark:text-gray-600">—</span>

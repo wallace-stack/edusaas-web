@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUser } from '../../../lib/auth';
 import api from '../../../lib/api';
-import { ArrowLeft, Plus, ClipboardList, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Plus, ClipboardList, Trash2, ChevronDown, ChevronUp, Baby } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface SchoolClass { id: number; name: string; }
@@ -106,7 +106,7 @@ export default function PlanejamentoDiarioPage() {
             </button>
             <div>
               <h1 className="font-bold text-[#1E3A5F] dark:text-white text-base">Planejamento Diário</h1>
-              <p className="text-[10px] text-purple-500 font-medium">🎨 Educação Infantil</p>
+              <p className="text-[10px] text-purple-500 font-medium flex items-center gap-1"><Baby size={11} /> Educação Infantil</p>
             </div>
           </div>
           {classId && (

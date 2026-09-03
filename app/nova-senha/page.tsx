@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import api from '../lib/api';
+import { CheckCircle2, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 const schema = z.object({
   password: z
@@ -65,7 +66,7 @@ function NovaSenhaForm() {
       {success ? (
         <div className="text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">✅</span>
+            <CheckCircle2 size={32} className="text-green-600" />
           </div>
           <h2 className="text-xl font-bold text-gray-800 mb-2">Senha redefinida!</h2>
           <p className="text-gray-500 text-sm">
@@ -92,12 +93,12 @@ function NovaSenhaForm() {
                     ${errors.password ? 'border-red-400 focus:ring-red-300 bg-red-50' : 'border-gray-200 focus:ring-[#1E3A5F]'}`}
                 />
                 <button type="button" onClick={() => setShowPass(p => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm p-1" tabIndex={-1}>
-                  {showPass ? '🙈' : '👁'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1" tabIndex={-1}>
+                  {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               {errors.password && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><span>⚠</span> {errors.password.message}</p>
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12} /> {errors.password.message}</p>
               )}
               <p className="text-xs text-gray-400 mt-1">Mínimo 8 caracteres, uma maiúscula e um número.</p>
             </div>
@@ -114,18 +115,18 @@ function NovaSenhaForm() {
                     ${errors.confirmPassword ? 'border-red-400 focus:ring-red-300 bg-red-50' : 'border-gray-200 focus:ring-[#1E3A5F]'}`}
                 />
                 <button type="button" onClick={() => setShowConfirm(p => !p)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm p-1" tabIndex={-1}>
-                  {showConfirm ? '🙈' : '👁'}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1" tabIndex={-1}>
+                  {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><span>⚠</span> {errors.confirmPassword.message}</p>
+                <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle size={12} /> {errors.confirmPassword.message}</p>
               )}
             </div>
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-3 rounded-xl flex items-start gap-2">
-                <span>⚠</span>
+                <AlertCircle size={15} className="mt-0.5 shrink-0" />
                 <div>
                   <p>{error}</p>
                   {error.includes('expirado') && (

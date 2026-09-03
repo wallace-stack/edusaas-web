@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/app/lib/api';
 import { toast } from 'sonner';
-import { ArrowLeft, Save, CreditCard, QrCode, Link, Percent } from 'lucide-react';
+import { ArrowLeft, Save, CreditCard, QrCode, Link, Percent, Mail } from 'lucide-react';
 
 const PIX_TYPES = [
   { value: 'cpf', label: 'CPF' },
@@ -207,13 +207,13 @@ export default function PagamentoPage() {
 
           {/* Preview */}
           <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 rounded-2xl p-6">
-            <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-3">📧 Preview do e-mail de cobrança</p>
+            <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-3 flex items-center gap-1.5"><Mail size={15} /> Preview do e-mail de cobrança</p>
             <div className="bg-white rounded-xl p-4 text-sm text-gray-700 space-y-2">
               <p>Olá, <strong>João!</strong></p>
               <p>A mensalidade de <strong>Pedro</strong> — Abril/2026 — <strong>R$ 800,00</strong> está em aberto.</p>
               {(form.pixKey || form.paymentLink || form.paymentInfo) && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2 space-y-1">
-                  <p className="font-bold text-[#1E3A5F]">💳 Como pagar:</p>
+                  <p className="font-bold text-[#1E3A5F] flex items-center gap-1.5"><CreditCard size={14} /> Como pagar:</p>
                   {form.pixKey && <p>PIX ({form.pixKeyType}): <strong>{form.pixKey}</strong></p>}
                   {form.paymentInfo && <p className="text-gray-600">{form.paymentInfo}</p>}
                   {form.paymentLink && <p className="text-[#1E3A5F] font-medium">→ Clique aqui para pagar online</p>}

@@ -8,7 +8,7 @@ import {
   ArrowLeft, Plus, BookOpen, Send, Edit3, Clock, Eye,
   CheckCircle, ChevronDown, ChevronUp, X, Paperclip,
   FileText, Upload, Check, Users, Pencil, Gamepad2,
-  Star, Tag, Loader2, ImageIcon,
+  Star, Tag, Loader2, ImageIcon, Calendar, Baby, GraduationCap,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -487,7 +487,8 @@ export default function CadernoPage() {
         <label className={labelCls}>Turma</label>
         <select value={form.classId} onChange={e => setForm(f => ({ ...f, classId: e.target.value }))} className={inputCls}>
           <option value="">Selecionar turma...</option>
-          {classes.map(c => <option key={c.id} value={c.id}>{c.name}{c.mode === 'infantil' ? ' 🎨' : ''}</option>)}
+          {/* <option> nativo não renderiza ícone — texto puro é a única opção aqui. */}
+          {classes.map(c => <option key={c.id} value={c.id}>{c.name}{c.mode === 'infantil' ? ' (Infantil)' : ''}</option>)}
         </select>
       </div>
 
@@ -530,8 +531,8 @@ export default function CadernoPage() {
             </div>
             {form.weekStart && (
               <div className="flex gap-2 bg-blue-50 dark:bg-blue-950/30 rounded-xl px-3 py-2">
-                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
-                  📅 Semana: {fmtDate(form.weekStart)} → {fmtDate(form.weekEnd)}
+                <span className="text-xs text-blue-600 dark:text-blue-400 font-medium inline-flex items-center gap-1">
+                  <Calendar size={12} /> Semana: {fmtDate(form.weekStart)} → {fmtDate(form.weekEnd)}
                 </span>
               </div>
             )}
@@ -916,8 +917,10 @@ export default function CadernoPage() {
               <h1 className="font-bold text-[#1E3A5F] dark:text-white text-base">
                 {mode === 'new' ? 'Novo Planejamento' : 'Editar Planejamento'}
               </h1>
-              <p className="text-[10px] text-gray-400 dark:text-gray-500 capitalize">
-                {form.moduleType === 'infantil' ? '🎨 Educação Infantil' : '📚 Ensino Regular'}
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 capitalize flex items-center gap-1">
+                {form.moduleType === 'infantil'
+                  ? <><Baby size={11} /> Educação Infantil</>
+                  : <><GraduationCap size={11} /> Ensino Regular</>}
               </p>
             </div>
           </div>
@@ -1021,7 +1024,7 @@ export default function CadernoPage() {
                 <div className="flex items-center gap-2 flex-wrap mb-1.5">
                   <StatusBadge plan={plan} />
                   {plan.moduleType === 'infantil' && (
-                    <span className="text-[10px] font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30 px-2 py-0.5 rounded-full">🎨 Infantil</span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-medium text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30 px-2 py-0.5 rounded-full"><Baby size={10} /> Infantil</span>
                   )}
                   <span className="text-[11px] text-gray-400 dark:text-gray-500">
                     {plan.periodType === 'weekly' && plan.weekStart

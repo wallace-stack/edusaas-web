@@ -229,10 +229,10 @@ export default function ProfessorNotificacoesPage() {
                 onChange={e => setForm({ ...form, type: e.target.value })}
                 className={inputCls}
               >
-                <option value="exam_scheduled">📚 Prova Agendada</option>
-                <option value="exam_changed">⚠️ Prova Alterada</option>
-                <option value="exam_cancelled">❌ Prova Cancelada</option>
-                <option value="class_notice">📢 Aviso Geral</option>
+                <option value="exam_scheduled">Prova Agendada</option>
+                <option value="exam_changed">Prova Alterada</option>
+                <option value="exam_cancelled">Prova Cancelada</option>
+                <option value="class_notice">Aviso Geral</option>
               </select>
 
               <input

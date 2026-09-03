@@ -7,7 +7,7 @@ import api from '../../../lib/api';
 import Cookies from 'js-cookie';
 import {
   DollarSign, AlertTriangle, Clock, Check,
-  Bell, Search, X,
+  Bell, Search, X, Zap, CreditCard, Landmark, Banknote, FileText, MoreHorizontal,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardHeader } from '@/components/dashboard-header';
@@ -39,13 +39,13 @@ interface Tuition {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const PAYMENT_METHODS = [
-  { value: 'pix',         label: 'PIX',      icon: '⚡' },
-  { value: 'credit_card', label: 'Crédito',  icon: '💳' },
-  { value: 'debit_card',  label: 'Débito',   icon: '🏦' },
-  { value: 'cash',        label: 'Dinheiro', icon: '💵' },
-  { value: 'bank_slip',   label: 'Boleto',   icon: '📄' },
-  { value: 'other',       label: 'Outro',    icon: '•••' },
+const PAYMENT_METHODS: { value: string; label: string; icon: React.ElementType }[] = [
+  { value: 'pix',         label: 'PIX',      icon: Zap },
+  { value: 'credit_card', label: 'Crédito',  icon: CreditCard },
+  { value: 'debit_card',  label: 'Débito',   icon: Landmark },
+  { value: 'cash',        label: 'Dinheiro', icon: Banknote },
+  { value: 'bank_slip',   label: 'Boleto',   icon: FileText },
+  { value: 'other',       label: 'Outro',    icon: MoreHorizontal },
 ];
 
 const METHOD_LABEL: Record<string, string> = {
@@ -566,7 +566,7 @@ export default function SecretariaFinanceiroPage() {
                           : 'border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-gray-300'
                       }`}
                     >
-                      <span className="text-base">{m.icon}</span>
+                      <m.icon size={18} />
                       {m.label}
                     </button>
                   ))}
