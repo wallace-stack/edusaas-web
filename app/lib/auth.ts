@@ -6,6 +6,7 @@ export interface User {
   email: string;
   role: 'director' | 'coordinator' | 'teacher' | 'student' | 'secretary';
   schoolId: number;
+  hasSeenOnboarding?: boolean;
 }
 
 export function getToken(): string | undefined {
@@ -25,6 +26,17 @@ export function getUser(): User | null {
 export function setAuth(token: string, user: User): void {
   Cookies.set('token', token, { expires: 7, sameSite: 'lax', secure: false });
   Cookies.set('user', JSON.stringify(user), { expires: 7, sameSite: 'lax', secure: false });
+}
+
+// Atualiza o cache local depois de marcar o tour como visto no backend — sem
+// isso, navegar pra outra página do dashboard reabriria o tour, porque o cookie
+// "user" (gravado só no login) continuaria com hasSeenOnboarding desatualizado.
+export function markOnboardingSeenLocally(): void {
+  const token = getToken();
+  const user = getUser();
+  if (token && user) {
+    setAuth(token, { ...user, hasSeenOnboarding: true });
+  }
 }
 
 export function clearAuth(): void {

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUser } from '../../lib/auth';
+import { getUser, markOnboardingSeenLocally } from '../../lib/auth';
 import api from '../../lib/api';
-import { BookOpen, CheckSquare, DollarSign, Bell, TrendingUp, AlertTriangle, Newspaper } from 'lucide-react';
+import { BookOpen, CheckSquare, DollarSign, Bell, TrendingUp, AlertTriangle, Newspaper, CheckCircle2 } from 'lucide-react';
 import { DashboardHeader } from '@/components/dashboard-header';
+import DashboardTour from '@/components/DashboardTour';
 
 interface Grade {
   id: number;
@@ -56,17 +57,25 @@ export default function AlunoDashboard() {
   const [tuitions, setTuitions] = useState<Tuition[]>([]);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'student') {
       router.push('/login');
       return;
     }
+    if (user.hasSeenOnboarding === false) setShowTour(true);
     loadData();
     api.get('/notifications/unread-count')
       .then(r => { const c = typeof r.data === 'number' ? r.data : r.data?.count || 0; setUnreadCount(c); })
       .catch(() => {});
   }, []);
+
+  const closeTour = () => {
+    setShowTour(false);
+    markOnboardingSeenLocally();
+    api.patch('/users/me/onboarding-seen').catch(() => {});
+  };
 
   const loadData = async () => {
     try {
@@ -111,13 +120,23 @@ export default function AlunoDashboard() {
     );
   }
 
+  const tourSteps = [
+    { icon: BookOpen, title: 'Minhas Notas', description: 'Acompanhe suas notas por disciplina, ou o parecer descritivo, se sua turma for de Educação Infantil.', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600' },
+    { icon: CheckSquare, title: 'Frequência', description: 'Veja seu histórico de presenças e faltas.', color: 'bg-green-50 dark:bg-green-950 text-green-600' },
+    { icon: DollarSign, title: 'Financeiro', description: 'Confira suas mensalidades e o status de pagamento.', color: 'bg-orange-50 dark:bg-orange-950 text-orange-600' },
+    { icon: Bell, title: 'Avisos', description: 'Fique por dentro dos avisos da sua turma e da escola.', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
+  ];
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
+      {showTour && (
+        <DashboardTour greeting="Bem-vindo" steps={tourSteps} onClose={closeTour} />
+      )}
       <DashboardHeader subtitle="Portal do Estudante" unreadCount={unreadCount} notificationsHref="/dashboard/aluno/notificacoes" />
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-xl font-bold text-[#1E3A5F] dark:text-white">Olá, {user?.name?.split(' ')[0]}! 👋</h1>
+          <h1 className="text-xl font-bold text-[#1E3A5F] dark:text-white">Olá, {user?.name?.split(' ')[0]}!</h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Acompanhe seu desempenho escolar.</p>
         </div>
 
@@ -220,7 +239,7 @@ export default function AlunoDashboard() {
             </div>
             {tuitions.length === 0 ? (
               <div className="text-center py-4">
-                <p className="text-sm text-green-600 font-medium">✓ Tudo em dia!</p>
+                <p className="text-sm text-green-600 font-medium flex items-center justify-center gap-1.5"><CheckCircle2 size={15} /> Tudo em dia!</p>
               </div>
             ) : (
               <div className="space-y-3">

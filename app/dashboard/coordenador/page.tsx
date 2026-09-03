@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUser } from '../../lib/auth';
+import { getUser, markOnboardingSeenLocally } from '../../lib/auth';
 import api from '../../lib/api';
-import { Users, AlertTriangle, Bell, BookOpen, TrendingDown, Newspaper, UserCog, NotebookPen } from 'lucide-react';
+import { Users, AlertTriangle, Bell, BookOpen, TrendingDown, Newspaper, UserCog, NotebookPen, Check } from 'lucide-react';
 import { DashboardHeader } from '@/components/dashboard-header';
+import DashboardTour from '@/components/DashboardTour';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
@@ -31,6 +32,7 @@ export default function CoordenadorDashboard() {
   const [teachers, setTeachers] = useState<{ id: number; name: string; email: string; subjects?: { subjectName: string; className: string }[] }[]>([]);
   const [loadingTeachers, setLoadingTeachers] = useState(false);
   const [totalTeachers, setTotalTeachers] = useState<number | null>(null);
+  const [showTour, setShowTour] = useState(false);
 
   const getSaudacao = () => {
     const h = new Date().getHours();
@@ -53,6 +55,7 @@ export default function CoordenadorDashboard() {
 
   useEffect(() => {
     if (!user || user.role !== 'coordinator') { router.push('/login'); return; }
+    if (user.hasSeenOnboarding === false) setShowTour(true);
     api.get('/metrics/coordinator')
       .then(r => setData(r.data))
       .catch(console.error)
@@ -65,6 +68,12 @@ export default function CoordenadorDashboard() {
       .catch(() => {});
   }, []);
 
+  const closeTour = () => {
+    setShowTour(false);
+    markOnboardingSeenLocally();
+    api.patch('/users/me/onboarding-seen').catch(() => {});
+  };
+
   if (loading) return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950 flex items-center justify-center">
       <div className="w-10 h-10 border-4 border-[#1E3A5F] dark:border-white border-t-transparent rounded-full animate-spin" />
@@ -74,8 +83,18 @@ export default function CoordenadorDashboard() {
   const riskPct = data && data.totalStudents > 0
     ? Math.round((data.atRiskStudents / data.totalStudents) * 100) : 0;
 
+  const tourSteps = [
+    { icon: Users, title: 'Alunos', description: 'Acompanhe a lista de alunos, frequência e situação acadêmica de toda a escola.', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600' },
+    { icon: BookOpen, title: 'Turmas', description: 'Veja turmas, professores vinculados e o modo de cada turma (regular ou infantil).', color: 'bg-purple-50 dark:bg-purple-950 text-purple-600' },
+    { icon: NotebookPen, title: 'Planejamentos', description: 'Revise e aprove os cadernos de planejamento enviados pelos professores.', color: 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600' },
+    { icon: Bell, title: 'Avisos', description: 'Envie e acompanhe avisos institucionais pra escola.', color: 'bg-orange-50 dark:bg-orange-950 text-orange-600' },
+  ];
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
+      {showTour && (
+        <DashboardTour greeting="Bem-vindo, coordenador" steps={tourSteps} onClose={closeTour} />
+      )}
       <DashboardHeader subtitle="Coordenação" unreadCount={unreadCount} notificationsHref="/dashboard/coordenador/notificacoes" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -182,7 +201,7 @@ export default function CoordenadorDashboard() {
         {data && !data.alerts.gradesAlert && !data.alerts.attendanceAlert && (
           <div className="bg-green-50 dark:bg-green-950 border border-green-100 dark:border-green-800 rounded-2xl p-4 flex items-center gap-3 mb-4">
             <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white text-xs">✓</span>
+              <Check size={12} className="text-white" />
             </div>
             <p className="text-sm text-green-700 dark:text-green-300">Todos os alunos com notas e frequência regulares.</p>
           </div>

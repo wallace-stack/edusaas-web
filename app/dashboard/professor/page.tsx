@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUser } from '../../lib/auth';
+import { getUser, markOnboardingSeenLocally } from '../../lib/auth';
 import api from '../../lib/api';
 import { BookOpen, Users, ClipboardList, CheckSquare, Newspaper, Bell, NotebookPen } from 'lucide-react';
 import { DashboardHeader } from '@/components/dashboard-header';
+import DashboardTour from '@/components/DashboardTour';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Filler, Tooltip, Legend } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 
@@ -28,6 +29,7 @@ export default function ProfessorDashboard() {
   const [data, setData] = useState<TeacherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showTour, setShowTour] = useState(false);
 
   const getSaudacao = () => {
     const h = new Date().getHours();
@@ -41,11 +43,18 @@ export default function ProfessorDashboard() {
       router.push('/login');
       return;
     }
+    if (user.hasSeenOnboarding === false) setShowTour(true);
     loadDashboard();
     api.get('/notifications/unread-count')
       .then(r => { const c = typeof r.data === 'number' ? r.data : r.data?.count || 0; setUnreadCount(c); })
       .catch(() => {});
   }, []);
+
+  const closeTour = () => {
+    setShowTour(false);
+    markOnboardingSeenLocally();
+    api.patch('/users/me/onboarding-seen').catch(() => {});
+  };
 
   const loadDashboard = async () => {
     try {
@@ -66,8 +75,18 @@ export default function ProfessorDashboard() {
     );
   }
 
+  const tourSteps = [
+    { icon: CheckSquare, title: 'Registrar Chamada', description: 'Marque presença e falta da turma em segundos, direto pelo celular ou computador.', color: 'bg-green-50 dark:bg-green-950 text-green-600' },
+    { icon: ClipboardList, title: 'Lançar Notas', description: 'Lance notas por turma e disciplina — ou avaliação por conceito, se a turma for de Educação Infantil.', color: 'bg-blue-50 dark:bg-blue-950 text-blue-600' },
+    { icon: NotebookPen, title: 'Caderno', description: 'Registre seus planejamentos de aula, semana a semana.', color: 'bg-indigo-50 dark:bg-indigo-950 text-indigo-600' },
+    { icon: Bell, title: 'Avisos da Turma', description: 'Envie avisos institucionais direto pra sua turma.', color: 'bg-orange-50 dark:bg-orange-950 text-orange-600' },
+  ];
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-gray-950">
+      {showTour && (
+        <DashboardTour greeting="Bem-vindo, professor" steps={tourSteps} onClose={closeTour} />
+      )}
       <DashboardHeader subtitle="Docente" unreadCount={unreadCount} notificationsHref="/dashboard/professor/notificacoes" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
