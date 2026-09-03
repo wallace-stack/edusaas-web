@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
-  Eye, EyeOff, Mail, Lock, AlertCircle, Loader2,
-  Building2, FileText, Phone, User,
+  Eye, EyeOff, Mail, Lock, AlertCircle, CheckCircle2, Loader2,
+  Building2, FileText, Phone, User, Tag,
 } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import api, { registerApi } from '../lib/api';
@@ -42,25 +42,62 @@ function maskPhone(value: string): string {
     .replace(/(\d{5})(\d{4})$/,'$1-$2');
 }
 
-/* ── SCHEMA ───────────────────────────────────── */
+/* ── CUPOM ────────────────────────────────────── */
+function maskCupom(value: string): string {
+  return value.toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 20);
+}
+
+const PLAN_LABELS: Record<string, string> = {
+  starter: 'Starter',
+  pro: 'Pro',
+  escola: 'Escola',
+  rede: 'Rede',
+};
+
+type CouponInfo = { durationDays: number; targetPlan: string };
+
+function descreverCupom(info: CouponInfo): string {
+  const meses = Math.round(info.durationDays / 30);
+  const plano = PLAN_LABELS[info.targetPlan] || info.targetPlan;
+  return `plano ${plano} por ${meses} ${meses === 1 ? 'mês' : 'meses'}`;
+}
+
+/* ── SCHEMA ───────────────────────────────────────────────────────────────
+ * Toda z.string() leva { error } próprio: sem isso, um valor ausente ou do
+ * tipo errado cai na mensagem crua do zod ("Invalid input: expected string,
+ * received undefined"), que não diz nada útil pra quem preenche o formulário.
+ */
 const registerSchema = z.object({
-  schoolName:    z.string().min(3, 'Nome da escola deve ter ao menos 3 caracteres'),
-  cnpj:          z.string().min(1, 'CNPJ é obrigatório').refine(v => validarCNPJ(v), 'CNPJ inválido — verifique os dígitos'),
-  schoolEmail:   z.string().email('E-mail inválido'),
-  directorName:  z.string().min(3, 'Nome deve ter ao menos 3 caracteres'),
-  directorEmail: z.string().email('E-mail inválido'),
-  password:      z.string().min(8,'Senha deve ter no mínimo 8 caracteres').regex(/[A-Z]/,'Deve ter ao menos uma maiúscula').regex(/[0-9]/,'Deve ter ao menos um número'),
-  phone:         z.string().optional().refine(v => !v || v.replace(/\D/g,'').length >= 10,'Telefone inválido'),
+  schoolName:    z.string({ error: 'Nome da escola é obrigatório.' })
+                   .min(3, 'Nome da escola deve ter ao menos 3 caracteres'),
+  cnpj:          z.string({ error: 'CNPJ inválido.' }).optional()
+                   .refine(v => !v || validarCNPJ(v), 'CNPJ inválido, verifique os dígitos'),
+  schoolEmail:   z.string({ error: 'E-mail da escola é obrigatório.' })
+                   .email('E-mail inválido'),
+  directorName:  z.string({ error: 'Nome do diretor é obrigatório.' })
+                   .min(3, 'Nome deve ter ao menos 3 caracteres'),
+  directorEmail: z.string({ error: 'E-mail do diretor é obrigatório.' })
+                   .email('E-mail inválido'),
+  password:      z.string({ error: 'Senha é obrigatória.' })
+                   .min(8,'Senha deve ter no mínimo 8 caracteres')
+                   .regex(/[A-Z]/,'Deve ter ao menos uma maiúscula')
+                   .regex(/[0-9]/,'Deve ter ao menos um número'),
+  phone:         z.string({ error: 'Telefone inválido.' }).optional()
+                   .refine(v => !v || v.replace(/\D/g,'').length >= 10,'Telefone inválido'),
+  couponCode:    z.string({ error: 'Cupom inválido.' }).optional(),
 });
 
 type RegisterForm = z.infer<typeof registerSchema>;
 
 /* ── FIELD HELPER ─────────────────────────────── */
-function FieldIcon({ icon: Icon, error, children }: { icon: React.ElementType; error?: string; children: React.ReactNode }) {
+function FieldIcon({ icon: Icon, error, success, children }: { icon: React.ElementType; error?: string; success?: boolean; children: React.ReactNode }) {
   return (
     <div style={{ position: 'relative' }}>
       <Icon size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', pointerEvents: 'none', zIndex: 1 }} />
       {children}
+      {success && !error && (
+        <CheckCircle2 size={15} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--success)', pointerEvents: 'none' }} />
+      )}
       {error && (
         <p style={{ fontSize: '12px', color: 'var(--error)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
           <AlertCircle size={12} /> {error}
@@ -89,10 +126,95 @@ export default function CadastroPage() {
   const [showPass, setShowPass] = useState(false);
   const [cnpjVal, setCnpjVal] = useState('');
   const [phoneVal, setPhoneVal] = useState('');
+  const [couponVal, setCouponVal] = useState('');
+  const [couponStatus, setCouponStatus] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
+  const [couponInfo, setCouponInfo] = useState<CouponInfo | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const couponRequestId = useRef(0);
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<RegisterForm>({ resolver: zodResolver(registerSchema) });
+  const { register, handleSubmit, setValue, formState: { errors, touchedFields, isSubmitted } } = useForm<RegisterForm>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
+  });
+
+  // zodResolver valida o schema INTEIRO a cada blur, não só o campo tocado — sem
+  // essa checagem, blurar um campo (inclusive por auto-avanço, ver onChange do CNPJ
+  // e do telefone) populava "errors" pra campos que a pessoa nem chegou a tocar
+  // ainda. Só mostra erro/sucesso de um campo se ELE MESMO foi tocado, ou depois de
+  // uma tentativa de envio (isSubmitted cobre os campos controlados manualmente,
+  // que o react-hook-form nem sabe que existem até o primeiro setValue).
+  const shouldShowValidation = (field: keyof RegisterForm) => !!touchedFields[field] || isSubmitted;
+
+  // Refs pra foco automático (Enter avança pro próximo campo; CNPJ e telefone também
+  // avançam sozinhos ao completar a máscara, ver onChange de cada um).
+  const cnpjRef = useRef<HTMLInputElement>(null);
+  const schoolEmailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const couponRef = useRef<HTMLInputElement>(null);
+  const directorNameRef = useRef<HTMLInputElement>(null);
+  const directorEmailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  function focusNextOnEnter(nextRef: React.RefObject<HTMLInputElement | null>) {
+    return (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        nextRef.current?.focus();
+      }
+    };
+  }
+
+  // Campos com ref próprio (auto-foco), mas registrados via react-hook-form: precisa
+  // mesclar o ref do register() com o nosso, senão um dos dois é sobrescrito.
+  const { ref: schoolEmailRHFRef, ...schoolEmailField } = register('schoolEmail');
+  const { ref: directorNameRHFRef, ...directorNameField } = register('directorName');
+  const { ref: directorEmailRHFRef, ...directorEmailField } = register('directorEmail');
+  const { ref: passwordRHFRef, ...passwordField } = register('password');
+
+  // Validação inline do cupom: confere plano e duração no backend sem consumi-lo
+  // (endpoint dedicado de preview, ver auth.controller.ts). Debounce evita bater a
+  // API a cada tecla — 7 chars é o menor código real (ex.: WADM-1).
+  useEffect(() => {
+    const code = couponVal.trim();
+    // Abaixo de 6 chars não existe código real (o menor formato é algo como
+    // "WADM-1"): evita mostrar "inválido" enquanto a pessoa ainda está digitando.
+    if (code.length < 6) {
+      setCouponStatus('idle');
+      setCouponInfo(null);
+      setCouponError('');
+      return;
+    }
+
+    setCouponStatus('checking');
+    const requestId = ++couponRequestId.current;
+    const timer = setTimeout(async () => {
+      try {
+        const response = await registerApi.post('/auth/coupon-preview', { code });
+        if (couponRequestId.current !== requestId) return;
+        setCouponInfo(response.data);
+        setCouponStatus('valid');
+        setCouponError('');
+      } catch (err: any) {
+        if (couponRequestId.current !== requestId) return;
+        setCouponInfo(null);
+        setCouponStatus('invalid');
+        setCouponError(err?.response?.data?.message || 'Cupom inválido ou já utilizado.');
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [couponVal]);
 
   const onSubmit = async (data: RegisterForm) => {
+    // Cupom digitado mas ainda não confirmado como válido: não deixa seguir pro
+    // registro, senão o backend derruba o cadastro inteiro (ver auth.service.ts) e
+    // quem pagou pelo combo vê um erro genérico sem entender o motivo.
+    if (couponVal.trim() && couponStatus !== 'valid') {
+      setError('Confira o código do cupom antes de continuar, ele ainda não foi validado.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setLoadingMsg('');
@@ -103,7 +225,12 @@ export default function CadastroPage() {
     }, 5_000);
 
     try {
-      const payload = { ...data, cnpj: data.cnpj.replace(/\D/g,''), phone: data.phone?.replace(/\D/g,'') || undefined };
+      const payload = {
+        ...data,
+        cnpj: data.cnpj?.replace(/\D/g,'') || undefined,
+        phone: data.phone?.replace(/\D/g,'') || undefined,
+        couponCode: couponVal.trim() || undefined,
+      };
       const response = await registerApi.post('/auth/register', payload);
       const { access_token, user } = response.data;
       setAuth(access_token, user);
@@ -128,8 +255,11 @@ export default function CadastroPage() {
     }
   };
 
+  // paddingRight sempre reservado pro ícone de sucesso/erro (FieldIcon), pra não
+  // deslocar o layout quando o status muda enquanto a pessoa digita.
   const inputStyle = (hasError: boolean): React.CSSProperties => ({
     paddingLeft: '40px',
+    paddingRight: '40px',
     ...(hasError ? {} : {}),
   });
 
@@ -157,7 +287,11 @@ export default function CadastroPage() {
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Link href="/"><img src="/logo.png" alt="Walladm" style={{ height: "96px", width: "auto", margin: "0 auto 12px" }} className="hover:opacity-80 transition-opacity cursor-pointer" /></Link>
           <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>Cadastrar Escola</h1>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>14 dias grátis — sem cartão de crédito</p>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+            {couponStatus === 'valid' && couponInfo
+              ? `Cupom aplicado, ${descreverCupom(couponInfo)}`
+              : '14 dias grátis, sem cartão de crédito'}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -167,36 +301,91 @@ export default function CadastroPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>Nome da escola</label>
-              <FieldIcon icon={Building2} error={errors.schoolName?.message}>
+              <FieldIcon icon={Building2} error={shouldShowValidation('schoolName') ? errors.schoolName?.message : undefined} success={shouldShowValidation('schoolName') && !errors.schoolName}>
                 <input {...register('schoolName')} placeholder="Ex: Colégio São Paulo"
-                  className={`themed-input${errors.schoolName ? ' error' : ''}`} style={inputStyle(!!errors.schoolName)} />
+                  onKeyDown={focusNextOnEnter(cnpjRef)}
+                  className={`themed-input${shouldShowValidation('schoolName') ? (errors.schoolName ? ' error' : ' success') : ''}`}
+                  style={inputStyle(shouldShowValidation('schoolName') && !!errors.schoolName)} />
               </FieldIcon>
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>CNPJ</label>
-              <FieldIcon icon={FileText} error={errors.cnpj?.message}>
-                <input value={cnpjVal} onChange={e => { const m = maskCNPJ(e.target.value); setCnpjVal(m); setValue('cnpj', m, { shouldValidate: true }); }}
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>CNPJ <span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>(opcional)</span></label>
+              <FieldIcon icon={FileText} error={cnpjVal.length > 0 ? errors.cnpj?.message : undefined} success={cnpjVal.length > 0 && !errors.cnpj}>
+                <input ref={cnpjRef} value={cnpjVal}
+                  onChange={e => {
+                    const m = maskCNPJ(e.target.value);
+                    setCnpjVal(m);
+                    setValue('cnpj', m, { shouldValidate: true });
+                    // Máscara completa (14 dígitos) e válida — avança sozinho, sem esperar Enter/Tab
+                    if (m.length === 18 && validarCNPJ(m)) schoolEmailRef.current?.focus();
+                  }}
+                  onKeyDown={focusNextOnEnter(schoolEmailRef)}
                   placeholder="00.000.000/0000-00" inputMode="numeric" maxLength={18}
-                  className={`themed-input${errors.cnpj ? ' error' : ''}`} style={inputStyle(!!errors.cnpj)} />
+                  className={`themed-input${cnpjVal.length > 0 ? (errors.cnpj ? ' error' : ' success') : ''}`}
+                  style={inputStyle(cnpjVal.length > 0 && !!errors.cnpj)} />
               </FieldIcon>
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>E-mail da escola</label>
-              <FieldIcon icon={Mail} error={errors.schoolEmail?.message}>
-                <input {...register('schoolEmail')} type="email" autoComplete="off" placeholder="contato@escola.com.br"
-                  className={`themed-input${errors.schoolEmail ? ' error' : ''}`} style={inputStyle(!!errors.schoolEmail)} />
+              <FieldIcon icon={Mail} error={shouldShowValidation('schoolEmail') ? errors.schoolEmail?.message : undefined} success={shouldShowValidation('schoolEmail') && !errors.schoolEmail}>
+                <input {...schoolEmailField} ref={(el) => { schoolEmailRHFRef(el); schoolEmailRef.current = el; }}
+                  type="email" autoComplete="off" placeholder="contato@escola.com.br"
+                  onKeyDown={focusNextOnEnter(phoneRef)}
+                  className={`themed-input${shouldShowValidation('schoolEmail') ? (errors.schoolEmail ? ' error' : ' success') : ''}`}
+                  style={inputStyle(shouldShowValidation('schoolEmail') && !!errors.schoolEmail)} />
               </FieldIcon>
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>Telefone <span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>(opcional)</span></label>
-              <FieldIcon icon={Phone} error={errors.phone?.message}>
-                <input value={phoneVal} onChange={e => { const m = maskPhone(e.target.value); setPhoneVal(m); setValue('phone', m, { shouldValidate: true }); }}
+              <FieldIcon icon={Phone} error={phoneVal.length > 0 ? errors.phone?.message : undefined} success={phoneVal.length > 0 && !errors.phone}>
+                <input ref={phoneRef} value={phoneVal}
+                  onChange={e => {
+                    const m = maskPhone(e.target.value);
+                    setPhoneVal(m);
+                    setValue('phone', m, { shouldValidate: true });
+                    // Celular completo (11 dígitos) — avança sozinho
+                    if (m.replace(/\D/g, '').length === 11) couponRef.current?.focus();
+                  }}
+                  onKeyDown={focusNextOnEnter(couponRef)}
                   placeholder="(11) 99999-9999" inputMode="numeric" maxLength={15}
-                  className={`themed-input${errors.phone ? ' error' : ''}`} style={inputStyle(!!errors.phone)} />
+                  className={`themed-input${phoneVal.length > 0 ? (errors.phone ? ' error' : ' success') : ''}`}
+                  style={inputStyle(phoneVal.length > 0 && !!errors.phone)} />
               </FieldIcon>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>Cupom promocional <span style={{ color: 'var(--text-secondary)', fontWeight: 400 }}>(opcional)</span></label>
+              <div style={{ position: 'relative' }}>
+                <Tag size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', pointerEvents: 'none', zIndex: 1 }} />
+                <input
+                  ref={couponRef}
+                  value={couponVal}
+                  onChange={e => { const m = maskCupom(e.target.value); setCouponVal(m); setValue('couponCode', m, { shouldValidate: true }); }}
+                  onKeyDown={focusNextOnEnter(directorNameRef)}
+                  placeholder="Ex: WADM-1234-5678" autoCapitalize="characters" maxLength={20}
+                  className={`themed-input${couponStatus === 'invalid' ? ' error' : ''}${couponStatus === 'valid' ? ' success' : ''}`}
+                  style={{ ...inputStyle(couponStatus === 'invalid'), paddingRight: '40px' }}
+                />
+                {couponStatus === 'checking' && (
+                  <Loader2 size={15} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', animation: 'spin 1s linear infinite' }} />
+                )}
+                {couponStatus === 'valid' && (
+                  <CheckCircle2 size={15} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--success)' }} />
+                )}
+              </div>
+              {couponStatus === 'invalid' && (
+                <p style={{ fontSize: '12px', color: 'var(--error)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <AlertCircle size={12} /> {couponError}
+                </p>
+              )}
+              {couponStatus === 'valid' && couponInfo && (
+                <p style={{ fontSize: '12px', color: 'var(--success)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <CheckCircle2 size={12} /> Cupom válido: {descreverCupom(couponInfo)}, ativado assim que o cadastro for enviado.
+                </p>
+              )}
             </div>
           </SectionCard>
 
@@ -205,17 +394,23 @@ export default function CadastroPage() {
 
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>Nome completo</label>
-              <FieldIcon icon={User} error={errors.directorName?.message}>
-                <input {...register('directorName')} placeholder="João da Silva" autoComplete="name"
-                  className={`themed-input${errors.directorName ? ' error' : ''}`} style={inputStyle(!!errors.directorName)} />
+              <FieldIcon icon={User} error={shouldShowValidation('directorName') ? errors.directorName?.message : undefined} success={shouldShowValidation('directorName') && !errors.directorName}>
+                <input {...directorNameField} ref={(el) => { directorNameRHFRef(el); directorNameRef.current = el; }}
+                  placeholder="João da Silva" autoComplete="name"
+                  onKeyDown={focusNextOnEnter(directorEmailRef)}
+                  className={`themed-input${shouldShowValidation('directorName') ? (errors.directorName ? ' error' : ' success') : ''}`}
+                  style={inputStyle(shouldShowValidation('directorName') && !!errors.directorName)} />
               </FieldIcon>
             </div>
 
             <div>
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>E-mail de acesso</label>
-              <FieldIcon icon={Mail} error={errors.directorEmail?.message}>
-                <input {...register('directorEmail')} type="email" autoComplete="email" placeholder="diretor@escola.com.br"
-                  className={`themed-input${errors.directorEmail ? ' error' : ''}`} style={inputStyle(!!errors.directorEmail)} />
+              <FieldIcon icon={Mail} error={shouldShowValidation('directorEmail') ? errors.directorEmail?.message : undefined} success={shouldShowValidation('directorEmail') && !errors.directorEmail}>
+                <input {...directorEmailField} ref={(el) => { directorEmailRHFRef(el); directorEmailRef.current = el; }}
+                  type="email" autoComplete="email" placeholder="diretor@escola.com.br"
+                  onKeyDown={focusNextOnEnter(passwordRef)}
+                  className={`themed-input${shouldShowValidation('directorEmail') ? (errors.directorEmail ? ' error' : ' success') : ''}`}
+                  style={inputStyle(shouldShowValidation('directorEmail') && !!errors.directorEmail)} />
               </FieldIcon>
             </div>
 
@@ -223,14 +418,19 @@ export default function CadastroPage() {
               <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' }}>Senha</label>
               <div style={{ position: 'relative' }}>
                 <Lock size={15} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', pointerEvents: 'none' }} />
-                <input {...register('password')} type={showPass ? 'text' : 'password'} autoComplete="new-password" placeholder="Mínimo 8 caracteres"
-                  className={`themed-input${errors.password ? ' error' : ''}`} style={{ paddingLeft: '40px', paddingRight: '44px' }} />
+                <input {...passwordField} ref={(el) => { passwordRHFRef(el); passwordRef.current = el; }}
+                  type={showPass ? 'text' : 'password'} autoComplete="new-password" placeholder="Mínimo 8 caracteres"
+                  className={`themed-input${shouldShowValidation('password') ? (errors.password ? ' error' : ' success') : ''}`}
+                  style={{ paddingLeft: '40px', paddingRight: '76px' }} />
+                {shouldShowValidation('password') && !errors.password && (
+                  <CheckCircle2 size={15} style={{ position: 'absolute', right: '40px', top: '50%', transform: 'translateY(-50%)', color: 'var(--success)', pointerEvents: 'none' }} />
+                )}
                 <button type="button" onClick={() => setShowPass(p => !p)} tabIndex={-1}
                   style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', padding: '4px' }}>
                   {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
-              {errors.password ? (
+              {shouldShowValidation('password') && errors.password ? (
                 <p style={{ fontSize: '12px', color: 'var(--error)', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <AlertCircle size={12} /> {errors.password.message}
                 </p>
@@ -255,17 +455,19 @@ export default function CadastroPage() {
           )}
 
           {/* Submit */}
-          <button type="submit" disabled={loading} style={{
+          <button type="submit" disabled={loading || couponStatus === 'checking'} style={{
             width: '100%',
-            background: loading ? 'rgba(249,115,22,0.6)' : '#F97316',
+            background: (loading || couponStatus === 'checking') ? 'rgba(249,115,22,0.6)' : '#F97316',
             color: 'white', padding: '13px', borderRadius: '12px', fontWeight: 600,
-            fontSize: '14px', border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+            fontSize: '14px', border: 'none', cursor: (loading || couponStatus === 'checking') ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
             transition: 'opacity 0.15s ease',
             boxShadow: '0 4px 16px rgba(249,115,22,0.3)',
           }}>
             {loading ? (
               <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Cadastrando...</>
+            ) : couponStatus === 'valid' && couponInfo ? (
+              `Ativar ${descreverCupom(couponInfo)}`
             ) : 'Começar 14 dias grátis'}
           </button>
 
