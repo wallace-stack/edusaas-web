@@ -139,7 +139,16 @@ function CadastroForm() {
   const [showPass, setShowPass] = useState(false);
   const [cnpjVal, setCnpjVal] = useState('');
   const [phoneVal, setPhoneVal] = useState('');
-  const [couponVal, setCouponVal] = useState('');
+  // Lazy initializer: roda de forma síncrona no primeiro render, então o campo já
+  // nasce preenchido — nunca chega a pintar vazio pra só depois (via useEffect, um
+  // tick mais tarde) receber o valor da URL.
+  const [couponVal, setCouponVal] = useState(() => maskCupom(searchParams.get('cupom') || ''));
+  // Fixado no valor do primeiro render (sem setter usado depois): diz se a pessoa
+  // chegou pelo link com cupom, pra decidir o texto enquanto o código ainda não
+  // terminou de validar — sem isso, botão/subtítulo mostravam "14 dias grátis" por
+  // uma fração de segundo antes de trocar pro plano, porque couponStatus começa
+  // 'idle' até o efeito de validação (mais abaixo) responder.
+  const [couponFromUrl] = useState(() => !!searchParams.get('cupom'));
   const [couponStatus, setCouponStatus] = useState<'idle' | 'checking' | 'valid' | 'invalid'>('idle');
   const [couponInfo, setCouponInfo] = useState<CouponInfo | null>(null);
   const [couponError, setCouponError] = useState('');
@@ -159,16 +168,12 @@ function CadastroForm() {
   // que o react-hook-form nem sabe que existem até o primeiro setValue).
   const shouldShowValidation = (field: keyof RegisterForm) => !!touchedFields[field] || isSubmitted;
 
-  // Link pronto de entrega (/cadastro?cupom=CODIGO): pré-preenche o campo, o efeito
-  // de validação abaixo (dependente de couponVal) dispara sozinho e confere o
-  // código como se a pessoa tivesse digitado — sem isso, quem clica no link ainda
-  // veria "14 dias grátis" depois de ter pago.
+  // Link pronto de entrega (/cadastro?cupom=CODIGO): couponVal já nasce preenchido
+  // (lazy initializer acima), isso só espelha o valor inicial pro react-hook-form.
+  // O efeito de validação do cupom (mais abaixo, dependente de couponVal) dispara
+  // sozinho e confere o código como se a pessoa tivesse digitado.
   useEffect(() => {
-    const cupomFromUrl = searchParams.get('cupom');
-    if (!cupomFromUrl) return;
-    const m = maskCupom(cupomFromUrl);
-    setCouponVal(m);
-    setValue('couponCode', m, { shouldValidate: true });
+    if (couponFromUrl) setValue('couponCode', couponVal, { shouldValidate: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -316,7 +321,9 @@ function CadastroForm() {
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
             {couponStatus === 'valid' && couponInfo
               ? `Cupom aplicado, ${descreverCupom(couponInfo)}`
-              : '14 dias grátis, sem cartão de crédito'}
+              : couponFromUrl && couponStatus !== 'invalid'
+                ? 'Confirmando cupom…'
+                : '14 dias grátis, sem cartão de crédito'}
           </p>
         </div>
 
@@ -481,11 +488,13 @@ function CadastroForm() {
           )}
 
           {/* Submit */}
-          <button type="submit" disabled={loading || couponStatus === 'checking'} style={{
+          {/* Confirmando cupom da URL conta como "ainda checando", mesmo antes do
+              efeito de validação marcar couponStatus como 'checking' de fato. */}
+          <button type="submit" disabled={loading || couponStatus === 'checking' || (couponFromUrl && couponStatus === 'idle')} style={{
             width: '100%',
-            background: (loading || couponStatus === 'checking') ? 'rgba(249,115,22,0.6)' : '#F97316',
+            background: (loading || couponStatus === 'checking' || (couponFromUrl && couponStatus === 'idle')) ? 'rgba(249,115,22,0.6)' : '#F97316',
             color: 'white', padding: '13px', borderRadius: '12px', fontWeight: 600,
-            fontSize: '14px', border: 'none', cursor: (loading || couponStatus === 'checking') ? 'not-allowed' : 'pointer',
+            fontSize: '14px', border: 'none', cursor: (loading || couponStatus === 'checking' || (couponFromUrl && couponStatus === 'idle')) ? 'not-allowed' : 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
             transition: 'opacity 0.15s ease',
             boxShadow: '0 4px 16px rgba(249,115,22,0.3)',
@@ -494,6 +503,8 @@ function CadastroForm() {
               <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Cadastrando...</>
             ) : couponStatus === 'valid' && couponInfo ? (
               `Ativar ${descreverCupom(couponInfo)}`
+            ) : couponFromUrl && couponStatus !== 'invalid' ? (
+              <><Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> Confirmando cupom...</>
             ) : 'Começar 14 dias grátis'}
           </button>
 
