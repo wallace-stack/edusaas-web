@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -66,19 +66,31 @@ function descreverCupom(info: CouponInfo): string {
  * Toda z.string() leva { error } próprio: sem isso, um valor ausente ou do
  * tipo errado cai na mensagem crua do zod ("Invalid input: expected string,
  * received undefined"), que não diz nada útil pra quem preenche o formulário.
+ *
+ * Vazio e mal preenchido são erros diferentes: .min(1, "Informe X") pega o
+ * vazio antes do check seguinte avaliar formato/tamanho, então a mensagem
+ * certa aparece pra cada caso (zod roda os checks em ordem e reporta o
+ * primeiro que falha — só o .email()/.min(3), sozinho, não saberia dizer se
+ * "" era ausência ou formato errado). Mensagem de "Informe X" repete o texto
+ * do label na tela, igual ao que a pessoa acabou de ler.
  */
 const registerSchema = z.object({
-  schoolName:    z.string({ error: 'Nome da escola é obrigatório.' })
+  schoolName:    z.string({ error: 'Informe o nome da escola.' })
+                   .min(1, 'Informe o nome da escola.')
                    .min(3, 'Nome da escola deve ter ao menos 3 caracteres'),
   cnpj:          z.string({ error: 'CNPJ inválido.' }).optional()
                    .refine(v => !v || validarCNPJ(v), 'CNPJ inválido, verifique os dígitos'),
-  schoolEmail:   z.string({ error: 'E-mail da escola é obrigatório.' })
+  schoolEmail:   z.string({ error: 'Informe o e-mail da escola.' })
+                   .min(1, 'Informe o e-mail da escola.')
                    .email('E-mail inválido'),
-  directorName:  z.string({ error: 'Nome do diretor é obrigatório.' })
+  directorName:  z.string({ error: 'Informe o nome completo.' })
+                   .min(1, 'Informe o nome completo.')
                    .min(3, 'Nome deve ter ao menos 3 caracteres'),
-  directorEmail: z.string({ error: 'E-mail do diretor é obrigatório.' })
+  directorEmail: z.string({ error: 'Informe o e-mail de acesso.' })
+                   .min(1, 'Informe o e-mail de acesso.')
                    .email('E-mail inválido'),
-  password:      z.string({ error: 'Senha é obrigatória.' })
+  password:      z.string({ error: 'Informe a senha.' })
+                   .min(1, 'Informe a senha.')
                    .min(8,'Senha deve ter no mínimo 8 caracteres')
                    .regex(/[A-Z]/,'Deve ter ao menos uma maiúscula')
                    .regex(/[0-9]/,'Deve ter ao menos um número'),
@@ -118,8 +130,9 @@ function SectionCard({ title, children }: { title: string; children: React.React
 }
 
 /* ── PAGE ─────────────────────────────────────── */
-export default function CadastroPage() {
+function CadastroForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingMsg, setLoadingMsg] = useState('');
@@ -134,7 +147,7 @@ export default function CadastroPage() {
 
   const { register, handleSubmit, setValue, formState: { errors, touchedFields, isSubmitted } } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
-    mode: 'onBlur',
+    mode: 'onTouched',
     reValidateMode: 'onChange',
   });
 
@@ -145,6 +158,19 @@ export default function CadastroPage() {
   // uma tentativa de envio (isSubmitted cobre os campos controlados manualmente,
   // que o react-hook-form nem sabe que existem até o primeiro setValue).
   const shouldShowValidation = (field: keyof RegisterForm) => !!touchedFields[field] || isSubmitted;
+
+  // Link pronto de entrega (/cadastro?cupom=CODIGO): pré-preenche o campo, o efeito
+  // de validação abaixo (dependente de couponVal) dispara sozinho e confere o
+  // código como se a pessoa tivesse digitado — sem isso, quem clica no link ainda
+  // veria "14 dias grátis" depois de ter pago.
+  useEffect(() => {
+    const cupomFromUrl = searchParams.get('cupom');
+    if (!cupomFromUrl) return;
+    const m = maskCupom(cupomFromUrl);
+    setCouponVal(m);
+    setValue('couponCode', m, { shouldValidate: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Refs pra foco automático (Enter avança pro próximo campo; CNPJ e telefone também
   // avançam sozinhos ao completar a máscara, ver onChange de cada um).
@@ -491,5 +517,13 @@ export default function CadastroPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function CadastroPage() {
+  return (
+    <Suspense fallback={null}>
+      <CadastroForm />
+    </Suspense>
   );
 }
