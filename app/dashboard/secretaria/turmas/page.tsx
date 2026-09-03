@@ -8,13 +8,7 @@ import { ArrowLeft, Plus, BookOpen, Users, X, ChevronRight, Phone, MapPin, User 
 import { toast } from 'sonner';
 import { maskCPF } from '../../../lib/utils';
 import EnrollmentActions from '@/components/EnrollmentActions';
-
-interface InfantilConfig {
-  useConceito:     boolean;
-  useParecer:      boolean;
-  useDiarioBordo:  boolean;
-  usePlanejamento: boolean;
-}
+import ClassModeSelector, { DEFAULT_INFANTIL_CONFIG, type InfantilConfig } from '@/components/ClassModeSelector';
 
 interface SchoolClass {
   id: number;
@@ -85,6 +79,8 @@ export default function SecretariaTurmasPage() {
   const [form, setForm] = useState({
     name: '', year: new Date().getFullYear().toString(), shift: 'morning',
   });
+  const [createMode, setCreateMode] = useState<'regular' | 'infantil'>('regular');
+  const [createInfantilConfig, setCreateInfantilConfig] = useState<InfantilConfig>(DEFAULT_INFANTIL_CONFIG);
 
   const [manageClass, setManageClass] = useState<SchoolClass | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -94,7 +90,7 @@ export default function SecretariaTurmasPage() {
   const [manageTab, setManageTab] = useState<'disciplinas' | 'modo'>('disciplinas');
   const [modeForm, setModeForm] = useState<{ mode: 'regular' | 'infantil'; cfg: InfantilConfig }>({
     mode: 'regular',
-    cfg: { useConceito: true, useParecer: true, useDiarioBordo: false, usePlanejamento: false },
+    cfg: DEFAULT_INFANTIL_CONFIG,
   });
   const [savingMode, setSavingMode] = useState(false);
 
@@ -122,9 +118,16 @@ export default function SecretariaTurmasPage() {
     try {
       setSaving(true);
       setError('');
-      await api.post('/secretary/classes', { ...form, year: Number(form.year) });
+      await api.post('/secretary/classes', {
+        ...form,
+        year: Number(form.year),
+        mode: createMode,
+        infantilConfig: createMode === 'infantil' ? createInfantilConfig : undefined,
+      });
       setShowModal(false);
       setForm({ name: '', year: new Date().getFullYear().toString(), shift: 'morning' });
+      setCreateMode('regular');
+      setCreateInfantilConfig(DEFAULT_INFANTIL_CONFIG);
       loadClasses();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao criar turma');
@@ -136,7 +139,7 @@ export default function SecretariaTurmasPage() {
     setManageTab('disciplinas');
     setModeForm({
       mode: c.mode ?? 'regular',
-      cfg: c.infantilConfig ?? { useConceito: true, useParecer: true, useDiarioBordo: false, usePlanejamento: false },
+      cfg: c.infantilConfig ?? DEFAULT_INFANTIL_CONFIG,
     });
     try {
       const [subRes, teachRes] = await Promise.all([
@@ -316,9 +319,18 @@ export default function SecretariaTurmasPage() {
                 <option value="afternoon">Tarde</option>
                 <option value="evening">Noite</option>
               </select>
+              <div>
+                <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">Modo da turma</label>
+                <ClassModeSelector
+                  mode={createMode}
+                  onModeChange={setCreateMode}
+                  infantilConfig={createInfantilConfig}
+                  onInfantilConfigChange={setCreateInfantilConfig}
+                />
+              </div>
               {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => { setShowModal(false); setError(''); }} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Cancelar</button>
+                <button type="button" onClick={() => { setShowModal(false); setError(''); setCreateMode('regular'); setCreateInfantilConfig(DEFAULT_INFANTIL_CONFIG); }} className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">Cancelar</button>
                 <button type="submit" disabled={saving} className="flex-1 py-3 rounded-xl bg-[#1E3A5F] text-white text-sm font-medium hover:bg-[#162d4a] disabled:opacity-50">
                   {saving ? 'Criando...' : 'Criar turma'}
                 </button>
@@ -418,50 +430,12 @@ export default function SecretariaTurmasPage() {
             {/* Aba Modo da turma */}
             {manageTab === 'modo' && (
               <div className="space-y-5">
-                {/* Toggle Regular / Infantil */}
-                <div className="flex gap-2">
-                  {(['regular', 'infantil'] as const).map(m => (
-                    <button
-                      key={m}
-                      onClick={() => setModeForm(f => ({ ...f, mode: m }))}
-                      className={`flex-1 py-3 rounded-xl text-sm font-medium border-2 transition-all ${
-                        modeForm.mode === m
-                          ? m === 'infantil'
-                            ? 'border-purple-500 bg-purple-50 dark:bg-purple-950 text-purple-700 dark:text-purple-300'
-                            : 'border-[#1E3A5F] bg-blue-50 dark:bg-blue-950 text-[#1E3A5F] dark:text-blue-300'
-                          : 'border-gray-200 dark:border-gray-700 text-gray-400 hover:border-gray-300'
-                      }`}
-                    >
-                      {m === 'regular' ? '📚 Regular' : '🎨 Educação Infantil'}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Opções do modo infantil */}
-                {modeForm.mode === 'infantil' && (
-                  <div className="bg-purple-50 dark:bg-purple-950/40 rounded-2xl p-4 space-y-3">
-                    <p className="text-xs font-semibold text-purple-700 dark:text-purple-300 uppercase tracking-wider mb-1">Recursos ativos</p>
-                    {([
-                      { key: 'useConceito',     label: 'Avaliação por conceito', desc: 'Desenvolvido / Em desenvolvimento / Não desenvolvido' },
-                      { key: 'useParecer',      label: 'Parecer descritivo',     desc: 'Texto livre por aluno por bimestre' },
-                      { key: 'useDiarioBordo',  label: 'Diário de bordo',        desc: 'Registro diário do que aconteceu na turma' },
-                      { key: 'usePlanejamento', label: 'Planejamento diário',    desc: 'Objetivos, atividades e recursos do dia' },
-                    ] as const).map(({ key, label, desc }) => (
-                      <label key={key} className="flex items-start gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={modeForm.cfg[key]}
-                          onChange={e => setModeForm(f => ({ ...f, cfg: { ...f.cfg, [key]: e.target.checked } }))}
-                          className="mt-0.5 w-4 h-4 accent-purple-600 flex-shrink-0"
-                        />
-                        <div>
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{label}</p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500">{desc}</p>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                )}
+                <ClassModeSelector
+                  mode={modeForm.mode}
+                  onModeChange={m => setModeForm(f => ({ ...f, mode: m }))}
+                  infantilConfig={modeForm.cfg}
+                  onInfantilConfigChange={cfg => setModeForm(f => ({ ...f, cfg }))}
+                />
 
                 <button
                   onClick={handleSaveMode}

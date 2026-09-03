@@ -8,6 +8,7 @@ import { ArrowLeft, Plus, BookOpen, Users, TrendingUp, CheckSquare, X, ChevronRi
 import { toast } from 'sonner';
 import { maskCPF } from '../../../lib/utils';
 import EnrollmentActions from '@/components/EnrollmentActions';
+import ClassModeSelector, { DEFAULT_INFANTIL_CONFIG, type InfantilConfig } from '@/components/ClassModeSelector';
 
 interface SchoolClass {
   id: number;
@@ -70,6 +71,8 @@ export default function DiretorTurmasPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({ name: '', year: new Date().getFullYear().toString(), shift: 'morning' });
+  const [createMode, setCreateMode] = useState<'regular' | 'infantil'>('regular');
+  const [createInfantilConfig, setCreateInfantilConfig] = useState<InfantilConfig>(DEFAULT_INFANTIL_CONFIG);
 
   const [manageClass, setManageClass] = useState<SchoolClass | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -104,9 +107,16 @@ export default function DiretorTurmasPage() {
     try {
       setSaving(true);
       setError('');
-      await api.post('/classes', { ...form, year: Number(form.year) });
+      await api.post('/classes', {
+        ...form,
+        year: Number(form.year),
+        mode: createMode,
+        infantilConfig: createMode === 'infantil' ? createInfantilConfig : undefined,
+      });
       setShowModal(false);
       setForm({ name: '', year: new Date().getFullYear().toString(), shift: 'morning' });
+      setCreateMode('regular');
+      setCreateInfantilConfig(DEFAULT_INFANTIL_CONFIG);
       loadClasses();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao criar turma');
@@ -314,11 +324,20 @@ export default function DiretorTurmasPage() {
                 <option value="afternoon">Tarde</option>
                 <option value="evening">Noite</option>
               </select>
+              <div>
+                <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">Modo da turma</label>
+                <ClassModeSelector
+                  mode={createMode}
+                  onModeChange={setCreateMode}
+                  infantilConfig={createInfantilConfig}
+                  onInfantilConfigChange={setCreateInfantilConfig}
+                />
+              </div>
               {error && <p className="text-red-500 dark:text-red-400 text-xs">{error}</p>}
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => { setShowModal(false); setError(''); }}
+                  onClick={() => { setShowModal(false); setError(''); setCreateMode('regular'); setCreateInfantilConfig(DEFAULT_INFANTIL_CONFIG); }}
                   className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   Cancelar

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import api from '@/app/lib/api';
 import { Check, BookOpen, UserPlus, GraduationCap, X } from 'lucide-react';
+import ClassModeSelector, { DEFAULT_INFANTIL_CONFIG, type InfantilConfig } from './ClassModeSelector';
 
 interface Props {
   onClose: () => void;
@@ -35,6 +36,8 @@ export default function OnboardingWizard({ onClose }: Props) {
   const [className, setClassName] = useState('');
   const [classYear, setClassYear] = useState('2026');
   const [classPeriod, setClassPeriod] = useState('Manhã');
+  const [classMode, setClassMode] = useState<'regular' | 'infantil'>('regular');
+  const [infantilConfig, setInfantilConfig] = useState<InfantilConfig>(DEFAULT_INFANTIL_CONFIG);
   const [createdClassId, setCreatedClassId] = useState<number | null>(null);
 
   // Step 2 state
@@ -67,6 +70,8 @@ export default function OnboardingWizard({ onClose }: Props) {
         name: className.trim(),
         year: Number(classYear),
         period: classPeriod,
+        mode: classMode,
+        infantilConfig: classMode === 'infantil' ? infantilConfig : undefined,
       });
       setCreatedClassId(r.data?.id ?? null);
       markDone(1);
@@ -148,7 +153,7 @@ export default function OnboardingWizard({ onClose }: Props) {
             </div>
             <div>
               <p className="text-white/70 text-xs uppercase tracking-widest">Walladm</p>
-              <h2 className="text-white font-bold text-lg leading-tight">Bem-vindo! Vamos começar 🎉</h2>
+              <h2 className="text-white font-bold text-lg leading-tight">Bem-vindo! Vamos começar</h2>
             </div>
           </div>
           <p className="text-white/60 text-xs">Configure sua escola em 3 passos simples</p>
@@ -233,6 +238,15 @@ export default function OnboardingWizard({ onClose }: Props) {
                       </select>
                     </div>
                   </div>
+                  <div>
+                    <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 block">Modo da turma</label>
+                    <ClassModeSelector
+                      mode={classMode}
+                      onModeChange={setClassMode}
+                      infantilConfig={infantilConfig}
+                      onInfantilConfigChange={setInfantilConfig}
+                    />
+                  </div>
                 </div>
               </div>
               <button className={btnPrimary} onClick={handleStep1} disabled={loading}>
@@ -313,7 +327,13 @@ export default function OnboardingWizard({ onClose }: Props) {
                 </p>
               </div>
               <button className={btnPrimary} onClick={handleStep3} disabled={loading}>
-                {loading ? 'Matriculando...' : 'Concluir configuração ✓'}
+                {loading ? (
+                  'Matriculando...'
+                ) : (
+                  <span className="inline-flex items-center justify-center gap-1.5">
+                    Concluir configuração <Check size={16} />
+                  </span>
+                )}
               </button>
             </>
           )}
