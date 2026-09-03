@@ -14,6 +14,7 @@ interface Notification {
   title: string;
   message: string;
   type?: string;
+  category?: string;
   target: string;
   classId?: number;
   createdById?: number;
@@ -28,13 +29,17 @@ const systemMsgIcon: Record<string, any> = {
   educational: BookOpen,
 };
 
-function SystemMsgBadge({ title }: { title: string }) {
-  const Icon = title.includes('✨') ? Star
-    : title.includes('💙') ? Heart
-    : title.includes('😄') ? Smile
-    : title.includes('🔥') ? Zap
-    : title.includes('📚') ? BookOpen
-    : Heart;
+function SystemMsgBadge({ title, category }: { title: string; category?: string }) {
+  // category é a fonte de verdade (ver Notification.category no backend); o
+  // includes() no título fica só de fallback pra notificação antiga que, por
+  // algum motivo, não tenha passado pelo backfill.
+  const Icon = (category && systemMsgIcon[category])
+    || (title.includes('✨') ? Star
+      : title.includes('💙') ? Heart
+      : title.includes('😄') ? Smile
+      : title.includes('🔥') ? Zap
+      : title.includes('📚') ? BookOpen
+      : Heart);
   return (
     <div className="flex items-center gap-1.5 mb-2">
       <div className="w-6 h-6 rounded-lg bg-pink-50 dark:bg-pink-950 flex items-center justify-center">
@@ -187,7 +192,7 @@ export default function DiretorNotificacoesPage() {
               const isSystemMsg = n.type === 'system_message';
               return (
               <div key={n.id} className={`rounded-2xl border p-5 ${isSystemMsg ? 'bg-pink-50/60 dark:bg-pink-950/30 border-pink-100 dark:border-pink-900' : 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800'}`}>
-                {isSystemMsg && <SystemMsgBadge title={n.title} />}
+                {isSystemMsg && <SystemMsgBadge title={n.title} category={n.category} />}
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <h3 className="font-semibold text-[#1E3A5F] dark:text-white text-sm">{n.title}</h3>
                   {!isSystemMsg && (
