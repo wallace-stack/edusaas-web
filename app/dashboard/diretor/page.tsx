@@ -160,8 +160,11 @@ export default function DiretorDashboard() {
           </div>
         </div>
 
-        {/* Alertas acadêmicos */}
-        {data && attNum < 75 && (
+        {/* Alertas acadêmicos — só com base de cálculo real: escola recém-criada, sem
+            nenhum lançamento ainda, tem avgAttendance/avgGrade zerados (0 é o default
+            do backend quando não há registro nenhum, não uma média baixa de verdade),
+            e mostraria alerta vermelho no primeiro acesso sem nenhum aluno cadastrado. */}
+        {data && data.academic.totalAttendanceRecords > 0 && attNum < 75 && (
           <div className="bg-orange-50 dark:bg-orange-950 border border-orange-100 dark:border-orange-800 rounded-2xl p-4 flex items-center gap-3 mb-4">
             <AlertTriangle size={18} className="text-orange-500 flex-shrink-0" />
             <div className="flex-1 min-w-0">
@@ -176,7 +179,7 @@ export default function DiretorDashboard() {
             </button>
           </div>
         )}
-        {data && avgGrade < 6 && (
+        {data && data.academic.totalGrades > 0 && avgGrade < 6 && (
           <div className="bg-yellow-50 dark:bg-yellow-950 border border-yellow-100 dark:border-yellow-800 rounded-2xl p-4 flex items-center gap-3 mb-4">
             <AlertTriangle size={18} className="text-yellow-500 flex-shrink-0" />
             <div className="flex-1 min-w-0">
